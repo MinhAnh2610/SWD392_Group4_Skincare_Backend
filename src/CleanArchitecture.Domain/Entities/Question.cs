@@ -9,4 +9,7 @@ public class Question : Entity<Guid>
     public string? Description { get; set; }
     public string? Instruction { get; set; }
     public string? Section { get; set; }
+    
+    //Navigation Properties
+    public Quiz? Quiz { get; set; }
 }
