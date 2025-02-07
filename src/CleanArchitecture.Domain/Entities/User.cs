@@ -1,6 +1,6 @@
 ﻿namespace CleanArchitecture.Domain.Entities;
 
-public class User : IdentityUser
+public class User : IdentityUser<Guid>
 {
   public DateOnly? BirthDate { get; set; } = new DateOnly();
   public string? FirstName { get; set; } = default!;

@@ -8,7 +8,7 @@ public interface IApplicationDbContext
   Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
 
-public class ApplicationDbContext : IdentityDbContext<User, Role, string>, IApplicationDbContext
+public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>, IApplicationDbContext
 {
   public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
   {

@@ -54,7 +54,7 @@ public class RoleService : IRoleService
     var resultErrors = result.Errors.Select(e => new Error(e.Code, e.Description)).ToList();
     var userProfile = new UserProfileResponse
     {
-      Id = user.Id,
+      Id = user.Id.ToString(),
       UserName = user.UserName!,
       Email = user.Email!,
       BirthDate = user.BirthDate,

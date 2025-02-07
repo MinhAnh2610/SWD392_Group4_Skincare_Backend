@@ -56,8 +56,8 @@ public static class DependencyInjection
     })
       .AddEntityFrameworkStores<ApplicationDbContext>()
       .AddDefaultTokenProviders()
-      .AddUserStore<UserStore<User, Role, ApplicationDbContext>>()
-      .AddRoleStore<RoleStore<Role, ApplicationDbContext>>();
+      .AddUserStore<UserStore<User, Role, ApplicationDbContext, Guid>>()
+      .AddRoleStore<RoleStore<Role, ApplicationDbContext, Guid>>();
 
     // Add authentication & authorization
     services.AddAuthentication(options =>
