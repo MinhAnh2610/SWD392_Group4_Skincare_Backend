@@ -1,10 +1,11 @@
 ﻿namespace CleanArchitecture.Domain.Entities;
 
-public class OrderItem
+public class RefundItem : Entity<Guid>
 {
-  public Guid OrderId { get; set; }
-  public Order Order { get; set; } = default!;
+  public Guid RefundId { get; set; }
+  public Refund Refund { get; set; } = default!;
   public Guid CosmeticId { get; set; }
   public Cosmetic Cosmetic { get; set; } = default!;
   public int Quantity { get; set; }
+  public string Reason { get; set; } = default!;
 }

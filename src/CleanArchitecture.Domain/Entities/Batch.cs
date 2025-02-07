@@ -8,4 +8,5 @@ public class Batch : Entity<Guid>
   public DateOnly ExportedDate { get; set; }
   public DateOnly ManufactureDate { get; set; }
   public DateOnly ExpirationDate { get; set; }
+  public List<Cosmetic> Cosmetics { get; set; } = new List<Cosmetic>();
 }
