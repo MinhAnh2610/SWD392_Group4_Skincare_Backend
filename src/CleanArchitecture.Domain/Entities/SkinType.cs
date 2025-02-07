@@ -1,6 +1,4 @@
-﻿using CleanArchitecture.Domain.Abstraction;
-
-namespace CleanArchitecture.Domain.Entities;
+﻿namespace CleanArchitecture.Domain.Entities;
 
 public class SkinType : Entity<Guid>
 {
@@ -10,4 +8,7 @@ public class SkinType : Entity<Guid>
   public bool IsSensitive { get; set; }
   public bool IsUneven { get; set; }
   public bool IsWrinkle { get; set; }
+  public List<User> Customers { get; set; } = new List<User>();
+  public List<Cosmetic> Cosmetics { get; set; } = new List<Cosmetic>();
+  public List<Routine> Routines { get; set; } = new List<Routine>();
 }

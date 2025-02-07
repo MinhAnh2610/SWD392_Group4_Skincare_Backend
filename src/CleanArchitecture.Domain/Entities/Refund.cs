@@ -1,18 +1,16 @@
-﻿using CleanArchitecture.Domain.Abstraction;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace CleanArchitecture.Domain.Entities;
 
-namespace CleanArchitecture.Domain.Entities
+public class Refund : Entity<Guid>
 {
-    public class Refund : Entity<Guid>
-    {
-        public string Reason { get; set; }
-        public decimal TotalAmount { get; set; }
-        public string Status { get; set; }
-        public DateTime RequestedDate { get; set; }
-        public string Method { get; set; } 
-    }
+  public Guid OrderId { get; set; }
+  public Order Order { get; set; } = default!;
+  public Guid CustomerId { get; set; }
+  public User Customer { get; set; } = default!;
+  public Guid StaffId { get; set; }
+  public User Staff { get; set; } = default!;
+  public string Reason { get; set; } = default!;
+  public decimal TotalAmount { get; set; }
+  public string Status { get; set; } = default!;
+  public string Method { get; set; } = default!;
+  public List<RefundItem> RefundItems { get; set; } = new List<RefundItem>();
 }
