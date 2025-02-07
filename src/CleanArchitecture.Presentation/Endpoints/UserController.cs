@@ -119,5 +119,6 @@ public class UserController : ICarterModule
       Roles = Roles.Admin,
     });
     #endregion
+
   }
 }

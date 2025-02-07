@@ -47,7 +47,6 @@ public static class DependencyInjection
 
     // Register Generic Repository
     services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-
     // Register Redis Caching
     services.AddScoped<IRedisCacheRepository, RedisCacheRepository>();
 
