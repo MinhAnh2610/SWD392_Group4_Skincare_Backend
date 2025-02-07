@@ -59,21 +59,21 @@ public static class DependencyInjection
       .AddUserStore<UserStore<User, Role, ApplicationDbContext, Guid>>()
       .AddRoleStore<RoleStore<Role, ApplicationDbContext, Guid>>();
 
-    // Add authentication & authorization
-    services.AddAuthentication(options =>
-    {
-      options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-      options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-    })
-      .AddCookie()
-      .AddJwtBearer(options =>
-      {
-        options.Authority = "https://localhost:5051";
-        options.TokenValidationParameters = new TokenValidationParameters
+        // Add authentication & authorization
+        services.AddAuthentication(options =>
         {
-          ValidateAudience = false,
-        };
-      });
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+        })
+          .AddCookie()
+          .AddJwtBearer(options =>
+          {
+              options.Authority = "https://localhost:5051";
+              options.TokenValidationParameters = new TokenValidationParameters
+              {
+                  ValidateAudience = false,
+              };
+          });
       //.AddGoogle(options =>
       //{
       //  options.ClientId = config["Authentication:Google:ClientId"]!;
