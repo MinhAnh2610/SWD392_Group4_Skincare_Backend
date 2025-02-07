@@ -1,5 +1,5 @@
 ﻿namespace CleanArchitecture.Domain.Entities;
 
-public class Role : IdentityRole
+public class Role : IdentityRole<Guid>
 {
 }

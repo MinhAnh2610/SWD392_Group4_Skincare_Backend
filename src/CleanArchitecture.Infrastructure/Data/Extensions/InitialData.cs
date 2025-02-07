@@ -7,7 +7,7 @@ internal class InitialData
     {
       new() 
       { 
-        Id = Guid.NewGuid().ToString(), 
+        Id = Guid.NewGuid(), 
         UserName = "Admin123", 
         Email = "admin123@gmail.com", 
         EmailConfirmed = true,
@@ -19,7 +19,7 @@ internal class InitialData
       },
       new()
       {
-        Id = Guid.NewGuid().ToString(),
+        Id = Guid.NewGuid(),
         UserName = "MinhAnh2610",
         Email = "minhanh26102004@gmail.com",
         EmailConfirmed = true,
@@ -34,7 +34,7 @@ internal class InitialData
   public static IEnumerable<Role> Roles =>
     new List<Role>
     {
-      new() { Id = Guid.NewGuid().ToString(), Name = "Admin" },
-      new() { Id = Guid.NewGuid().ToString(), Name = "Customer" }
+      new() { Id = Guid.NewGuid(), Name = "Admin" },
+      new() { Id = Guid.NewGuid(), Name = "Customer" }
     };
 }

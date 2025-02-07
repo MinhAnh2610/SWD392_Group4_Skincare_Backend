@@ -48,7 +48,7 @@ public class ResourceOwnerPasswordValidator : IResourceOwnerPasswordValidator
     // User is valid, create claims
     var claims = new List<Claim>
     {
-      new Claim(JwtClaimTypes.Subject, user.Id),
+      new Claim(JwtClaimTypes.Subject, user.Id.ToString()),
       new Claim(JwtClaimTypes.Email, user.Email!),
       new Claim(JwtClaimTypes.Name, user.UserName!),
       new Claim(JwtClaimTypes.PhoneNumber, user.PhoneNumber!),
@@ -61,6 +61,6 @@ public class ResourceOwnerPasswordValidator : IResourceOwnerPasswordValidator
     var roles = await _userManager.GetRolesAsync(user);
     claims.AddRange(roles.Select(role => new Claim(JwtClaimTypes.Roles, role)));
 
-    context.Result = new GrantValidationResult(user.Id, "password", claims);
+    context.Result = new GrantValidationResult(user.Id.ToString(), "password", claims);
   }
 }

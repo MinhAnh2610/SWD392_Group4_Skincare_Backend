@@ -26,7 +26,7 @@ public class ProfileService : IProfileService
       var claims = new List<Claim>
       {
         // Add standard claims
-        new Claim(JwtClaimTypes.Subject, user.Id),
+        new Claim(JwtClaimTypes.Subject, user.Id.ToString()),
         new Claim(JwtClaimTypes.Name, user.UserName!),
         new Claim(JwtClaimTypes.Email, user.Email!),
           

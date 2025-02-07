@@ -1,0 +1,25 @@
+﻿namespace CleanArchitecture.Domain.Entities;
+
+public class Cosmetic : Entity<Guid>
+{
+  public Guid BrandId { get; set; }
+  public Brand Brand { get; set; } = default!;
+  public Guid SkinTypeId { get; set; } 
+  public SkinType SkinType { get; set; } = default!;
+  public Guid CosmeticTypeId { get; set; }
+  public CosmeticType CosmeticType { get; set; } = default!;
+  public string Name { get; set; } = default!;  
+  public decimal Price { get; set; }
+  public bool Gender { get; set; } = true;
+  public string Notice { get; set; } = default!;
+  public string Ingredients { get; set; } = default!;
+  public string MainUsage { get; set; } = default!;
+  public string Texture { get; set; } = default!;
+  public string Origin { get; set; } = default!;
+  public string Instructions { get; set; } = default!;
+  public List<CosmeticSubcategory> CosmeticSubcategories { get; set; } = new List<CosmeticSubcategory>();
+  public List<CosmeticImage> CosmeticImages { get; set; } = new List<CosmeticImage>();
+  public List<CartItems> CartItems { get; set; } = new List<CartItems>();
+  public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+  public List<Batch> Batches { get; set; } = new List<Batch>();
+}
