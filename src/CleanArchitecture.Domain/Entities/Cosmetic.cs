@@ -22,4 +22,5 @@ public class Cosmetic : Entity<Guid>
   public List<CartItems> CartItems { get; set; } = new List<CartItems>();
   public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
   public List<Batch> Batches { get; set; } = new List<Batch>();
+  public List<RoutineStep> RoutineSteps { get; set; } = new List<RoutineStep>();
 }

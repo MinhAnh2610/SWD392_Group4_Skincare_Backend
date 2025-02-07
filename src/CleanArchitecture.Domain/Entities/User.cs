@@ -8,4 +8,7 @@ public class User : IdentityUser<Guid>
   public bool Gender { get; set; } = true;
   public string? RefreshToken { get; set; }
   public DateTime? RefreshTokenExpiration { get; set; }
+  public List<Blog> Blogs { get; set; } = new List<Blog>();
+  public List<Feedback> Feedbacks { get; set; } = new List<Feedback>();
+  public List<Refund> Refunds { get; set; } = new List<Refund>();
 }
