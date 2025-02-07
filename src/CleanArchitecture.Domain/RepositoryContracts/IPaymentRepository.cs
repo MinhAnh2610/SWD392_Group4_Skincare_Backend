@@ -8,8 +8,10 @@ namespace CleanArchitecture.Domain.RepositoryContracts
 {
     public interface IPaymentRepository : IGenericRepository<Payment>
     {
-        Task<IEnumerable<Payment>> GetPaymentsByStatusAsync(string status);
-        Task<IEnumerable<Payment>> GetPaymentsByDateRangeAsync(DateTime startDate, DateTime endDate);
-        Task<decimal> GetTotalAmountByStatusAsync(string status);
+        public Task<List<Payment>> GetAllAsync()
+        {
+            // Your implementation here...
+            throw new NotImplementedException();
+        }
     }
 }

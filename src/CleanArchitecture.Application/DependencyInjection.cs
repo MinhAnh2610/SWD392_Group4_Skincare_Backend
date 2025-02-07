@@ -7,6 +7,7 @@ using CleanArchitecture.Application.Validators;
 using CleanArchitecture.Application.Validators.Auth;
 using CleanArchitecture.Application.Validators.Role;
 using CleanArchitecture.Application.Validators.User;
+using CleanArchitecture.Domain.RepositoryContracts;
 using IdentityServer4.Validation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,10 +47,13 @@ public static class DependencyInjection
 
     // Add services
     services.AddScoped<IAuthService, AuthService>();
-    //services.AddScoped<IProfileService, ProfileService>();
-    services.AddScoped<IUserService, UserService>();
+    services.AddScoped<IPaymentService,PaymentService>();
+        services.AddScoped<IRefundService, RefundService>();
+        services.AddScoped<IRefundItemService, RefundItemService>();
+        //services.AddScoped<IProfileService, ProfileService>();
+        services.AddScoped<IUserService, UserService>();
     services.AddScoped<IRoleService, RoleService>();
-
-    return services;
+  
+        return services;
   }
 }
