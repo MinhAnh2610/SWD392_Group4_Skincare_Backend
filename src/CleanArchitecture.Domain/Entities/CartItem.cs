@@ -1,6 +1,6 @@
 ﻿namespace CleanArchitecture.Domain.Entities;
 
-public class CartItems
+public class CartItem
 {
   public Guid CustomerId { get; set; }
   public User Customer { get; set; } = default!;

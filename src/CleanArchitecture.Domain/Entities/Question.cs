@@ -8,5 +8,5 @@ public class Question : Entity<Guid>
   public string? Description { get; set; }
   public string? Instruction { get; set; }
   public string? Section { get; set; }
-  public List<QuestionOption> QuestionOptions { get; set; } = new List<QuestionOption>();
+  public List<QuestionOption>? QuestionOptions { get; set; } = new List<QuestionOption>();
 }
