@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 namespace CleanArchitecture.Infrastructure.Data;
@@ -17,7 +18,7 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>, IApplic
 
   protected override void OnModelCreating(ModelBuilder builder)
   {
-    builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     base.OnModelCreating(builder);
   }
 }
