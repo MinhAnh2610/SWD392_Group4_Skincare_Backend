@@ -19,8 +19,9 @@ public class Cosmetic : Entity<Guid>
   public string Instructions { get; set; } = default!;
   public List<CosmeticSubcategory> CosmeticSubcategories { get; set; } = new List<CosmeticSubcategory>();
   public List<CosmeticImage> CosmeticImages { get; set; } = new List<CosmeticImage>();
-  public List<CartItems> CartItems { get; set; } = new List<CartItems>();
+  public List<CartItem> CartItems { get; set; } = new List<CartItem>();
   public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
   public List<Batch> Batches { get; set; } = new List<Batch>();
   public List<RoutineStep> RoutineSteps { get; set; } = new List<RoutineStep>();
+  public List<Feedback> Feedbacks { get; set; } = new List<Feedback>();
 }
