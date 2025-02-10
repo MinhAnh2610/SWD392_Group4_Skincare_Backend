@@ -8,9 +8,9 @@ namespace CleanArchitecture.Application.DTOs.Refund
 {
     public class CreateRefundRequest
     {
-        public string Reason { get; set; }
+        public string? Reason { get; set; }
         public decimal TotalAmount { get; set; }
-        public string Status { get; set; }
-        public string Method { get; set; }
+        public string? Status { get; set; }
+        public string? Method { get; set; }
     }
 }
