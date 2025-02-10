@@ -14,6 +14,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.HasOne(order => order.Coupon)
             .WithMany(coupon => coupon.Orders);
         
-
+        builder.HasMany(order => order.OrderItems)
+            .WithOne(orderItem => orderItem.Order);
     }
 }

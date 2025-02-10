@@ -1,6 +1,6 @@
 ﻿namespace CleanArchitecture.Domain.Entities;
 
-public class CosmeticSubcategory
+public class CosmeticSubCategory
 {
   public Guid CosmeticId { get; set; }
   public Cosmetic Cosmetic { get; set; } = default!;
