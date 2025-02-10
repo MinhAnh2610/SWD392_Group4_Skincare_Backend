@@ -1,6 +1,8 @@
-﻿namespace CleanArchitecture.Infrastructure.Repositories;
+﻿using CleanArchitecture.Domain.RepositoryContracts;
 
-public class SkinTypeRepository : GenericRepository<SkinType>
+namespace CleanArchitecture.Infrastructure.Repositories;
+
+public class SkinTypeRepository : GenericRepository<SkinType>, ISkinTypeRepository
 {
   public SkinTypeRepository(ApplicationDbContext context) : base(context)
   {

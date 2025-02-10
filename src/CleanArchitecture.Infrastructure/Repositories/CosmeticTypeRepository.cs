@@ -1,6 +1,8 @@
-﻿namespace CleanArchitecture.Infrastructure.Repositories;
+﻿using CleanArchitecture.Domain.RepositoryContracts;
 
-public class CosmeticTypeRepository : GenericRepository<CosmeticType>
+namespace CleanArchitecture.Infrastructure.Repositories;
+
+public class CosmeticTypeRepository : GenericRepository<CosmeticType>, ICosmeticTypeRepository
 {
   public CosmeticTypeRepository(ApplicationDbContext context) : base(context)
   {

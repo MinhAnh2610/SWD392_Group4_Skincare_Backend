@@ -1,6 +1,8 @@
-﻿namespace CleanArchitecture.Infrastructure.Repositories;
+﻿using CleanArchitecture.Domain.RepositoryContracts;
 
-public class CartItemRepository : GenericRepository<CartItem>
+namespace CleanArchitecture.Infrastructure.Repositories;
+
+public class CartItemRepository : GenericRepository<CartItem>, ICartItemRepository
 {
   public CartItemRepository(ApplicationDbContext context) : base(context)
   {

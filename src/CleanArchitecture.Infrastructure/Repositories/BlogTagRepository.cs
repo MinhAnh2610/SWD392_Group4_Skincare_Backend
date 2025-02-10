@@ -1,6 +1,8 @@
-﻿namespace CleanArchitecture.Infrastructure.Repositories;
+﻿using CleanArchitecture.Domain.RepositoryContracts;
 
-public class BlogTagRepository : GenericRepository<BlogTag>
+namespace CleanArchitecture.Infrastructure.Repositories;
+
+public class BlogTagRepository : GenericRepository<BlogTag>, IBlogTagRepository
 {
   public BlogTagRepository(ApplicationDbContext context) : base(context)
   {

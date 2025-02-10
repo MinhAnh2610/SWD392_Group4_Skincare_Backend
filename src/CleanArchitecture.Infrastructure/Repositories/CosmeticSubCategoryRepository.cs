@@ -1,6 +1,8 @@
-﻿namespace CleanArchitecture.Infrastructure.Repositories;
+﻿using CleanArchitecture.Domain.RepositoryContracts;
 
-public class CosmeticSubCategoryRepository : GenericRepository<CosmeticSubCategory>
+namespace CleanArchitecture.Infrastructure.Repositories;
+
+public class CosmeticSubCategoryRepository : GenericRepository<CosmeticSubCategory>, ICosmeticSubCategoryRepository
 {
   public CosmeticSubCategoryRepository(ApplicationDbContext context) : base(context)
   {

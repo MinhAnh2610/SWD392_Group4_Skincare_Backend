@@ -1,6 +1,8 @@
-﻿namespace CleanArchitecture.Infrastructure.Repositories;
+﻿using CleanArchitecture.Domain.RepositoryContracts;
 
-public class BatchRepository : GenericRepository<Batch>
+namespace CleanArchitecture.Infrastructure.Repositories;
+
+public class BatchRepository : GenericRepository<Batch>, IBatchRepository
 {
   public BatchRepository(ApplicationDbContext context) : base(context)
   {

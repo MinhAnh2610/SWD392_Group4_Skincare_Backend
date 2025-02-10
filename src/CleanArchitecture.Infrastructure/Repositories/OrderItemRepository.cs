@@ -1,6 +1,8 @@
-﻿namespace CleanArchitecture.Infrastructure.Repositories;
+﻿using CleanArchitecture.Domain.RepositoryContracts;
 
-public class OrderItemRepository : GenericRepository<OrderItem>
+namespace CleanArchitecture.Infrastructure.Repositories;
+
+public class OrderItemRepository : GenericRepository<OrderItem>, IOrderItemRepository
 {
   public OrderItemRepository(ApplicationDbContext context) : base(context)
   {

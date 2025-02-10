@@ -1,6 +1,8 @@
-﻿namespace CleanArchitecture.Infrastructure.Repositories;
+﻿using CleanArchitecture.Domain.RepositoryContracts;
 
-public class SubCategoryRepository : GenericRepository<SubCategory>
+namespace CleanArchitecture.Infrastructure.Repositories;
+
+public class SubCategoryRepository : GenericRepository<SubCategory>, ISubCategoryRepository
 {
   public SubCategoryRepository(ApplicationDbContext context) : base(context)
   {
