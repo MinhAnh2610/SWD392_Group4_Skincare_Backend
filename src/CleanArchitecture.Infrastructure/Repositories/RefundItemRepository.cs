@@ -1,15 +1,8 @@
-﻿using CleanArchitecture.Domain.Entities;
-using CleanArchitecture.Domain.RepositoryContracts;
-using CleanArchitecture.Infrastructure.Repositories.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CleanArchitecture.Domain.RepositoryContracts;
 
 namespace CleanArchitecture.Infrastructure.Repositories
 {
-    public class RefundItemRepository :  GenericRepository<RefundItem>, IRefundItemRepository
+  public class RefundItemRepository :  GenericRepository<RefundItem>, IRefundItemRepository
     {
         public RefundItemRepository(ApplicationDbContext context) : base(context)
         {
