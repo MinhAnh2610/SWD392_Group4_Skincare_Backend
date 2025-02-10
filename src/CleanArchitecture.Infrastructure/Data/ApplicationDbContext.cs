@@ -7,21 +7,22 @@ namespace CleanArchitecture.Infrastructure.Data;
 
 public interface IApplicationDbContext
 {
-  Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
 
 public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>, IApplicationDbContext
 {
-  public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-  {
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+    {
 
-  }
+    }
 
-  protected override void OnModelCreating(ModelBuilder builder)
-  {
-       
-    builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-    builder.ApplyConfiguration(new BlogConfiguration());
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+
+        builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+        builder.ApplyConfiguration(new BlogConfiguration());
         builder.ApplyConfiguration(new BlogTagConfiguration());
         builder.ApplyConfiguration(new CartItemConfiguration());
         builder.ApplyConfiguration(new CartConfiguration());
@@ -40,5 +41,5 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>, IApplic
         builder.ApplyConfiguration(new RefundConfiguration());
         builder.ApplyConfiguration(new RefundItemConfiguration());
         base.OnModelCreating(builder);
-  }
+    }
 }
