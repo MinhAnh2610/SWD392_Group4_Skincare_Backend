@@ -1,9 +1,8 @@
 ﻿using CleanArchitecture.Domain.RepositoryContracts;
-using CleanArchitecture.Infrastructure.Repositories.Base;
 
 namespace CleanArchitecture.Infrastructure.Repositories
 {
-    public class RefundRepository : GenericRepository<Refund>, IRefundRepository
+  public class RefundRepository : GenericRepository<Refund>, IRefundRepository
     {
         public RefundRepository(ApplicationDbContext context) : base(context)
         {
