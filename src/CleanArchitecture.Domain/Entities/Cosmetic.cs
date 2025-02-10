@@ -17,7 +17,7 @@ public class Cosmetic : Entity<Guid>
   public string Texture { get; set; } = default!;
   public string Origin { get; set; } = default!;
   public string Instructions { get; set; } = default!;
-  public List<CosmeticSubcategory> CosmeticSubcategories { get; set; } = new List<CosmeticSubcategory>();
+  public List<CosmeticSubCategory> CosmeticSubcategories { get; set; } = new List<CosmeticSubCategory>();
   public List<CosmeticImage> CosmeticImages { get; set; } = new List<CosmeticImage>();
   public List<CartItem> CartItems { get; set; } = new List<CartItem>();
   public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();

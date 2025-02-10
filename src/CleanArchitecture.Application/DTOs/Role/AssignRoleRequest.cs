@@ -1,3 +1,3 @@
 ﻿namespace CleanArchitecture.Application.DTOs.Role;
 
-public record AssignRoleRequest(string UserName, List<string> Roles);
+public record AssignRoleRequest(string? UserName, List<string>? Roles);

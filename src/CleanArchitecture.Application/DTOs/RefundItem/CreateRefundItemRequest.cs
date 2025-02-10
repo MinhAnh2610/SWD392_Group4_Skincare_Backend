@@ -9,6 +9,6 @@ namespace CleanArchitecture.Application.DTOs.RefundItem
     public class CreateRefundItemRequest
     {
         public int Quantity { get; set; }
-        public string Reason { get; set; }
+        public string? Reason { get; set; }
     }
 }

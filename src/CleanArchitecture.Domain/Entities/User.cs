@@ -14,4 +14,6 @@ public class User : IdentityUser<Guid>
     public List<Feedback> Feedbacks { get; set; } = new List<Feedback>();
     public List<Refund> Refunds { get; set; } = new List<Refund>();
     public List<Order> Orders { get; set; } = new List<Order>();
+    public List<Testimonial>? Testimonials { get; set; } = new List<Testimonial>();
+    public List<UserRole>? UserRoles { get; set; } = new List<UserRole>();
 }
