@@ -6,7 +6,6 @@ using CleanArchitecture.Infrastructure.Auth;
 using CleanArchitecture.Infrastructure.Data.Interceptors;
 using CleanArchitecture.Infrastructure.Redis;
 using CleanArchitecture.Infrastructure.Repositories;
-using CleanArchitecture.Infrastructure.Repositories.Base;
 using CleanArchitecture.Infrastructure.Repositories.UnitOfWork;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -49,15 +48,15 @@ public static class DependencyInjection
 
     // Register Generic Repository
     services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-    
-    // Register Repositories    
-        services.AddScoped(typeof(IPaymentRepository), typeof(PaymentRepository));
-        services.AddScoped(typeof(IRefundRepository), typeof(RefundRepository));
-        services.AddScoped(typeof(IRefundItemRepository), typeof(RefundItemRepository));
-        // Register Redis Caching
-        services.AddScoped<IRedisCacheRepository, RedisCacheRepository>();
-   
 
-        return services;
+    // Register Repositories    
+    services.AddScoped(typeof(IPaymentRepository), typeof(PaymentRepository));
+    services.AddScoped(typeof(IRefundRepository), typeof(RefundRepository));
+    services.AddScoped(typeof(IRefundItemRepository), typeof(RefundItemRepository));
+
+    // Register Redis Caching
+    services.AddScoped<IRedisCacheRepository, RedisCacheRepository>();
+
+    return services;
   }
 }

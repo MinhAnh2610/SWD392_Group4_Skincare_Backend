@@ -1,6 +1,5 @@
 ﻿using CleanArchitecture.Infrastructure.Data.Configuration;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 namespace CleanArchitecture.Infrastructure.Data;
