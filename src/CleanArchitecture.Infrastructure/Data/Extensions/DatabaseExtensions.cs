@@ -40,15 +40,15 @@ public static class DatabaseExtensions
 
   private static async Task SeedUserAsync(ApplicationDbContext context, UserManager<User> userManager)
   {
-    //if (!await context.Users.AnyAsync())
-    //{
-    //  //await context.Users.AddRangeAsync(InitialData.Users);
-    //  //await context.SaveChangesAsync();
-    //  foreach (var user in InitialData.Users)
-    //  {
-    //    await userManager.CreateAsync(user, "12345");
-    //    await userManager.AddToRolesAsync(user, ["Admin", "Customer"]);
-    //  }
-    //}
-  }
+        //if (!await context.Users.AnyAsync())
+        //{
+        //    //await context.Users.AddRangeAsync(InitialData.Users);
+        //    //await context.SaveChangesAsync();
+        //    foreach (var user in InitialData.Users)
+        //    {
+        //        await userManager.CreateAsync(user, "12345");
+        //        await userManager.AddToRolesAsync(user, ["Admin", "Customer"]);
+        //    }
+        //}
+    }
 }
