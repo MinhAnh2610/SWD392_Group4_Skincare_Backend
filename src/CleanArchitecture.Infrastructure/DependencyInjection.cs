@@ -49,10 +49,39 @@ public static class DependencyInjection
     // Register Generic Repository
     services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
-    // Register Repositories    
+    #region Register Repositories
+    services.AddScoped(typeof(IBatchRepository), typeof(BatchRepository));
+    services.AddScoped(typeof(IBlogRepository), typeof(BlogRepository));
+    services.AddScoped(typeof(IBlogTagRepository), typeof(BlogTagRepository));
+    services.AddScoped(typeof(IBrandRepository), typeof(BrandRepository));
+    services.AddScoped(typeof(ICartItemRepository), typeof(CartItemRepository));
+    services.AddScoped(typeof(ICartRepository), typeof(CartRepository));
+    services.AddScoped(typeof(ICategoryRepository), typeof(CategoryRepository));
+    services.AddScoped(typeof(ICompanyInformationRepository), typeof(CompanyInformationRepository));
+    services.AddScoped(typeof(ICosmeticImageRepository), typeof(CosmeticImageRepository));
+    services.AddScoped(typeof(ICosmeticRepository), typeof(CosmeticRepository));
+    services.AddScoped(typeof(ICosmeticSubCategoryRepository), typeof(CosmeticSubCategoryRepository));
+    services.AddScoped(typeof(ICosmeticTypeRepository), typeof(CosmeticTypeRepository));
+    services.AddScoped(typeof(ICouponRepository), typeof(CouponRepository));
+    services.AddScoped(typeof(IFAQRepository), typeof(FAQRepository));
+    services.AddScoped(typeof(IFeedbackRepository), typeof(FeedbackRepository));
+    services.AddScoped(typeof(IOrderItemRepository), typeof(OrderItemRepository));
+    services.AddScoped(typeof(IOrderRepository), typeof(OrderRepository));
     services.AddScoped(typeof(IPaymentRepository), typeof(PaymentRepository));
+    services.AddScoped(typeof(IPolicyRepository), typeof(PolicyRepository));
+    services.AddScoped(typeof(IQuestionOptionRepository), typeof(QuestionOptionRepository));
+    services.AddScoped(typeof(IQuestionRepository), typeof(QuestionRepository));
+    services.AddScoped(typeof(IQuestionTypeRepository), typeof(QuestionTypeRepository));
+    services.AddScoped(typeof(IQuizRepository), typeof(QuizRepository));
     services.AddScoped(typeof(IRefundRepository), typeof(RefundRepository));
     services.AddScoped(typeof(IRefundItemRepository), typeof(RefundItemRepository));
+    services.AddScoped(typeof(IRoutineRepository), typeof(RoutineRepository));
+    services.AddScoped(typeof(IRoutineStepRepository), typeof(RoutineStepRepository));
+    services.AddScoped(typeof(ISkinTypeRepository), typeof(SkinTypeRepository));
+    services.AddScoped(typeof(ISubCategoryRepository), typeof(SubCategoryRepository));
+    services.AddScoped(typeof(ITagRepository), typeof(TagRepository));
+    services.AddScoped(typeof(ITestimonialRepository), typeof(TestimonialRepository));
+    #endregion 
 
     // Register Redis Caching
     services.AddScoped<IRedisCacheRepository, RedisCacheRepository>();
