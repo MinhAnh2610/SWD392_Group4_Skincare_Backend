@@ -23,6 +23,9 @@ public static class DatabaseExtensions
   {
     await SeedRoleAsync(context, roleManager);
     await SeedUserAsync(context, userManager);
+    await SeedCompanyInformationAsync(context);
+    await SeedFAQAsync(context);
+    await SeedPolicyAsync(context);
   }
 
   private static async Task SeedRoleAsync(ApplicationDbContext context, RoleManager<Role> roleManager)
@@ -49,6 +52,33 @@ public static class DatabaseExtensions
         await userManager.CreateAsync(user, "12345");
         await userManager.AddToRolesAsync(user, ["Admin", "Customer"]);
       }
+    }
+  }
+
+  private static async Task SeedCompanyInformationAsync(ApplicationDbContext context)
+  {
+    if (!await context.CompanyInformation.AnyAsync())
+    {
+      await context.CompanyInformation.AddRangeAsync(InitialData.CompanyInfos);
+      await context.SaveChangesAsync();
+    }
+  }
+
+  private static async Task SeedFAQAsync(ApplicationDbContext context)
+  {
+    if (!await context.FAQs.AnyAsync())
+    {
+      await context.FAQs.AddRangeAsync(InitialData.FAQs);
+      await context.SaveChangesAsync();
+    }
+  }
+
+  private static async Task SeedPolicyAsync(ApplicationDbContext context)
+  {
+    if (!await context.Policies.AnyAsync())
+    {
+      await context.Policies.AddRangeAsync(InitialData.Policies);
+      await context.SaveChangesAsync();
     }
   }
 }

@@ -1,6 +1,8 @@
-﻿namespace CleanArchitecture.Infrastructure.Repositories;
+﻿using CleanArchitecture.Domain.RepositoryContracts;
 
-public class TestimonialRepository : GenericRepository<Testimonial>
+namespace CleanArchitecture.Infrastructure.Repositories;
+
+public class TestimonialRepository : GenericRepository<Testimonial>, ITestimonialRepository
 {
   public TestimonialRepository(ApplicationDbContext context) : base(context)
   {
