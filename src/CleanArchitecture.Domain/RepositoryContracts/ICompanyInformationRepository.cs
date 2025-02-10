@@ -1,5 +1,5 @@
 ﻿namespace CleanArchitecture.Domain.RepositoryContracts;
 
-public interface ICompanyInformationRepository
+public interface ICompanyInformationRepository : IGenericRepository<CompanyInformation>
 {
 }
