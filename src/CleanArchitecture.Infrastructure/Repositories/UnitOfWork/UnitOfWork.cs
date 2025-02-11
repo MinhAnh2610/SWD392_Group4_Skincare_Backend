@@ -7,6 +7,8 @@ public class UnitOfWork : IUnitOfWork
 {
   private readonly ApplicationDbContext _context;
   public ICompanyInformationRepository CompanyInformation { get; }
+  public IFAQRepository FAQs { get; }
+  public IPolicyRepository Policies { get; }
   public IPaymentRepository Payments { get; }
   public IRefundRepository Refunds { get; }
   public IRefundItemRepository RefundItems { get; }
@@ -15,6 +17,8 @@ public class UnitOfWork : IUnitOfWork
   {
     _context = context;
     CompanyInformation = new CompanyInformationRepository(_context);
+    FAQs = new FAQRepository(_context);
+    Policies = new PolicyRepository(_context);
     Payments = new PaymentRepository(_context);
     Refunds = new RefundRepository(_context);
     RefundItems = new RefundItemRepository(_context);
