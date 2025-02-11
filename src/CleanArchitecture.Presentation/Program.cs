@@ -28,7 +28,7 @@ builder.Services.AddSwaggerGen(opt =>
               opt.SwaggerDoc("v1",
               new OpenApiInfo
               {
-                Title = "Cursus API - " + version,
+                Title = "De Fleur API - " + version,
                 Version = version
               }
                );
@@ -47,7 +47,7 @@ if (app.Environment.IsDevelopment())
   app.UseSwaggerUI(c =>
   //https://localhost:5051/swagger/
   {
-    c.SwaggerEndpoint("/openapi/v1.json", "Cursus API");
+    c.SwaggerEndpoint("/openapi/v1.json", "De Fleur API");
     //c.RoutePrefix = string.Empty;
   });
   await app.InitializeDatabaseAsync();
