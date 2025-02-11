@@ -15,25 +15,30 @@ namespace CleanArchitecture.Infrastructure;
 
 public static class DependencyInjection
 {
-  public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
+  public static IServiceCollection AddInfrastructureServices(this IServiceCollection services,
+    IConfiguration configuration)
   {
     // Add services to the container
     services.AddIdentityServer()
-            //.AddAspNetIdentity<User>()
-            .AddInMemoryApiScopes(Config.ApiScopes)      // Define API scopes
-            .AddInMemoryApiResources(Config.ApiResources) // Define API resources
-            .AddInMemoryClients(Config.Clients)          // Define clients
-            .AddInMemoryIdentityResources(Config.IdentityResources)
-            .AddDeveloperSigningCredential()            // Use for dev, use a real certificate in prod
-            .AddProfileService<ProfileService>();
+      //.AddAspNetIdentity<User>()
+      .AddInMemoryApiScopes(Config.ApiScopes) // Define API scopes
+      .AddInMemoryApiResources(Config.ApiResources) // Define API resources
+      .AddInMemoryClients(Config.Clients) // Define clients
+      .AddInMemoryIdentityResources(Config.IdentityResources)
+      .AddDeveloperSigningCredential() // Use for dev, use a real certificate in prod
+      .AddProfileService<ProfileService>();
 
     services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
 
     services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
     {
       options.AddInterceptors(serviceProvider.GetServices<ISaveChangesInterceptor>());
-      //options.UseNpgsql(configuration.GetConnectionString("Database"));
-      options.UseInMemoryDatabase("Database");
+
+      string? connectionString = Environment.GetEnvironmentVariable("databaseConnectionString");
+      // if (string.IsNullOrEmpty(connectionString))
+      //   connectionString = configuration.GetConnectionString("DevDatabase");
+        
+      options.UseNpgsql(connectionString);
     });
 
     services.AddStackExchangeRedisCache(options =>
@@ -50,6 +55,7 @@ public static class DependencyInjection
     services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
     #region Register Repositories
+
     services.AddScoped(typeof(IBatchRepository), typeof(BatchRepository));
     services.AddScoped(typeof(IBlogRepository), typeof(BlogRepository));
     services.AddScoped(typeof(IBlogTagRepository), typeof(BlogTagRepository));
@@ -60,7 +66,8 @@ public static class DependencyInjection
     services.AddScoped(typeof(ICompanyInformationRepository), typeof(CompanyInformationRepository));
     services.AddScoped(typeof(ICosmeticImageRepository), typeof(CosmeticImageRepository));
     services.AddScoped(typeof(ICosmeticRepository), typeof(CosmeticRepository));
-    services.AddScoped(typeof(ICosmeticSubCategoryRepository), typeof(CosmeticSubCategoryRepository));
+    services.AddScoped(typeof(ICosmeticSubCategoryRepository),
+      typeof(CosmeticSubCategoryRepository));
     services.AddScoped(typeof(ICosmeticTypeRepository), typeof(CosmeticTypeRepository));
     services.AddScoped(typeof(ICouponRepository), typeof(CouponRepository));
     services.AddScoped(typeof(IFAQRepository), typeof(FAQRepository));
@@ -81,7 +88,8 @@ public static class DependencyInjection
     services.AddScoped(typeof(ISubCategoryRepository), typeof(SubCategoryRepository));
     services.AddScoped(typeof(ITagRepository), typeof(TagRepository));
     services.AddScoped(typeof(ITestimonialRepository), typeof(TestimonialRepository));
-    #endregion 
+
+    #endregion
 
     // Register Redis Caching
     services.AddScoped<IRedisCacheRepository, RedisCacheRepository>();
