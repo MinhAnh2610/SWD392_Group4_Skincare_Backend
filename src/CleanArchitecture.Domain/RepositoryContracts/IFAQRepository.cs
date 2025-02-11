@@ -1,5 +1,5 @@
 ﻿namespace CleanArchitecture.Domain.RepositoryContracts;
 
-public interface IFAQRepository
+public interface IFAQRepository : IGenericRepository<FAQ>
 {
 }

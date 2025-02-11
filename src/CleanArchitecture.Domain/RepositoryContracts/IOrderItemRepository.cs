@@ -1,5 +1,5 @@
 ﻿namespace CleanArchitecture.Domain.RepositoryContracts;
 
-public interface IOrderItemRepository
+public interface IOrderItemRepository : IGenericRepository<OrderItem>
 {
 }

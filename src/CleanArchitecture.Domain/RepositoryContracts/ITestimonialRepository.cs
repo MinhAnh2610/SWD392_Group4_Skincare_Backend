@@ -1,5 +1,5 @@
 ﻿namespace CleanArchitecture.Domain.RepositoryContracts;
 
-public interface ITestimonialRepository
+public interface ITestimonialRepository : IGenericRepository<Testimonial>
 {
 }

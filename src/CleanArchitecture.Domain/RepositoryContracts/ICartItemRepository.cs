@@ -1,5 +1,5 @@
 ﻿namespace CleanArchitecture.Domain.RepositoryContracts;
 
-public interface ICartItemRepository
+public interface ICartItemRepository : IGenericRepository<CartItem>
 {
 }

@@ -1,5 +1,5 @@
 ﻿namespace CleanArchitecture.Domain.RepositoryContracts;
 
-public interface IRoutineStepRepository
+public interface IRoutineStepRepository : IGenericRepository<RoutineStep>
 {
 }

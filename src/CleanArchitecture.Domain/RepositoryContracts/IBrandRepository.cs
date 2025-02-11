@@ -1,5 +1,5 @@
 ﻿namespace CleanArchitecture.Domain.RepositoryContracts;
 
-public interface IBrandRepository
+public interface IBrandRepository : IGenericRepository<Brand>
 {
 }

@@ -1,5 +1,5 @@
 ﻿namespace CleanArchitecture.Domain.RepositoryContracts;
 
-public interface ISkinTypeRepository
+public interface ISkinTypeRepository : IGenericRepository<SkinType>
 {
 }

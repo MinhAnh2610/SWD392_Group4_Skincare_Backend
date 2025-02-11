@@ -1,5 +1,5 @@
 ﻿namespace CleanArchitecture.Domain.RepositoryContracts;
 
-public interface ICouponRepository
+public interface ICouponRepository : IGenericRepository<Coupon>
 {
 }

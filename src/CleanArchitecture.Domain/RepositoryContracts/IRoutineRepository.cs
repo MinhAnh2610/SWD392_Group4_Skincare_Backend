@@ -1,5 +1,5 @@
 ﻿namespace CleanArchitecture.Domain.RepositoryContracts;
 
-public interface IRoutineRepository
+public interface IRoutineRepository : IGenericRepository<Routine>
 {
 }

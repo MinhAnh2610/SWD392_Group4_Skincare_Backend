@@ -1,5 +1,5 @@
 ﻿namespace CleanArchitecture.Domain.RepositoryContracts;
 
-public interface IFeedbackRepository
+public interface IFeedbackRepository : IGenericRepository<Feedback>
 {
 }

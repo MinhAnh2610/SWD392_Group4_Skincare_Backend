@@ -1,5 +1,5 @@
 ﻿namespace CleanArchitecture.Domain.RepositoryContracts;
 
-public interface ICategoryRepository
+public interface ICategoryRepository : IGenericRepository<Category>
 {
 }

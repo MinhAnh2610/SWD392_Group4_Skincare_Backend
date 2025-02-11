@@ -1,5 +1,5 @@
 ﻿namespace CleanArchitecture.Domain.RepositoryContracts;
 
-public interface IQuestionOptionRepository
+public interface IQuestionOptionRepository : IGenericRepository<QuestionOption>
 {
 }
