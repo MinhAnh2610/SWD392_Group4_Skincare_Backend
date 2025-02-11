@@ -1,5 +1,5 @@
 ﻿namespace CleanArchitecture.Domain.RepositoryContracts;
 
-public interface ICosmeticRepository
+public interface ICosmeticRepository : IGenericRepository<Cosmetic>
 {
 }

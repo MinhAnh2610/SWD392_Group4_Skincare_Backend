@@ -1,5 +1,5 @@
 ﻿namespace CleanArchitecture.Domain.RepositoryContracts;
 
-public interface IBlogRepository
+public interface IBlogRepository : IGenericRepository<Blog>
 {
 }

@@ -1,5 +1,5 @@
 ﻿namespace CleanArchitecture.Domain.RepositoryContracts;
 
-public interface IQuizRepository
+public interface IQuizRepository : IGenericRepository<Quiz>
 {
 }
