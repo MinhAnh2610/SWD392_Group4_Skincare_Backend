@@ -13,7 +13,10 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>, IApplic
 {
   public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
   {
-
+  }
+  
+  public ApplicationDbContext()
+  {
   }
 
   public DbSet<Batch> Batches => Set<Batch>();
