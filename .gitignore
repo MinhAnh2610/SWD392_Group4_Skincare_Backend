@@ -364,3 +364,9 @@ FodyWeavers.xsd
 
 # Rider Idea
 .idea/
+
+# env
+.env
+.env/
+env
+*.env

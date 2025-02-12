@@ -17,8 +17,6 @@ databaseConnectionString=Server=skincare.db;Database=skincare;User Id=admin;Pass
 - ### Step 1:
  - Run `docker-compose`, this will create two services (Web API and Database).
 - ### Step 2:
- - Run `docker-compose`, this will create two services (Web API and Database).
-- ### Step 3:
  - Web API should be accessible at http://localhost:8080/swagger/index.html
  
 # Guide to update database
