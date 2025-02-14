@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using CleanArchitecture.Application.Enums;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,17 +24,35 @@ public static class DatabaseExtensions
   {
     await SeedRoleAsync(context, roleManager);
     await SeedUserAsync(context, userManager);
+    await SeedBatchAsync(context);
+    await SeedBlogAsync(context);
+    await SeedBlogTagAsync(context);
+    await SeedBrandAsync(context);
+    await SeedCartAsync(context);
+    await SeedCartItemAsync(context);
+    await SeedCategoryAsync(context);
     await SeedCompanyInformationAsync(context);
+    await SeedCosmeticAsync(context);
+    await SeedCosmeticImageAsync(context);
+    await SeedCosmeticSubCategoryAsync(context);
+    await SeedCosmeticTypeAsync(context);
+    await SeedCouponAsync(context);
     await SeedFAQAsync(context);
+    await SeedFeedbackAsync(context);
+    await SeedOrderAsync(context);
+    await SeedOrderItemAsync(context);
     await SeedPolicyAsync(context);
+    await SeedRoutineAsync(context);
+    await SeedRoutineStepAsync(context);
+    await SeedSkinTypeAsync(context);
+    await SeedSubCategoryAsync(context);
+    await SeedTagAsync(context);
   }
 
   private static async Task SeedRoleAsync(ApplicationDbContext context, RoleManager<Role> roleManager)
   {
     if (!await context.Roles.AnyAsync())
     {
-      //await context.Roles.AddRangeAsync(InitialData.Roles);
-      //await context.SaveChangesAsync();
       foreach (var role in InitialData.Roles)
       {
         await roleManager.CreateAsync(role);
@@ -45,13 +64,90 @@ public static class DatabaseExtensions
   {
     if (!await context.Users.AnyAsync())
     {
-      //await context.Users.AddRangeAsync(InitialData.Users);
-      //await context.SaveChangesAsync();
-      foreach (var user in InitialData.Users)
+      var managers = InitialData.Users.Skip(0).Take(2).ToList();
+      var staffs = InitialData.Users.Skip(2).Take(3).ToList();
+      var customers = InitialData.Users.Skip(5).Take(2).ToList();
+
+      foreach (var user in managers)
       {
         await userManager.CreateAsync(user, "12345");
-        await userManager.AddToRolesAsync(user, ["Admin", "Customer"]);
+        await userManager.AddToRoleAsync(user, Roles.Manager);
       }
+
+      foreach (var user in staffs)
+      {
+        await userManager.CreateAsync(user, "12345");
+        await userManager.AddToRoleAsync(user, Roles.Staff);
+      }
+
+      foreach (var user in customers)
+      {
+        await userManager.CreateAsync(user, "12345");
+        await userManager.AddToRoleAsync(user, Roles.Customer);
+      }
+    }
+  }
+
+  private static async Task SeedBatchAsync(ApplicationDbContext context)
+  {
+    if (!await context.Batches.AnyAsync())
+    {
+      await context.Batches.AddRangeAsync(InitialData.Batches);
+      await context.SaveChangesAsync();
+    }
+  }
+
+  private static async Task SeedBlogAsync(ApplicationDbContext context)
+  {
+    if (!await context.Blogs.AnyAsync())
+    {
+      await context.Blogs.AddRangeAsync(InitialData.Blogs);
+      await context.SaveChangesAsync();
+    }
+  }
+
+  private static async Task SeedBlogTagAsync(ApplicationDbContext context)
+  {
+    if (!await context.BlogsTags.AnyAsync())
+    {
+      await context.BlogsTags.AddRangeAsync(InitialData.BlogTags);
+      await context.SaveChangesAsync();
+    }
+  }
+
+  private static async Task SeedBrandAsync(ApplicationDbContext context)
+  {
+    if (!await context.Brands.AnyAsync())
+    {
+      await context.Brands.AddRangeAsync(InitialData.Brands);
+      await context.SaveChangesAsync();
+    }
+  }
+
+  private static async Task SeedCartAsync(ApplicationDbContext context)
+  {
+    if (!await context.Carts.AnyAsync())
+    {
+      await context.Carts.AddRangeAsync(InitialData.Carts);
+      await context.SaveChangesAsync();
+    }
+  }
+
+  private static async Task SeedCartItemAsync(ApplicationDbContext context)
+  {
+    if (!await context.CartItems.AnyAsync())
+    {
+      await context.CartItems.AddRangeAsync(InitialData.CartItems);
+      await context.SaveChangesAsync();
+    }
+  }
+
+  private static async Task SeedCategoryAsync(ApplicationDbContext context)
+  {
+    if (!await context.Categories.AnyAsync())
+    {
+      await context.Categories.AddRangeAsync(InitialData.Categories);
+      await context.SaveChangesAsync();
     }
   }
 
@@ -60,6 +156,51 @@ public static class DatabaseExtensions
     if (!await context.CompanyInformation.AnyAsync())
     {
       await context.CompanyInformation.AddRangeAsync(InitialData.CompanyInfos);
+      await context.SaveChangesAsync();
+    }
+  }
+
+  private static async Task SeedCosmeticAsync(ApplicationDbContext context)
+  {
+    if (!await context.Cosmetics.AnyAsync())
+    {
+      await context.Cosmetics.AddRangeAsync(InitialData.Cosmetics);
+      await context.SaveChangesAsync();
+    }
+  }
+
+  private static async Task SeedCosmeticImageAsync(ApplicationDbContext context)
+  {
+    if (!await context.CosmeticsImages.AnyAsync())
+    {
+      await context.CosmeticsImages.AddRangeAsync(InitialData.CosmeticImages);
+      await context.SaveChangesAsync();
+    }
+  }
+
+  private static async Task SeedCosmeticSubCategoryAsync(ApplicationDbContext context)
+  {
+    if (!await context.CosmeticSubCategories.AnyAsync())
+    {
+      await context.CosmeticSubCategories.AddRangeAsync(InitialData.CosmeticSubCategories);
+      await context.SaveChangesAsync();
+    }
+  }
+
+  private static async Task SeedCosmeticTypeAsync(ApplicationDbContext context)
+  {
+    if (!await context.CosmeticTypes.AnyAsync())
+    {
+      await context.CosmeticTypes.AddRangeAsync(InitialData.CosmeticTypes);
+      await context.SaveChangesAsync();
+    }
+  }
+
+  private static async Task SeedCouponAsync(ApplicationDbContext context)
+  {
+    if (!await context.Coupons.AnyAsync())
+    {
+      await context.Coupons.AddRangeAsync(InitialData.Coupons);
       await context.SaveChangesAsync();
     }
   }
@@ -73,11 +214,83 @@ public static class DatabaseExtensions
     }
   }
 
+  private static async Task SeedFeedbackAsync(ApplicationDbContext context)
+  {
+    if (!await context.Feedbacks.AnyAsync())
+    {
+      await context.Feedbacks.AddRangeAsync(InitialData.Feedbacks);
+      await context.SaveChangesAsync();
+    }
+  }
+
+  private static async Task SeedOrderAsync(ApplicationDbContext context)
+  {
+    if (!await context.Orders.AnyAsync())
+    {
+      await context.Orders.AddRangeAsync(InitialData.Orders);
+      await context.SaveChangesAsync();
+    }
+  }
+
+  private static async Task SeedOrderItemAsync(ApplicationDbContext context)
+  {
+    if (!await context.OrderItems.AnyAsync())
+    {
+      await context.OrderItems.AddRangeAsync(InitialData.OrderItems);
+      await context.SaveChangesAsync();
+    }
+  }
+
   private static async Task SeedPolicyAsync(ApplicationDbContext context)
   {
     if (!await context.Policies.AnyAsync())
     {
       await context.Policies.AddRangeAsync(InitialData.Policies);
+      await context.SaveChangesAsync();
+    }
+  }
+
+  private static async Task SeedRoutineAsync(ApplicationDbContext context)
+  {
+    if (!await context.Routines.AnyAsync())
+    {
+      await context.Routines.AddRangeAsync(InitialData.Routines);
+      await context.SaveChangesAsync();
+    }
+  }
+
+  private static async Task SeedRoutineStepAsync(ApplicationDbContext context)
+  {
+    if (!await context.RoutineSteps.AnyAsync())
+    {
+      await context.RoutineSteps.AddRangeAsync(InitialData.RoutineSteps);
+      await context.SaveChangesAsync();
+    }
+  }
+
+  private static async Task SeedSkinTypeAsync(ApplicationDbContext context)
+  {
+    if (!await context.SkinTypes.AnyAsync())
+    {
+      await context.SkinTypes.AddRangeAsync(InitialData.SkinTypes);
+      await context.SaveChangesAsync();
+    }
+  }
+
+  private static async Task SeedSubCategoryAsync(ApplicationDbContext context)
+  {
+    if (!await context.SubCategories.AnyAsync())
+    {
+      await context.SubCategories.AddRangeAsync(InitialData.SubCategories);
+      await context.SaveChangesAsync();
+    }
+  }
+
+  private static async Task SeedTagAsync(ApplicationDbContext context)
+  {
+    if (!await context.Tags.AnyAsync())
+    {
+      await context.Tags.AddRangeAsync(InitialData.Tags);
       await context.SaveChangesAsync();
     }
   }

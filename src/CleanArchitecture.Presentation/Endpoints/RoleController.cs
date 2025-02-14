@@ -35,7 +35,7 @@ public class RoleController : ICarterModule
     .WithDescription("Assign User To Roles")
     .RequireAuthorization(new AuthorizeAttribute
     {
-      Roles = Roles.Admin
+      Roles = Roles.Manager
     });
     #endregion
   }

@@ -87,7 +87,7 @@ public class UserController : ICarterModule
     .WithDescription("Enable User Account")
     .RequireAuthorization(new AuthorizeAttribute
     {
-      Roles = Roles.Admin,
+      Roles = Roles.Manager,
     });
     #endregion
 
@@ -116,7 +116,7 @@ public class UserController : ICarterModule
     .WithDescription("Disable User Account")
     .RequireAuthorization(new AuthorizeAttribute
     {
-      Roles = Roles.Admin,
+      Roles = Roles.Manager,
     });
     #endregion
 
