@@ -4,11 +4,11 @@ public class Cosmetic : Entity<Guid>
 {
   public Guid BrandId { get; set; }
   public Brand Brand { get; set; } = default!;
-  public Guid SkinTypeId { get; set; } 
+  public Guid SkinTypeId { get; set; }
   public SkinType SkinType { get; set; } = default!;
   public Guid CosmeticTypeId { get; set; }
   public CosmeticType CosmeticType { get; set; } = default!;
-  public string Name { get; set; } = default!;  
+  public string Name { get; set; } = default!;
   public decimal Price { get; set; }
   public bool Gender { get; set; } = true;
   public string Notice { get; set; } = default!;
@@ -24,5 +24,5 @@ public class Cosmetic : Entity<Guid>
   public List<Batch> Batches { get; set; } = new List<Batch>();
   public List<RoutineStep> RoutineSteps { get; set; } = new List<RoutineStep>();
   public List<Feedback> Feedbacks { get; set; } = new List<Feedback>();
-    public List<RefundItem> RefundItems { get; set; } = new List<RefundItem>();
+  public List<RefundItem> RefundItems { get; set; } = new List<RefundItem>();
 }
