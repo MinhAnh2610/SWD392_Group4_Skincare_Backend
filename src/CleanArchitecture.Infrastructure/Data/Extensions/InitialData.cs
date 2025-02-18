@@ -6,7 +6,7 @@ internal class InitialData
   {
     new()
     {
-      Id = Guid.NewGuid(),
+      Id = new Guid("8E62D9EE-64AF-47E7-8A49-FA1E2F5DA054"),
       UserName = "Admin123",
       Email = "admin123@gmail.com",
       EmailConfirmed = true,
@@ -18,7 +18,7 @@ internal class InitialData
     },
     new()
     {
-      Id = Guid.NewGuid(),
+      Id = new Guid("D650E6F2-C402-45C1-B92F-F7573BDE7335"),
       UserName = "MinhAnh2610",
       Email = "minhanh26102004@gmail.com",
       EmailConfirmed = true,
@@ -70,7 +70,6 @@ internal class InitialData
       BirthDate = new DateOnly(1995, 12, 5),
       Gender = false,
       Email = "emma.williams@example.com",
-      SkinTypeId = new Guid("F73B3596-D3F0-4DA9-BA46-0E75D332658B"),
       PhoneNumber = "1234567890"
     },
     new User
@@ -82,16 +81,15 @@ internal class InitialData
       BirthDate = new DateOnly(2000, 7, 19),
       Gender = true,
       Email = "daniel.brown@example.com",
-      SkinTypeId = new Guid("F73B3596-D3F0-4DA9-BA46-0E75D332658B"),
       PhoneNumber = "1234567890"
     }
   };
 
   public static IEnumerable<Role> Roles => new List<Role>
   {
-    new Role { Id = new Guid(), Name = "Customer" },
-    new Role { Id = new Guid(), Name = "Staff" },
-    new Role { Id = new Guid(), Name = "Manager" }
+    new Role { Id = new Guid("55535483-D1EC-459C-8189-C6D8C4B50195"), Name = "Customer" },
+    new Role { Id = new Guid("C459402C-64CB-4D36-9238-60B15462CE25"), Name = "Staff" },
+    new Role { Id = new Guid("D586839A-B80C-4EBB-8488-95CDD857D1BF"), Name = "Manager" }
   };
 
   public static IEnumerable<Batch> Batches
@@ -103,7 +101,7 @@ internal class InitialData
       {
         new Batch
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("8342CF0F-182F-4B7E-963D-6F4061939B9C"),
           CosmeticId = cosmetics[0].Id,
           Quantity = 100,
           ManufactureDate = new DateOnly(2025, 1, 1),
@@ -112,7 +110,7 @@ internal class InitialData
         },
         new Batch
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("96F6C0EA-FB8E-4DFB-947A-A77027006B36"),
           CosmeticId = cosmetics[1].Id,
           Quantity = 200,
           ManufactureDate = new DateOnly(2025, 3, 15),
@@ -127,13 +125,13 @@ internal class InitialData
   {
     get
     {
-      var staffId = new Guid("103E55BA-607A-4D27-8119-B0C22969F02A");
+      var staffs = Users.ToList();
       return new List<Blog>
       {
         new Blog
         {
           Id = new Guid("CB64A508-526E-4156-A512-1D1BF7A5A032"),
-          StaffId = staffId,
+          StaffId = staffs[3].Id,
           Title = "The Future of AI",
           Content = "AI is transforming industries...",
           BlogTags = new List<BlogTag>() // BlogTags will be assigned later
@@ -141,7 +139,7 @@ internal class InitialData
         new Blog
         {
           Id = new Guid("C9DED966-A2F7-4328-B899-8201508D5476"),
-          StaffId = staffId,
+          StaffId = staffs[3].Id,
           Title = "Starting a Business in 2024",
           Content = "Starting a business has never been easier...",
           BlogTags = new List<BlogTag>()
@@ -218,49 +216,49 @@ internal class InitialData
   {
     new Category
     {
-      Id = Guid.NewGuid(),
+      Id = new Guid("0419D5D4-1C6A-4F2D-ACFA-D3E5687C5A73"),
       Name = "Radiance",
       Description = "Enhance your natural glow and brighten your complexion."
     },
     new Category
     {
-      Id = Guid.NewGuid(),
+      Id = new Guid("0CDF8B34-6D34-4669-9757-10C68A69ECAA"),
       Name = "Rejuvenation",
       Description = "Age-defying and skin renewal solutions."
     },
     new Category
     {
-      Id = Guid.NewGuid(),
+      Id = new Guid("222AFB3A-879D-4FB1-AEB4-BCD4EECE09C4"),
       Name = "Purity",
       Description = "Deep cleansing and detoxifying products."
     },
     new Category
     {
-      Id = Guid.NewGuid(),
+      Id = new Guid("ECBE8150-1FF8-4DE8-B13F-44E007E2487D"),
       Name = "Hydration",
       Description = "Products to lock in moisture and nourish your skin."
     },
     new Category
     {
-      Id = Guid.NewGuid(),
+      Id = new Guid("E187FB64-B583-4BF6-A9F7-34C8DCE1CDCF"),
       Name = "Balance",
       Description = "Formulations to maintain skin pH and soothe irritation."
     },
     new Category
     {
-      Id = Guid.NewGuid(),
+      Id = new Guid("16C105C4-D38D-46A1-98CA-48852724DA8F"),
       Name = "Protection",
       Description = "Guard your skin against environmental stressors."
     },
     new Category
     {
-      Id = Guid.NewGuid(),
+      Id = new Guid("67D4B89F-17EE-4458-9678-6454E89547DD"),
       Name = "Specialized Care",
       Description = "Targeted solutions for specific skin concerns."
     },
     new Category
     {
-      Id = Guid.NewGuid(),
+      Id = new Guid("D5E75588-1D27-4FF4-8DDA-6220DF581268"),
       Name = "Masking",
       Description = "Intensive treatments delivered via masks."
     }
@@ -270,55 +268,55 @@ internal class InitialData
   {
     new CosmeticType
     {
-      Id = Guid.NewGuid(),
+      Id = new Guid("AC635372-0D15-44F7-BF5F-7496C4F16051"),
       Name = "Cleansers",
       Description = "Products that clean the skin."
     },
     new CosmeticType
     {
-      Id = Guid.NewGuid(),
+      Id = new Guid("119B5F44-626F-4831-8978-388A8B2AD23C"),
       Name = "Exfoliators",
       Description = "Products to remove dead skin cells."
     },
     new CosmeticType
     {
-      Id = Guid.NewGuid(),
+      Id = new Guid("A0F0DF4B-07C2-4984-A914-184479DB31B0"),
       Name = "Toners",
       Description = "Products to balance and refresh the skin."
     },
     new CosmeticType
     {
-      Id = Guid.NewGuid(),
+      Id = new Guid("22D4240D-9674-4E6C-B0B7-72F84CA010B8"),
       Name = "Serums",
       Description = "Concentrated treatments for skin."
     },
     new CosmeticType
     {
-      Id = Guid.NewGuid(),
+      Id = new Guid("4CCDED92-BB02-4B8E-9119-95F59628C5D2"),
       Name = "Moisturizers",
       Description = "Products to hydrate and nourish the skin."
     },
     new CosmeticType
     {
-      Id = Guid.NewGuid(),
+      Id = new Guid("79406AF7-46EE-49B4-9D4C-6812A2C396A0"),
       Name = "Eye Creams",
       Description = "Specialized creams for the eye area."
     },
     new CosmeticType
     {
-      Id = Guid.NewGuid(),
+      Id = new Guid("79BD1C90-FAF6-4A08-9893-DBA2552FEE68"),
       Name = "Sunscreens",
       Description = "Products that protect the skin from UV rays."
     },
     new CosmeticType
     {
-      Id = Guid.NewGuid(),
+      Id = new Guid("C6C92631-D452-4C16-A065-3FA93CE750D8"),
       Name = "Lip Care Products",
       Description = "Products to care for and enhance the lips."
     },
     new CosmeticType
     {
-      Id = Guid.NewGuid(),
+      Id = new Guid("C4FDAAE7-B369-4842-B31B-37EAA3072534"),
       Name = "Face Masks",
       Description = "Treatments that refresh and rejuvenate the skin."
     }
@@ -335,7 +333,7 @@ internal class InitialData
       {
         new Cosmetic
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("A14E2C76-662E-4FA4-A9A9-81EE4512D441"),
           Name = "Hydrating Face Cream",
           BrandId = brands[0].Id,
           SkinTypeId = skinTypes[0].Id,
@@ -351,7 +349,7 @@ internal class InitialData
         },
         new Cosmetic
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("70DEC3C1-B8FB-4BCB-AA27-B04B49E5D626"),
           Name = "Gentle Facial Cleanser",
           BrandId = brands[1].Id,
           SkinTypeId = skinTypes[1].Id,
@@ -367,7 +365,7 @@ internal class InitialData
         },
         new Cosmetic
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("1D3E5EC9-6FEC-450E-8283-D44D349EDBBF"),
           Name = "Revitalizing Serum",
           BrandId = brands[1].Id,
           SkinTypeId = skinTypes[1].Id,
@@ -383,7 +381,7 @@ internal class InitialData
         },
         new Cosmetic
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("3A7DFA4B-E4C7-430D-9B0B-AC2E341602C4"),
           Name = "Hydrating Moisturizer",
           BrandId = brands[0].Id,
           SkinTypeId = skinTypes[2].Id,
@@ -399,7 +397,7 @@ internal class InitialData
         },
         new Cosmetic
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("8877B094-53E7-4A6E-8A10-7A47A805311F"),
           Name = "Soothing Toner",
           BrandId = brands[1].Id,
           SkinTypeId = skinTypes[0].Id,
@@ -415,7 +413,7 @@ internal class InitialData
         },
         new Cosmetic
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("2125C657-3ACA-4960-B4C5-DA0DB91B1968"),
           Name = "Exfoliating Scrub",
           BrandId = brands[0].Id,
           SkinTypeId = skinTypes[0].Id,
@@ -431,7 +429,7 @@ internal class InitialData
         },
         new Cosmetic
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("3F0FE941-D7F6-433D-AD8E-F0003AAAA75C"),
           Name = "Nourishing Night Cream",
           BrandId = brands[1].Id,
           SkinTypeId = skinTypes[2].Id,
@@ -447,7 +445,7 @@ internal class InitialData
         },
         new Cosmetic
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("AF48F533-2AF5-4A28-BEFD-24CB3F851218"),
           Name = "Brightening Eye Cream",
           BrandId = brands[0].Id,
           SkinTypeId = skinTypes[0].Id,
@@ -463,7 +461,7 @@ internal class InitialData
         },
         new Cosmetic
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("103ED5BE-D2D4-4C24-8DF9-B854CAAE48D1"),
           Name = "UV Protection Sunscreen",
           BrandId = brands[1].Id,
           SkinTypeId = skinTypes[2].Id,
@@ -479,7 +477,7 @@ internal class InitialData
         },
         new Cosmetic
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("CBEDBE89-9EC6-4487-9481-789A90575B3A"),
           Name = "Soothing Lip Balm",
           BrandId = brands[0].Id,
           SkinTypeId = skinTypes[0].Id,
@@ -495,7 +493,7 @@ internal class InitialData
         },
         new Cosmetic
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("3AF3131D-6996-4EC7-8FEC-64A53C8B3C7E"),
           Name = "Hydrating Face Mask",
           BrandId = brands[1].Id,
           SkinTypeId = skinTypes[2].Id,
@@ -522,13 +520,13 @@ internal class InitialData
       {
         new CosmeticImage
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("74D96977-165F-428B-8DE8-5488D6427355"),
           CosmeticId = cosmetics[0].Id,
           ImageUrl = "https://example.com/hydrating-face-cream.png"
         },
         new CosmeticImage
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("76AB322C-CD7C-4862-ADA1-15AE2AE78E84"),
           CosmeticId = cosmetics[1].Id,
           ImageUrl = "https://example.com/gentle-facial-cleanser.png"
         }
@@ -567,7 +565,7 @@ internal class InitialData
   {
     new CompanyInformation
     {
-      Id = Guid.NewGuid(),
+      Id = new Guid("DD7C5D83-2B34-4943-87EC-95D965C13FF9"),
       Name = "TechCorp",
       Description = "A leading technology company.",
       LogoUrl = "https://example.com/logo.png",
@@ -581,7 +579,7 @@ internal class InitialData
   {
     new Coupon
     {
-      Id = Guid.NewGuid(),
+      Id = new Guid("6E8F40E3-7A19-4A41-B3F8-4DFF00FD8C21"),
       Code = "DISCOUNT10",
       DiscountAmount = 10.00
     }
@@ -589,8 +587,8 @@ internal class InitialData
 
   public static IEnumerable<FAQ> FAQs => new List<FAQ>
   {
-    new FAQ { Id = Guid.NewGuid(), Question = "How do I reset my password?", Answer = "You can reset your password in the settings page." },
-    new FAQ { Id = Guid.NewGuid(), Question = "Where can I contact support?", Answer = "You can contact support at support@example.com." }
+    new FAQ { Id = new Guid("2B4AE24C-EED6-4EBC-AFD9-5DA8E22037F3"), Question = "How do I reset my password?", Answer = "You can reset your password in the settings page." },
+    new FAQ { Id = new Guid("21AE2A57-761C-4A36-B5FF-62488BF8F4FB"), Question = "Where can I contact support?", Answer = "You can contact support at support@example.com." }
   };
 
   public static IEnumerable<Feedback> Feedbacks
@@ -603,7 +601,7 @@ internal class InitialData
       {
         new Feedback
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("16784D61-99F6-4242-879D-AE16C088AE0D"),
           CosmeticId = cosmetics[0].Id,
           CustomerId = users[5].Id,
           Content = "This cleanser left my skin feeling incredibly soft and refreshed.",
@@ -611,7 +609,7 @@ internal class InitialData
         },
         new Feedback
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("476FB2C8-476B-4426-B025-87BEE1AE00C6"),
           CosmeticId = cosmetics[1].Id,
           CustomerId = users[5].Id,
           Content = "The serum really brightened my complexion. Highly recommend!",
@@ -619,7 +617,7 @@ internal class InitialData
         },
         new Feedback
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("F7D08F8A-4650-4320-89DE-FD790D992BF0"),
           CosmeticId = cosmetics[0].Id,
           CustomerId = users[5].Id,
           Content = "Decent product, but didn't meet all my expectations.",
@@ -639,7 +637,7 @@ internal class InitialData
       {
         new Order
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("F72B5E3B-C443-4920-9D03-BB774721F70A"),
           CustomerId = customer[5].Id,
           CouponId = coupon.Id,
           SubTotal = 89.97m,
@@ -681,8 +679,8 @@ internal class InitialData
 
   public static IEnumerable<Policy> Policies => new List<Policy>
   {
-    new Policy { Id = Guid.NewGuid(), Title = "Privacy Policy", Content = "This is the privacy policy content." },
-    new Policy { Id = Guid.NewGuid(), Title = "Terms of Service", Content = "These are the terms of service." }
+    new Policy { Id = new Guid("70B1B2A8-8361-468C-A602-04E1A815495E"), Title = "Privacy Policy", Content = "This is the privacy policy content." },
+    new Policy { Id = new Guid("EC19577C-8D19-4497-801A-11B66E55666D"), Title = "Terms of Service", Content = "These are the terms of service." }
   };
 
   public static IEnumerable<Routine> Routines
@@ -692,7 +690,7 @@ internal class InitialData
       var skinTypes = SkinTypes.ToList();
       var morningRoutine = new Routine
       {
-        Id = Guid.NewGuid(),
+        Id = new Guid("A453329C-9635-4DC9-82A5-5D50883F52C9"),
         SkinTypeId = skinTypes[0].Id,
         Title = "Morning Routine",
         Period = "Morning",
@@ -700,7 +698,7 @@ internal class InitialData
 
       var eveningRoutine = new Routine
       {
-        Id = Guid.NewGuid(),
+        Id = new Guid("A194BD2B-2BCD-4CB1-9E28-45F9F4C5CD85"),
         SkinTypeId = skinTypes[13].Id,
         Title = "Evening Routine",
         Period = "Evening",
@@ -721,33 +719,29 @@ internal class InitialData
         // Morning Routine Steps (for oily, sensitive skin)
         new RoutineStep
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("A64ACFD4-2352-4A5F-AF71-F010549139F8"),
           RoutineId = routines[0].Id,
-          Routine = routines[0],
           CosmeticId = cosmetics[1].Id,
           StepNumber = 1
         },
         new RoutineStep
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("A26909AB-7E98-4241-8967-5C1099C1D12B"),
           RoutineId = routines[0].Id,
-          Routine = routines[0],
           CosmeticId = cosmetics[4].Id,
           StepNumber = 2
         },
         new RoutineStep
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("92867F27-6111-4DE4-A4A3-50A28031BDE6"),
           RoutineId = routines[0].Id,
-          Routine = routines[0],
           CosmeticId = cosmetics[2].Id,
           StepNumber = 3
         },
         new RoutineStep
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("4C7362B9-D2C3-4013-8637-94AD06193845"),
           RoutineId = routines[0].Id,
-          Routine = routines[0],
           CosmeticId = cosmetics[3].Id,
           StepNumber = 4
         },
@@ -755,25 +749,22 @@ internal class InitialData
         // Evening Routine Steps (for dry, sensitive skin)
         new RoutineStep
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("BCDCA4D0-45BB-4074-B0DD-E50D5FF4A823"),
           RoutineId = routines[1].Id,
-          Routine = routines[1],
           CosmeticId = cosmetics[1].Id,
           StepNumber = 1
         },
         new RoutineStep
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("26EFC8B8-3139-4EEA-8442-2BABC1D54326"),
           RoutineId = routines[1].Id,
-          Routine = routines[1],
           CosmeticId = cosmetics[2].Id,
           StepNumber = 2
         },
         new RoutineStep
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("5EBF2F4F-78EB-4159-9780-47D01D1826FD"),
           RoutineId = routines[1].Id,
-          Routine = routines[1],
           CosmeticId = cosmetics[3].Id,
           StepNumber = 3
         }
@@ -813,21 +804,21 @@ internal class InitialData
         // Radiance (Category 1)
         new SubCategory
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("FA5585BA-D79A-4738-973A-2A46BAAFEF02"),
           CategoryId = categories[0].Id,
           Name = "Glow Boosters",
           Description = "Enhance natural radiance and luminosity."
         },
         new SubCategory
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("924F9CB9-DA41-4B51-A9E6-3F43B15BF4A6"),
           CategoryId = categories[0].Id,
           Name = "Brightening Formulas",
           Description = "Products formulated to brighten and even out skin tone."
         },
         new SubCategory
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("9B4F16A4-3163-4744-9399-E9381819283A"),
           CategoryId = categories[0].Id,
           Name = "Illuminators",
           Description = "Subtle enhancers for a lit-from-within glow."
@@ -836,21 +827,21 @@ internal class InitialData
         // Rejuvenation (Category 2)
         new SubCategory
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("A8EF488E-56C6-46AC-889B-4A0FFBD680AC"),
           CategoryId = categories[1].Id,
           Name = "Age-Defying Treatments",
           Description = "Reduce the signs of aging and smooth wrinkles."
         },
         new SubCategory
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("9A924542-D844-43C2-88CB-5641D00A22DD"),
           CategoryId = categories[1].Id,
           Name = "Firming Solutions",
           Description = "Products that help to tighten and firm the skin."
         },
         new SubCategory
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("277169B9-E26C-4EE1-9CBC-B4E326E82EE0"),
           CategoryId = categories[1].Id,
           Name = "Renewal Complex",
           Description = "Promote cell turnover and skin renewal."
@@ -859,21 +850,21 @@ internal class InitialData
         // Purity (Category 3)
         new SubCategory
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("C7C096CE-8959-494D-8913-4139CA48B160"),
           CategoryId = categories[2].Id,
           Name = "Deep Cleansing",
           Description = "Thorough cleansers to purify the skin."
         },
         new SubCategory
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("FA60A320-490A-4CCF-8BA8-1386DF682A61"),
           CategoryId = categories[2].Id,
           Name = "Detox & Clarify",
           Description = "Remove impurities and unclog pores."
         },
         new SubCategory
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("17E228DD-F780-4CCE-8884-DFE530FD5A00"),
           CategoryId = categories[2].Id,
           Name = "Pore Refiners",
           Description = "Minimize pores and smooth skin texture."
@@ -882,14 +873,14 @@ internal class InitialData
         // Hydration (Category 4)
         new SubCategory
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("7FB4A783-8587-4A18-A0DA-94D40682EEFC"),
           CategoryId = categories[3].Id,
           Name = "Moisture Locks",
           Description = "Seal in hydration for long-lasting moisture."
         },
         new SubCategory
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("F86FA2D9-B3C1-48DF-828E-4BD6CDD76319"),
           CategoryId = categories[3].Id,
           Name = "Hydrating Essentials",
           Description = "Fundamental products for daily hydration."
@@ -897,7 +888,7 @@ internal class InitialData
 
         new SubCategory
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("C6A71C5D-A067-4BB6-8D9C-3CA3F180ADFD"),
           CategoryId = categories[3].Id,
           Name = "Nourishing Creams",
           Description = "Rich creams that deeply nourish the skin."
@@ -906,33 +897,30 @@ internal class InitialData
         // Balance (Category 5)
         new SubCategory
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("71895946-0B7C-40F9-97E0-9195D7BDC5E2"),
           CategoryId = categories[4].Id,
           Name = "pH Balancing",
           Description = "Products to maintain the skin's natural pH."
         },
         new SubCategory
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("9AD8FBB8-DB09-4842-95B3-590F3728ED42"),
           CategoryId = categories[4].Id,
-
           Name = "Soothing Solutions",
-
           Description = "Calm and reduce irritation for balanced skin."
-
         },
         
         // Protection (Category 6)
         new SubCategory
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("C4A28A94-14DA-452D-96EB-1B01D4892C84"),
           CategoryId = categories[5].Id,
           Name = "Environmental Shields",
           Description = "Defend skin against pollution and external stressors."
         },
         new SubCategory
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("39783437-38B8-480A-B9A5-4814E9920C36"),
           CategoryId = categories[5].Id,
           Name = "SPF Essentials",
           Description = "Sunscreens and UV protective formulations."
@@ -941,14 +929,14 @@ internal class InitialData
         // Specialized Care (Category 7)
         new SubCategory
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("7B314245-8C44-4E8D-B763-155291ED57C8"),
           CategoryId = categories[6].Id,
           Name = "Targeted Remedies",
           Description = "Specific solutions for defined skin issues."
         },
         new SubCategory
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("646E7856-BF86-46FB-A71A-799FDAC30F82"),
           CategoryId = categories[6].Id,
           Name = "Delicate Area Care",
           Description = "Gentle products for sensitive areas like eyes and lips."
@@ -957,14 +945,14 @@ internal class InitialData
         // Masking (Category 8)
         new SubCategory
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("93894942-ADB7-4D19-ABBF-1AA6620B5BCB"),
           CategoryId = categories[7].Id,
           Name = "Sheet Masks",
           Description = "Single-use masks for an instant boost."
         },
         new SubCategory
         {
-          Id = Guid.NewGuid(),
+          Id = new Guid("DADC109E-FA2E-4BE0-A5E2-29FC46F54826"),
           CategoryId = categories[7].Id,
           Name = "Overnight Masks",
           Description = "Leave-on treatments for intensive overnight care."
@@ -979,4 +967,29 @@ internal class InitialData
             new Tag { Id = new Guid("555B8613-1FC3-465C-8020-2C1E6E8D4668"), Name = "Business", Description = "Posts related to business" },
             new Tag { Id = new Guid("0DD9E52B-443F-4512-B44C-BC79E90B36CE"), Name = "Health", Description = "Posts related to health and wellness" }
         };
+
+  public static IEnumerable<Testimonial> Testimonials => new List<Testimonial>
+  {
+    new Testimonial
+    {
+      Id = new Guid("A7804842-3B9E-47A0-9D0D-B464203D5C62"),
+      CustomerId = new Guid("A1E34814-7E85-4858-B0AB-2D9E2DA27D99"),
+      Content = "This product changed my life! I can't recommend it enough.",
+      Rating = 5
+    },
+    new Testimonial
+    {
+      Id = new Guid("80E56A47-A71D-4B9C-AD7B-061FADAE4EA2"),
+      CustomerId = new Guid("A1E34814-7E85-4858-B0AB-2D9E2DA27D99"),
+      Content = "Great quality and fast shipping. Very satisfied.",
+      Rating = 4
+    },
+    new Testimonial
+    {
+      Id = new Guid("A073408F-52CD-4C3C-87FF-5EDDC32C0AB8"),
+      CustomerId = new Guid("A1E34814-7E85-4858-B0AB-2D9E2DA27D99"),
+      Content = "Not what I expected, but still a decent product.",
+      Rating = 3
+    }
+  };
 }

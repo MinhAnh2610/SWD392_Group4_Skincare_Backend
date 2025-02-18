@@ -12,11 +12,12 @@ using System.Xml.Linq;
 
 namespace CleanArchitecture.Application.Services
 {
-  public class CosmeticService : ICosmeticService
-  {
+public class CosmeticService : ICosmeticService
+{
     private readonly ICosmeticRepository _cosmeticRepository;
+   private readonly IUnitOfWork _unitOfWork;
 
-    public CosmeticService(
+        public CosmeticService(
         ICosmeticRepository cosmeticRepository
       )
     {
@@ -74,10 +75,10 @@ namespace CleanArchitecture.Application.Services
         return Result<List<Cosmetic>>.Success(cosmetic, StatusCodes.Status200OK);
       }
       else
-      {
+  {
         return Result<List<Cosmetic>>.Failure([CosmeticErrors.CosmeticNotFound], StatusCodes.Status404NotFound);
       }
-    }
+  }
 
     public async Task<Result<List<Cosmetic>>> GetCosmeticsByTypeId(Guid typeId)
     {
@@ -87,7 +88,7 @@ namespace CleanArchitecture.Application.Services
         return Result<List<Cosmetic>>.Success(cosmetic, StatusCodes.Status200OK);
       }
       else
-      {
+  {
         return Result<List<Cosmetic>>.Failure([CosmeticErrors.CosmeticNotFound], StatusCodes.Status404NotFound);
       }
     }
@@ -97,4 +98,36 @@ namespace CleanArchitecture.Application.Services
       throw new NotImplementedException();
     }
   }
+    public async Task<Result<List<CosmeticResponse>>> GetAllCosmeticsAsync()
+    {
+        var cosmetics = await _unitOfWork.Cosmetics.GetCosmeticsAsync();
+
+        return Result<List<CosmeticResponse>>.Success(cosmetics.Select(c => new CosmeticResponse
+        {
+            Id = c.Id,
+            CreateAt = c.CreateAt,
+            CreatedBy = c.CreatedBy,
+            LastModified = c.LastModified,
+            LastModifiedBy = c.LastModifiedBy,
+            IsActive = c.IsActive,
+            BrandId = c.BrandId,
+            Brand = c.Brand,
+            SkinTypeId = c.SkinTypeId,
+            SkinType = c.SkinType,
+            CosmeticTypeId = c.CosmeticTypeId,
+            CosmeticType = c.CosmeticType,
+            Name = c.Name,
+            Price = c.Price,
+            Gender = c.Gender,
+            Notice = c.Notice,
+            Ingredients = c.Ingredients,
+            MainUsage = c.MainUsage,
+            Texture = c.Texture,
+            Origin = c.Origin,
+            Instructions = c.Instructions,
+            CosmeticSubcategories = c.CosmeticSubcategories.ToList(),
+            CosmeticImages = c.CosmeticImages.ToList(),
+            Feedbacks = c.Feedbacks.ToList()
+        }).ToList(), StatusCodes.Status200OK);
+    }
 }

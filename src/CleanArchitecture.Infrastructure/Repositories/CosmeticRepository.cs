@@ -19,4 +19,13 @@ public class CosmeticRepository : GenericRepository<Cosmetic>, ICosmeticReposito
 
     return entities;
   }
+
+  public async Task<List<Cosmetic>> GetCosmeticsAsync()
+  {
+    return await _context.Cosmetics
+      .Include(c => c.Brand)
+      .Include(c => c.SkinType)
+      .Include(c => c.CosmeticType)
+      .ToListAsync();
+  }
 }

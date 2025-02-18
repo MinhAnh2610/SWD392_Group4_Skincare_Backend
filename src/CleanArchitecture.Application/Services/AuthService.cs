@@ -1,10 +1,5 @@
 ﻿using CleanArchitecture.Application.DTOs.Auth;
-using CleanArchitecture.Application.DTOs.User;
 using CleanArchitecture.Application.Enums;
-using CleanArchitecture.Application.ServiceContracts;
-using CleanArchitecture.Application.Validators.User;
-using CleanArchitecture.Domain.Entities;
-using IdentityModel;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;

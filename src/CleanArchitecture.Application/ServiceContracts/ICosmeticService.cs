@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace CleanArchitecture.Application.ServiceContracts
 {
-  public interface ICosmeticService
-  {
-    Task<Result<List<CosmeticResponse>>> GetAllCosmetics();
+public interface ICosmeticService
+{
+    Task<Result<List<CosmeticResponse>>> GetAllCosmeticsAsync();
     Task<Result<CosmeticResponse>> GetCosmeticById(Guid id);
     Task<Result<List<CosmeticResponse>>> GetCosmeticsByBrandId(Guid brandId);
     Task<Result<List<CosmeticResponse>>> GetCosmeticsByTypeId(Guid typeId);

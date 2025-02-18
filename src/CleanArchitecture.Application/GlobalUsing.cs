@@ -6,4 +6,6 @@ global using CleanArchitecture.Domain.Entities;
 global using FluentValidation;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.EntityFrameworkCore;
+global using CleanArchitecture.Application.ServiceContracts;
+global using CleanArchitecture.Domain.RepositoryContracts.UnitOfWork;
 //global using CleanArchitecture.Application.Extensions;

@@ -3,32 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 namespace CleanArchitecture.Application.DTOs.Cosmetic
 {
-  public class CosmeticResponse
-  {
-      // Base Entity properties
-      public Guid Id { get; init; }
-      public DateTime? CreateAt { get; init; }
-      public string? CreatedBy { get; init; }
-      public DateTime? LastModified { get; init; }
-      public string? LastModifiedBy { get; init; }
-      public bool IsActive { get; init; }
-
-      // Cosmetic-specific properties
-      public Guid BrandId { get; init; }
-      public Guid SkinTypeId { get; init; }
-      public Guid CosmeticTypeId { get; init; }
-      public string Name { get; init; } = default!;
-      public decimal Price { get; init; }
-      public bool Gender { get; init; }
-      public string Notice { get; init; } = default!;
-      public string Ingredients { get; init; } = default!;
-      public string MainUsage { get; init; } = default!;
-      public string Texture { get; init; } = default!;
-      public string Origin { get; init; } = default!;
-      public string Instructions { get; init; } = default!;
-
-}
+public class CosmeticResponse
+{
+  public Guid Id { get; set; }
+  public DateTime? CreateAt { get; set; }
+  public string? CreatedBy { get; set; }
+  public DateTime? LastModified { get; set; }
+  public string? LastModifiedBy { get; set; }
+  public bool IsActive { get; set; }
+  public Guid BrandId { get; set; }
+  public Brand? Brand { get; set; }
+  public Guid SkinTypeId { get; set; }
+  public SkinType? SkinType { get; set; }
+  public Guid CosmeticTypeId { get; set; }
+  public CosmeticType? CosmeticType { get; set; }
+  public string Name { get; set; } = default!;
+  public decimal Price { get; set; }
+  public bool Gender { get; set; } = true;
+  public string Notice { get; set; } = default!;
+  public string Ingredients { get; set; } = default!;
+  public string MainUsage { get; set; } = default!;
+  public string Texture { get; set; } = default!;
+  public string Origin { get; set; } = default!;
+  public string Instructions { get; set; } = default!;
+  public List<CosmeticSubCategory>? CosmeticSubcategories { get; set; }
+  public List<CosmeticImage>? CosmeticImages { get; set; }
+  public List<Feedback>? Feedbacks { get; set; }
 }
