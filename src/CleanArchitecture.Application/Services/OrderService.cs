@@ -164,7 +164,7 @@ namespace CleanArchitecture.Application.Services
       {
         Id = order.Id,
         CustomerId = order.CustomerId,
-        CouponId = order.CouponId,
+        CouponId = (Guid)order.CouponId,
         SubTotal = order.SubTotal,
         TotalPrice = order.TotalPrice,
         OrderDate = order.OrderDate,
