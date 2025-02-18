@@ -50,8 +50,9 @@ public static class DependencyInjection
         services.AddScoped<IPaymentService, PaymentService>();
         services.AddScoped<IRefundService, RefundService>();
         services.AddScoped<IRefundItemService, RefundItemService>();
-        //services.AddScoped<IProfileService, ProfileService>();
-        services.AddScoped<IUserService, UserService>();
+    services.AddScoped<ICosmeticService, CosmeticService>();
+    //services.AddScoped<IProfileService, ProfileService>();
+    services.AddScoped<IUserService, UserService>();
         services.AddScoped<IRoleService, RoleService>();
 
         return services;
