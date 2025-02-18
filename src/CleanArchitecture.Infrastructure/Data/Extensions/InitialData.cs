@@ -979,4 +979,29 @@ internal class InitialData
             new Tag { Id = new Guid("555B8613-1FC3-465C-8020-2C1E6E8D4668"), Name = "Business", Description = "Posts related to business" },
             new Tag { Id = new Guid("0DD9E52B-443F-4512-B44C-BC79E90B36CE"), Name = "Health", Description = "Posts related to health and wellness" }
         };
+
+  public static IEnumerable<Testimonial> Testimonials => new List<Testimonial>
+  {
+    new Testimonial
+    {
+      Id = Guid.NewGuid(),
+      CustomerId = new Guid("A1E34814-7E85-4858-B0AB-2D9E2DA27D99"),
+      Content = "This product changed my life! I can't recommend it enough.",
+      Rating = 5
+    },
+    new Testimonial
+    {
+      Id = Guid.NewGuid(),
+      CustomerId = new Guid("A1E34814-7E85-4858-B0AB-2D9E2DA27D99"),
+      Content = "Great quality and fast shipping. Very satisfied.",
+      Rating = 4
+    },
+    new Testimonial
+    {
+      Id = Guid.NewGuid(),
+      CustomerId = new Guid("A1E34814-7E85-4858-B0AB-2D9E2DA27D99"),
+      Content = "Not what I expected, but still a decent product.",
+      Rating = 3
+    }
+  };
 }

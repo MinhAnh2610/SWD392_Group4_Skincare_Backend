@@ -47,6 +47,7 @@ public static class DatabaseExtensions
     await SeedSkinTypeAsync(context);
     await SeedSubCategoryAsync(context);
     await SeedTagAsync(context);
+    await SeedTestimonialAsync(context);
   }
 
   private static async Task SeedRoleAsync(ApplicationDbContext context, RoleManager<Role> roleManager)
@@ -291,6 +292,15 @@ public static class DatabaseExtensions
     if (!await context.Tags.AnyAsync())
     {
       await context.Tags.AddRangeAsync(InitialData.Tags);
+      await context.SaveChangesAsync();
+    }
+  }
+
+  private static async Task SeedTestimonialAsync(ApplicationDbContext context)
+  {
+    if (!await context.Testimonials.AnyAsync())
+    {
+      await context.Testimonials.AddRangeAsync(InitialData.Testimonials);
       await context.SaveChangesAsync();
     }
   }

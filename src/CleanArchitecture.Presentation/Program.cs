@@ -1,11 +1,9 @@
 using CleanArchitecture.Application;
-using CleanArchitecture.Application.Services;
 using CleanArchitecture.Infrastructure;
 using CleanArchitecture.Infrastructure.Data.Extensions;
 using CleanArchitecture.Presentation;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
-using System;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
