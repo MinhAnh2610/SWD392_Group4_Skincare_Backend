@@ -5,6 +5,7 @@ using CleanArchitecture.Presentation;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
 using System.Reflection;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 var fullVersion = Assembly.GetExecutingAssembly()
@@ -13,7 +14,6 @@ var fullVersion = Assembly.GetExecutingAssembly()
 
 // Trim the commit hash suffix if it exists
 var version = fullVersion.Split('+')[0];
-
 
 // Add services to the container.
 builder.Services
@@ -48,7 +48,7 @@ if (app.Environment.IsDevelopment())
     c.SwaggerEndpoint("/openapi/v1.json", "De Fleur API");
     //c.RoutePrefix = string.Empty;
   });
-  await app.InitializeDatabaseAsync();
+  //await app.InitializeDatabaseAsync();
 }
 
 app.UseApiServices();
