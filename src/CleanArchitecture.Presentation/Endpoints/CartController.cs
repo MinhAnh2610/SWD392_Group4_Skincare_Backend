@@ -33,12 +33,12 @@ namespace CleanArchitecture.Presentation.Endpoints
       #endregion
 
       #region Add to Cart API
-      group.MapGet("/add-product", async (ICartService cartService) =>
+      group.MapGet("/add-product", async (ICartService cartService, AddProductRequest addProductRequest) =>
       {
-        var result = await cartService.GetAllCartsAsync();
+        var result = await cartService.AddCartItemAsync(addProductRequest);
         if (result.IsSuccess)
         {
-          return Results.Ok(ApiResponse<List<CartResponse>>.SuccessResponse(result.Data!, "Retrieved Carts Successfully."));
+          return Results.Ok(ApiResponse<List<CartResponse>>.SuccessResponse(result.Data!, "Add Item to Cart Successfully."));
         }
 
         return result.Status switch
@@ -46,12 +46,58 @@ namespace CleanArchitecture.Presentation.Endpoints
           _ => Results.StatusCode(StatusCodes.Status500InternalServerError)
         };
       })
-      .WithName("GetAllCarts")
+      .WithName("AddProductToCart")
       .Produces<ApiResponse<List<CartResponse>>>(StatusCodes.Status200OK)
       .ProducesProblem(StatusCodes.Status401Unauthorized)
       .ProducesProblem(StatusCodes.Status500InternalServerError)
-      .WithSummary("GetAllCarts")
-      .WithDescription("Get All Carts")
+      .WithSummary("AddProductToCart")
+      .WithDescription("Add ProductTo Cart")
+      .RequireAuthorization();
+      #endregion
+
+      #region Delete Item from Cart API
+      group.MapGet("/delete-product", async (ICartService cartService, RemoveProductRequest removeProductRequest) =>
+      {
+        var result = await cartService.DeletebyIdAsync(removeProductRequest);
+        if (result.IsSuccess)
+        {
+          return Results.Ok(ApiResponse<List<CartResponse>>.SuccessResponse(result.Data!, "Delete From Cart Successfully."));
+        }
+
+        return result.Status switch
+        {
+          _ => Results.StatusCode(StatusCodes.Status500InternalServerError)
+        };
+      })
+      .WithName("DeleteProductFromCart")
+      .Produces<ApiResponse<List<CartResponse>>>(StatusCodes.Status200OK)
+      .ProducesProblem(StatusCodes.Status401Unauthorized)
+      .ProducesProblem(StatusCodes.Status500InternalServerError)
+      .WithSummary("DeleteProductFromCart")
+      .WithDescription("Delete Product From Cartt")
+      .RequireAuthorization();
+      #endregion
+
+      #region View Cart from Cart API
+      group.MapGet("/view-cart", async (ICartService cartService, Guid id) =>
+      {
+        var result = await cartService.GetByIdAsync(id);
+        if (result.IsSuccess)
+        {
+          return Results.Ok(ApiResponse<CartResponse>.SuccessResponse(result.Data!, "Delete From Cart Successfully."));
+        }
+
+        return result.Status switch
+        {
+          _ => Results.StatusCode(StatusCodes.Status500InternalServerError)
+        };
+      })
+      .WithName("ViewCart")
+      .Produces<ApiResponse<List<CartResponse>>>(StatusCodes.Status200OK)
+      .ProducesProblem(StatusCodes.Status401Unauthorized)
+      .ProducesProblem(StatusCodes.Status500InternalServerError)
+      .WithSummary("ViewCart")
+      .WithDescription("View Cart")
       .RequireAuthorization();
       #endregion
     }

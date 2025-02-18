@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Application.DTOs.Auth;
+using CleanArchitecture.Application.DTOs.CouponDTO;
 using CleanArchitecture.Application.DTOs.Role;
 using CleanArchitecture.Application.DTOs.User;
 using CleanArchitecture.Application.ServiceContracts;
@@ -42,6 +43,10 @@ public static class DependencyInjection
     services.AddScoped<IValidator<AssignRoleRequest>, AssignRoleValidator>();
     #endregion
 
+    #region Coupon Validatorss
+    services.AddScoped<IValidator<ApplyCouponRequest>, ApplyCouponRequestValidator>();
+    #endregion
+
     // Add identity server 4 validator for owner password
     services.AddTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>();
 
@@ -54,6 +59,8 @@ public static class DependencyInjection
     //services.AddScoped<IProfileService, ProfileService>();
     services.AddScoped<IUserService, UserService>();
     services.AddScoped<IRoleService, RoleService>();
+    services.AddScoped<ICartService, CartService>();
+    services.AddScoped<ICouponService, CouponService>();
 
     return services;
   }

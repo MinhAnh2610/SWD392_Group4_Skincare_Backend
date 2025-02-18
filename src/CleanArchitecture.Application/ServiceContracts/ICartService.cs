@@ -10,8 +10,8 @@ namespace CleanArchitecture.Application.ServiceContracts
   public interface ICartService
   {
     Task<Result<List<CartResponse>>> GetAllCartsAsync();
-    Task<Result<CartResponse>> AddCartItemAsync();
+    Task<Result<List<CartResponse>>> AddCartItemAsync(AddProductRequest addProductRequest);
     Task<Result<CartResponse>> GetByIdAsync(Guid id);
-    Task<Result<CartResponse>> DeletebyIdAsync(Guid id);
+    Task<Result<List<CartResponse>>> DeletebyIdAsync(RemoveProductRequest removeProductRequest);
   }
 }

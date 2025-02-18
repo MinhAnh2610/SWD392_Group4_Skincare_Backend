@@ -13,7 +13,7 @@ namespace CleanArchitecture.Application.DTOs.Cart
 
       public CleanArchitecture.Domain.Entities.User Customer { get; set; } = default!;
 
-      public List<CartItem>? Items { get; set; } = new List<CartItem>();
+      public List<CleanArchitecture.Domain.Entities.CartItem>? Items { get; set; } = new List<CleanArchitecture.Domain.Entities.CartItem>();
 
   }
 }

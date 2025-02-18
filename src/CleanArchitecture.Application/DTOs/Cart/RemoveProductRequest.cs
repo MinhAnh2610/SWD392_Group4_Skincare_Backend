@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace CleanArchitecture.Application.DTOs.Cart
 {
-  public class AddProductRequest
+  public class RemoveProductRequest
   {
     public Guid CartId { get; set; }
     public Guid CosmeticId { get; set; }
-    public int Quantity { get; set; }
   }
 }
