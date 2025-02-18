@@ -64,6 +64,7 @@ public static class DependencyInjection
 
     services.AddScoped<IOrderService, OrderService>();
     services.AddScoped<IFeedbackService, FeedbackService>();
+    services.AddScoped<IRoutineService, RoutineService>();
     return services;
   }
 }
