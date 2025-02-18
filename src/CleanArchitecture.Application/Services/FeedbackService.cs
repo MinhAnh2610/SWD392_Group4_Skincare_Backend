@@ -23,4 +23,21 @@ public class FeedbackService : IFeedbackService
       CustomerId = f.CustomerId,
     }).ToList(), StatusCodes.Status200OK);
   }
+  
+  public async Task<Result<List<FeedbackResponse>>> GetFeedbacksByCustomerIdAsync(Guid customerId)
+  {
+    try
+    {
+      var feedbacks = await _feedbackRepository.GetFeedbacksByCustomerIdAsync(customerId);
+      var responses = feedbacks.Select(MapToFeedbackResponse).ToList();
+      return Result<List<FeedbackResponse>>.Success(responses, StatusCodes.Status200OK);
+    }
+    catch (Exception ex)
+    {
+      return Result<List<FeedbackResponse>>.Failure(
+          new List<Error> { new Error("Feedback.GetByCustomer", ex.Message) },
+          StatusCodes.Status500InternalServerError
+      );
+    }
+  }
 }

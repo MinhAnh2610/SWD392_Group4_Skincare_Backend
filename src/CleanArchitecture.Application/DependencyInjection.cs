@@ -42,6 +42,10 @@ public static class DependencyInjection
     services.AddScoped<IValidator<AssignRoleRequest>, AssignRoleValidator>();
     #endregion
 
+    #region Coupon Validatorss
+    services.AddScoped<IValidator<ApplyCouponRequest>, ApplyCouponRequestValidator>();
+    #endregion
+
     // Add identity server 4 validator for owner password
     services.AddTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>();
 
@@ -62,7 +66,12 @@ public static class DependencyInjection
     services.AddScoped<ITestimonialService, TestimonialService>();
     services.AddScoped<IUserService, UserService>();
     services.AddScoped<IRoleService, RoleService>();
+    services.AddScoped<ICartService, CartService>();
+    services.AddScoped<ICouponService, CouponService>();
 
+    services.AddScoped<IOrderService, OrderService>();
+    services.AddScoped<IFeedbackService, FeedbackService>();
+    services.AddScoped<IRoutineService, RoutineService>();
     return services;
   }
 }

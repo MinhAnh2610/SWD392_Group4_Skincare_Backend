@@ -198,13 +198,13 @@ internal class InitialData
       {
         new CartItem
         {
-          CustomerId = customer[5].Id,
+          //CustomerId = customer[5].Id,
           CosmeticId = cosmetics[0].Id,
           Quantity = 2
         },
         new CartItem
         {
-          CustomerId = customer[5].Id,
+          //CustomerId = customer[5].Id,
           CosmeticId = cosmetics[1].Id,
           Quantity = 1
         }
