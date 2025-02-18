@@ -15,7 +15,7 @@ public static class DatabaseExtensions
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
-    //context.Database.MigrateAsync().GetAwaiter().GetResult();
+    context.Database.MigrateAsync().GetAwaiter().GetResult();
 
     await SeedAsync(context, roleManager, userManager);
   }
@@ -48,6 +48,7 @@ public static class DatabaseExtensions
     await SeedSubCategoryAsync(context);
     await SeedTagAsync(context);
     await SeedTestimonialAsync(context);
+    await context.SaveChangesAsync();
   }
 
   private static async Task SeedRoleAsync(ApplicationDbContext context, RoleManager<Role> roleManager)
@@ -94,7 +95,6 @@ public static class DatabaseExtensions
     if (!await context.Batches.AnyAsync())
     {
       await context.Batches.AddRangeAsync(InitialData.Batches);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -103,7 +103,6 @@ public static class DatabaseExtensions
     if (!await context.Blogs.AnyAsync())
     {
       await context.Blogs.AddRangeAsync(InitialData.Blogs);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -112,7 +111,6 @@ public static class DatabaseExtensions
     if (!await context.BlogsTags.AnyAsync())
     {
       await context.BlogsTags.AddRangeAsync(InitialData.BlogTags);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -121,7 +119,6 @@ public static class DatabaseExtensions
     if (!await context.Brands.AnyAsync())
     {
       await context.Brands.AddRangeAsync(InitialData.Brands);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -130,7 +127,6 @@ public static class DatabaseExtensions
     if (!await context.Carts.AnyAsync())
     {
       await context.Carts.AddRangeAsync(InitialData.Carts);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -139,7 +135,6 @@ public static class DatabaseExtensions
     if (!await context.CartItems.AnyAsync())
     {
       await context.CartItems.AddRangeAsync(InitialData.CartItems);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -148,7 +143,6 @@ public static class DatabaseExtensions
     if (!await context.Categories.AnyAsync())
     {
       await context.Categories.AddRangeAsync(InitialData.Categories);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -157,7 +151,6 @@ public static class DatabaseExtensions
     if (!await context.CompanyInformation.AnyAsync())
     {
       await context.CompanyInformation.AddRangeAsync(InitialData.CompanyInfos);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -166,7 +159,6 @@ public static class DatabaseExtensions
     if (!await context.Cosmetics.AnyAsync())
     {
       await context.Cosmetics.AddRangeAsync(InitialData.Cosmetics);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -175,7 +167,6 @@ public static class DatabaseExtensions
     if (!await context.CosmeticsImages.AnyAsync())
     {
       await context.CosmeticsImages.AddRangeAsync(InitialData.CosmeticImages);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -184,7 +175,6 @@ public static class DatabaseExtensions
     if (!await context.CosmeticSubCategories.AnyAsync())
     {
       await context.CosmeticSubCategories.AddRangeAsync(InitialData.CosmeticSubCategories);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -193,7 +183,6 @@ public static class DatabaseExtensions
     if (!await context.CosmeticTypes.AnyAsync())
     {
       await context.CosmeticTypes.AddRangeAsync(InitialData.CosmeticTypes);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -202,7 +191,6 @@ public static class DatabaseExtensions
     if (!await context.Coupons.AnyAsync())
     {
       await context.Coupons.AddRangeAsync(InitialData.Coupons);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -211,7 +199,6 @@ public static class DatabaseExtensions
     if (!await context.FAQs.AnyAsync())
     {
       await context.FAQs.AddRangeAsync(InitialData.FAQs);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -220,7 +207,6 @@ public static class DatabaseExtensions
     if (!await context.Feedbacks.AnyAsync())
     {
       await context.Feedbacks.AddRangeAsync(InitialData.Feedbacks);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -229,7 +215,6 @@ public static class DatabaseExtensions
     if (!await context.Orders.AnyAsync())
     {
       await context.Orders.AddRangeAsync(InitialData.Orders);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -238,7 +223,6 @@ public static class DatabaseExtensions
     if (!await context.OrderItems.AnyAsync())
     {
       await context.OrderItems.AddRangeAsync(InitialData.OrderItems);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -247,7 +231,6 @@ public static class DatabaseExtensions
     if (!await context.Policies.AnyAsync())
     {
       await context.Policies.AddRangeAsync(InitialData.Policies);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -256,7 +239,6 @@ public static class DatabaseExtensions
     if (!await context.Routines.AnyAsync())
     {
       await context.Routines.AddRangeAsync(InitialData.Routines);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -265,7 +247,6 @@ public static class DatabaseExtensions
     if (!await context.RoutineSteps.AnyAsync())
     {
       await context.RoutineSteps.AddRangeAsync(InitialData.RoutineSteps);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -274,7 +255,6 @@ public static class DatabaseExtensions
     if (!await context.SkinTypes.AnyAsync())
     {
       await context.SkinTypes.AddRangeAsync(InitialData.SkinTypes);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -283,7 +263,6 @@ public static class DatabaseExtensions
     if (!await context.SubCategories.AnyAsync())
     {
       await context.SubCategories.AddRangeAsync(InitialData.SubCategories);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -292,7 +271,6 @@ public static class DatabaseExtensions
     if (!await context.Tags.AnyAsync())
     {
       await context.Tags.AddRangeAsync(InitialData.Tags);
-      await context.SaveChangesAsync();
     }
   }
 
@@ -301,7 +279,6 @@ public static class DatabaseExtensions
     if (!await context.Testimonials.AnyAsync())
     {
       await context.Testimonials.AddRangeAsync(InitialData.Testimonials);
-      await context.SaveChangesAsync();
     }
   }
 }

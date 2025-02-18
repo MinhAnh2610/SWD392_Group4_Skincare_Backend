@@ -55,36 +55,35 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>, IApplic
   {
 
     builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-
-    builder.ApplyConfiguration(new BatchConfiguration());
-    builder.ApplyConfiguration(new BlogConfiguration());
-    builder.ApplyConfiguration(new BlogTagConfiguration());
-    builder.ApplyConfiguration(new BrandConfiguration());
-    builder.ApplyConfiguration(new CartItemConfiguration());
-    builder.ApplyConfiguration(new CartConfiguration());
-    builder.ApplyConfiguration(new CategoryConfiguration());
-    builder.ApplyConfiguration(new CosmeticConfiguration());
-    builder.ApplyConfiguration(new CosmeticImageConfiguration());
-    builder.ApplyConfiguration(new CosmeticSubCategoryConfiguration()); 
-    builder.ApplyConfiguration(new CosmeticTypeConfiguration());
-    builder.ApplyConfiguration(new FeedbackConfiguration());
-    builder.ApplyConfiguration(new OrderConfiguration());
-    builder.ApplyConfiguration(new OrderItemConfiguration());
-    builder.ApplyConfiguration(new OrderConfiguration());
-    builder.ApplyConfiguration(new PaymentConfiguration());
-    builder.ApplyConfiguration(new QuestionConfiguration());
-    builder.ApplyConfiguration(new QuestionOptionConfiguration());
-    builder.ApplyConfiguration(new QuestionTypeConfiguration());
-    builder.ApplyConfiguration(new QuizConfiguration());
-    builder.ApplyConfiguration(new RefundConfiguration());
-    builder.ApplyConfiguration(new RefundItemConfiguration());
-    builder.ApplyConfiguration(new RoutineConfiguration());
-    builder.ApplyConfiguration(new RoutineStepConfiguration());
-    builder.ApplyConfiguration(new SkinTypeConfiguration());
-    builder.ApplyConfiguration(new SubCategoryConfiguration());
-    builder.ApplyConfiguration(new TagConfiguration());
-    builder.ApplyConfiguration(new UserConfiguration());
-    builder.ApplyConfiguration(new PaymentConfiguration());
+    //builder.ApplyConfiguration(new BatchConfiguration());
+    //builder.ApplyConfiguration(new BlogConfiguration());
+    //builder.ApplyConfiguration(new BlogTagConfiguration());
+    //builder.ApplyConfiguration(new BrandConfiguration());
+    //builder.ApplyConfiguration(new CartItemConfiguration());
+    //builder.ApplyConfiguration(new CartConfiguration());
+    //builder.ApplyConfiguration(new CategoryConfiguration());
+    //builder.ApplyConfiguration(new CosmeticConfiguration());
+    //builder.ApplyConfiguration(new CosmeticImageConfiguration());
+    //builder.ApplyConfiguration(new CosmeticSubCategoryConfiguration()); 
+    //builder.ApplyConfiguration(new CosmeticTypeConfiguration());
+    //builder.ApplyConfiguration(new FeedbackConfiguration());
+    //builder.ApplyConfiguration(new OrderConfiguration());
+    //builder.ApplyConfiguration(new OrderItemConfiguration());
+    //builder.ApplyConfiguration(new OrderConfiguration());
+    //builder.ApplyConfiguration(new PaymentConfiguration());
+    //builder.ApplyConfiguration(new QuestionConfiguration());
+    //builder.ApplyConfiguration(new QuestionOptionConfiguration());
+    //builder.ApplyConfiguration(new QuestionTypeConfiguration());
+    //builder.ApplyConfiguration(new QuizConfiguration());
+    //builder.ApplyConfiguration(new RefundConfiguration());
+    //builder.ApplyConfiguration(new RefundItemConfiguration());
+    //builder.ApplyConfiguration(new RoutineConfiguration());
+    //builder.ApplyConfiguration(new RoutineStepConfiguration());
+    //builder.ApplyConfiguration(new SkinTypeConfiguration());
+    //builder.ApplyConfiguration(new SubCategoryConfiguration());
+    //builder.ApplyConfiguration(new TagConfiguration());
+    //builder.ApplyConfiguration(new UserConfiguration());
+    //builder.ApplyConfiguration(new PaymentConfiguration());
     base.OnModelCreating(builder);
   }
 }
