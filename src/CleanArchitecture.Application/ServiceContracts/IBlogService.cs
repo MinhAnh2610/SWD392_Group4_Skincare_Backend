@@ -1,4 +1,4 @@
-﻿using CleanArchitecture.Application.DTOs.Blog;
+﻿using CleanArchitecture.Application.DTOs.BlogDto;
 
 namespace CleanArchitecture.Application.ServiceContracts;
 

@@ -1,6 +1,4 @@
-﻿
-using CleanArchitecture.Application.DTOs.Blog;
-using CleanArchitecture.Application.DTOs.Cosmetic;
+﻿using CleanArchitecture.Application.DTOs.BlogDto;
 using CleanArchitecture.Domain.Entities;
 
 namespace CleanArchitecture.Presentation.Endpoints;
@@ -23,7 +21,7 @@ public class BlogController : ICarterModule
       return Results.StatusCode(StatusCodes.Status500InternalServerError);
     })
     .WithName("GetBlogs")
-    .Produces<ApiResponse<CompanyInformation>>(StatusCodes.Status200OK)
+    .Produces<ApiResponse<List<BlogResponse>>>(StatusCodes.Status200OK)
     .ProducesProblem(StatusCodes.Status500InternalServerError)
     .WithSummary("GetBlogs")
     .WithDescription("Get Blogs");

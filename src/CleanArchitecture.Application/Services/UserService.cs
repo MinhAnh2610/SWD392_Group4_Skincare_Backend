@@ -1,4 +1,4 @@
-﻿using CleanArchitecture.Application.DTOs.User;
+﻿using CleanArchitecture.Application.DTOs.UserDto;
 using CleanArchitecture.Application.ServiceContracts;
 using FluentValidation;
 using IdentityModel;

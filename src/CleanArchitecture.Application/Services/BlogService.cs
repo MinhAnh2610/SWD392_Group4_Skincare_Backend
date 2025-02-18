@@ -1,4 +1,4 @@
-﻿using CleanArchitecture.Application.DTOs.Blog;
+﻿using CleanArchitecture.Application.DTOs.BlogDto;
 using Microsoft.AspNetCore.Http;
 
 namespace CleanArchitecture.Application.Services;
@@ -18,11 +18,6 @@ public class BlogService : IBlogService
     return Result<List<BlogResponse>>.Success(blogs.Select(b => new BlogResponse
     {
       Id = b.Id,
-      CreateAt = b.CreateAt,
-      CreatedBy = b.CreatedBy,
-      LastModified = b.LastModified,
-      LastModifiedBy = b.LastModifiedBy,
-      IsActive = b.IsActive,
       StaffId = b.StaffId,
       Staff = b.Staff,
       Title = b.Title,

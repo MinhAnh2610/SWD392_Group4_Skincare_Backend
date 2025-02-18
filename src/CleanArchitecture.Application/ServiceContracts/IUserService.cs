@@ -1,4 +1,4 @@
-﻿using CleanArchitecture.Application.DTOs.User;
+﻿using CleanArchitecture.Application.DTOs.UserDto;
 
 namespace CleanArchitecture.Application.ServiceContracts;
 

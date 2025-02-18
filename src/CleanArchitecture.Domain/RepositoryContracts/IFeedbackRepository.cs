@@ -2,4 +2,5 @@
 
 public interface IFeedbackRepository : IGenericRepository<Feedback>
 {
+  Task<List<Feedback>> GetAllFeedbacksAsync();
 }

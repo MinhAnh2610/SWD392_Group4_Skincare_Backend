@@ -8,4 +8,11 @@ public class TestimonialRepository : GenericRepository<Testimonial>, ITestimonia
   {
     
   }
+
+  public async Task<List<Testimonial>> GetAllTestimonialsAsync()
+  {
+    return await _context.Testimonials
+      .Include(t => t.Customer)
+      .ToListAsync();
+  }
 }

@@ -2,4 +2,5 @@
 
 public interface ICosmeticTypeRepository : IGenericRepository<CosmeticType>
 {
+  Task<List<CosmeticType>> GetAllCosmeticTypesAsync();
 }

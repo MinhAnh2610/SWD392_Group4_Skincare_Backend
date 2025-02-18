@@ -14,6 +14,11 @@ public class CosmeticRepository : GenericRepository<Cosmetic>, ICosmeticReposito
       .Include(c => c.Brand)
       .Include(c => c.SkinType)
       .Include(c => c.CosmeticType)
+      .Include(c => c.CosmeticSubcategories)
+        .ThenInclude(cs => cs.SubCategory)
+      .Include(c => c.CosmeticImages)
+      .Include(c => c.Feedbacks)
+        .ThenInclude(f => f.Customer)
       .ToListAsync();
   }
 }

@@ -1,4 +1,4 @@
-﻿using CleanArchitecture.Application.DTOs.Role;
+﻿using CleanArchitecture.Application.DTOs.RoleDto;
 
 namespace CleanArchitecture.Application.Validators.Role;
 
