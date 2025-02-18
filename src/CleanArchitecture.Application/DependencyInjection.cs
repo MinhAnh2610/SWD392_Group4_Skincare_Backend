@@ -54,7 +54,8 @@ public static class DependencyInjection
     //services.AddScoped<IProfileService, ProfileService>();
     services.AddScoped<IUserService, UserService>();
     services.AddScoped<IRoleService, RoleService>();
-
+    services.AddScoped<IOrderService, OrderService>();
+    services.AddScoped<IFeedbackService, FeedbackService>();
     return services;
   }
 }
