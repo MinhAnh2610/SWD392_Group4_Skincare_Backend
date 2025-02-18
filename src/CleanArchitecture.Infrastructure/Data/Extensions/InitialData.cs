@@ -6,7 +6,7 @@ internal class InitialData
   {
     new()
     {
-      Id = Guid.NewGuid(),
+      Id = new Guid("8E62D9EE-64AF-47E7-8A49-FA1E2F5DA054"),
       UserName = "Admin123",
       Email = "admin123@gmail.com",
       EmailConfirmed = true,
@@ -70,7 +70,6 @@ internal class InitialData
       BirthDate = new DateOnly(1995, 12, 5),
       Gender = false,
       Email = "emma.williams@example.com",
-      SkinTypeId = new Guid("F73B3596-D3F0-4DA9-BA46-0E75D332658B"),
       PhoneNumber = "1234567890"
     },
     new User
@@ -82,7 +81,6 @@ internal class InitialData
       BirthDate = new DateOnly(2000, 7, 19),
       Gender = true,
       Email = "daniel.brown@example.com",
-      SkinTypeId = new Guid("F73B3596-D3F0-4DA9-BA46-0E75D332658B"),
       PhoneNumber = "1234567890"
     }
   };
@@ -723,7 +721,6 @@ internal class InitialData
         {
           Id = new Guid("A64ACFD4-2352-4A5F-AF71-F010549139F8"),
           RoutineId = routines[0].Id,
-          Routine = routines[0],
           CosmeticId = cosmetics[1].Id,
           StepNumber = 1
         },
@@ -731,7 +728,6 @@ internal class InitialData
         {
           Id = new Guid("A26909AB-7E98-4241-8967-5C1099C1D12B"),
           RoutineId = routines[0].Id,
-          Routine = routines[0],
           CosmeticId = cosmetics[4].Id,
           StepNumber = 2
         },
@@ -739,7 +735,6 @@ internal class InitialData
         {
           Id = new Guid("92867F27-6111-4DE4-A4A3-50A28031BDE6"),
           RoutineId = routines[0].Id,
-          Routine = routines[0],
           CosmeticId = cosmetics[2].Id,
           StepNumber = 3
         },
@@ -747,7 +742,6 @@ internal class InitialData
         {
           Id = new Guid("4C7362B9-D2C3-4013-8637-94AD06193845"),
           RoutineId = routines[0].Id,
-          Routine = routines[0],
           CosmeticId = cosmetics[3].Id,
           StepNumber = 4
         },
@@ -757,15 +751,13 @@ internal class InitialData
         {
           Id = new Guid("BCDCA4D0-45BB-4074-B0DD-E50D5FF4A823"),
           RoutineId = routines[1].Id,
-          Routine = routines[1],
           CosmeticId = cosmetics[1].Id,
           StepNumber = 1
         },
         new RoutineStep
         {
-          Id = new Guid("BCDCA4D0-45BB-4074-B0DD-E50D5FF4A823"),
+          Id = new Guid("26EFC8B8-3139-4EEA-8442-2BABC1D54326"),
           RoutineId = routines[1].Id,
-          Routine = routines[1],
           CosmeticId = cosmetics[2].Id,
           StepNumber = 2
         },
@@ -773,7 +765,6 @@ internal class InitialData
         {
           Id = new Guid("5EBF2F4F-78EB-4159-9780-47D01D1826FD"),
           RoutineId = routines[1].Id,
-          Routine = routines[1],
           CosmeticId = cosmetics[3].Id,
           StepNumber = 3
         }
