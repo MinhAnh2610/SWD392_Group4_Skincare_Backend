@@ -1,7 +1,10 @@
-﻿using CleanArchitecture.Application.DTOs.Cosmetic;
+﻿using Castle.MicroKernel.Registration;
+using CleanArchitecture.Application.DTOs.Cosmetic;
 using CleanArchitecture.Application.ServiceContracts;
 using CleanArchitecture.Domain.Entities;
 using CleanArchitecture.Domain.RepositoryContracts;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -12,122 +15,145 @@ using System.Xml.Linq;
 
 namespace CleanArchitecture.Application.Services
 {
-public class CosmeticService : ICosmeticService
-{
-    private readonly ICosmeticRepository _cosmeticRepository;
-   private readonly IUnitOfWork _unitOfWork;
+  public class CosmeticService : ICosmeticService
+  {
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
 
-        public CosmeticService(
-        ICosmeticRepository cosmeticRepository
-      )
+    public CosmeticService(
+    IUnitOfWork unitOfWork, IMapper mapper)
     {
-      _cosmeticRepository = cosmeticRepository;
-
+      _unitOfWork = unitOfWork;
+      _mapper = mapper;
     }
     public async Task<Result<CreateCosmetic>> CreateCosmetic(Cosmetic cosmetic)
     {
-      throw new NotImplementedException();
+      var existcosmetic = _unitOfWork.Cosmetics.GetById(cosmetic.Id);
+      if (existcosmetic != null)
+      {
+        return Result<CreateCosmetic>.Failure([CosmeticErrors.CosmeticAlreadyExist], StatusCodes.Status400BadRequest);
+      }
+      else
+      {
+        await _unitOfWork.Cosmetics.CreateAsync(cosmetic);
+        var output = cosmetic.Adapt<CreateCosmetic>();
+        return Result<CreateCosmetic>.Success(output, StatusCodes.Status201Created);
+      }
     }
 
     public async Task<Result<List<CosmeticResponse>>> GetAllCosmetics()
     {
-      var cosmetic = await _cosmeticRepository.GetAllAsync();
+      var cosmetic = await _unitOfWork.Cosmetics.GetAllAsync();
       if (cosmetic != null)
       {
-        return Result<List<Cosmetic>>.Success(cosmetic, StatusCodes.Status200OK);
+        var cosmeticsReponse = cosmetic.Adapt<List<CosmeticResponse>>();
+        return Result<List<CosmeticResponse>>.Success(cosmeticsReponse, StatusCodes.Status200OK);
       }
       else
       {
-        return Result<List<Cosmetic>>.Failure([CosmeticErrors.CosmeticNotFound], StatusCodes.Status404NotFound);
+        return Result<List<CosmeticResponse>>.Failure([CosmeticErrors.CosmeticNotFound], StatusCodes.Status404NotFound);
       }
     }
 
-    public async Task<Result<Cosmetic>> GetCosmeticById(int id)
+    public async Task<Result<CosmeticResponse>> GetCosmeticById(Guid id)
     {
-        var cosmetic = await _cosmeticRepository.GetByIdAsync(id);
-        if (cosmetic != null)
-        {
-          return Result<Cosmetic>.Success(cosmetic, StatusCodes.Status200OK);
-        }
-        else
-        {
-          return Result<Cosmetic>.Failure([CosmeticErrors.CosmeticNotFound], StatusCodes.Status404NotFound);
-        }
+      var cosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(id);
+      if (cosmetic != null)
+      {
+        var cosmeticResponse = cosmetic.Adapt<CosmeticResponse>();
+        return Result<CosmeticResponse>.Success(cosmeticResponse, StatusCodes.Status200OK);
+      }
+      else
+      {
+        return Result<CosmeticResponse>.Failure([CosmeticErrors.CosmeticNotFound], StatusCodes.Status404NotFound);
+      }
     }
 
-    public async Task<Result<List<Cosmetic>>> GetCosmeticsByBrandId(Guid brandId)
+    public async Task<Result<List<CosmeticResponse>>> GetCosmeticsByBrandId(Guid brandId)
     {
-      var cosmetic = await _cosmeticRepository.GetListByAnyId(e => e.BrandId == brandId);
+      var cosmetic = await _unitOfWork.Cosmetics.GetListByAnyId(e => e.BrandId == brandId);
       if (cosmetic != null)
       {
-        return Result<List<Cosmetic>>.Success(cosmetic, StatusCodes.Status200OK);
+        var cosmeticResponse = cosmetic.Adapt<List<CosmeticResponse>>();
+        return Result<List<CosmeticResponse>>.Success(cosmeticResponse, StatusCodes.Status200OK);
       }
       else
       {
-        return Result<List<Cosmetic>>.Failure([CosmeticErrors.CosmeticNotFound], StatusCodes.Status404NotFound);
+        return Result<List<CosmeticResponse>>.Failure([CosmeticErrors.CosmeticNotFound], StatusCodes.Status404NotFound);
       }
     }
-    public async Task<Result<List<Cosmetic>>> GetCosmeticsByName(string name)
+    public async Task<Result<List<CosmeticResponse>>> GetCosmeticsByName(string name)
     {
-      var cosmetic = await _cosmeticRepository.GetListByAnyId(e => e.Name == name);
+      var cosmetic = await _unitOfWork.Cosmetics.GetListByAnyId(e => e.Name == name);
       if (cosmetic != null)
       {
-        return Result<List<Cosmetic>>.Success(cosmetic, StatusCodes.Status200OK);
+        var cosmeticResponse = cosmetic.Adapt<List<CosmeticResponse>>();
+        return Result<List<CosmeticResponse>>.Success(cosmeticResponse, StatusCodes.Status200OK);
       }
       else
-  {
-        return Result<List<Cosmetic>>.Failure([CosmeticErrors.CosmeticNotFound], StatusCodes.Status404NotFound);
+      {
+        return Result<List<CosmeticResponse>>.Failure([CosmeticErrors.CosmeticNotFound], StatusCodes.Status404NotFound);
       }
+    }
+
+    public async Task<Result<List<CosmeticResponse>>> GetCosmeticsBySkinTypeId(Guid skinTypeId)
+    {
+      var cosmetic = await _unitOfWork.Cosmetics.GetListByAnyId(e => e.SkinTypeId== skinTypeId);
+      if (cosmetic != null)
+      {
+        var cosmeticResponse = cosmetic.Adapt<List<CosmeticResponse>>();
+        return Result<List<CosmeticResponse>>.Success(cosmeticResponse, StatusCodes.Status200OK);
+      }
+      else
+      {
+        return Result<List<CosmeticResponse>>.Failure([CosmeticErrors.CosmeticNotFound], StatusCodes.Status404NotFound);
+      }
+    }
+
+    public async Task<Result<List<CosmeticResponse>>> GetCosmeticsByTypeId(Guid typeId)
+    {
+      var cosmetic = await _unitOfWork.Cosmetics.GetListByAnyId(e => e.CosmeticTypeId == typeId);
+      if (cosmetic != null)
+      {
+        var cosmeticResponse = cosmetic.Adapt<List<CosmeticResponse>>();
+        return Result<List<CosmeticResponse>>.Success(cosmeticResponse, StatusCodes.Status200OK);
+      }
+      else
+      {
+        return Result<List<CosmeticResponse>>.Failure([CosmeticErrors.CosmeticNotFound], StatusCodes.Status404NotFound);
+      }
+    }
+
+    public async Task<Result<CosmeticResponse>> UpdateCosmetic(UpdateCosmetic cosmetic)
+    {
+      var existcosmetic = _unitOfWork.Cosmetics.GetById(cosmetic.Id);
+      if (existcosmetic == null)
+      {
+        return Result<CosmeticResponse>.Failure([CosmeticErrors.CosmeticNotFound], StatusCodes.Status404NotFound);
+      }
+      else
+      {
+        existcosmetic.Price = cosmetic.Price;
+        existcosmetic.MainUsage = cosmetic.MainUsage;
+        existcosmetic.Instructions = cosmetic.Instructions;
+        await _unitOfWork.Cosmetics.UpdateAsync(existcosmetic);
+        var output = existcosmetic.Adapt<CosmeticResponse>();
+        return Result<CosmeticResponse>.Success(output, StatusCodes.Status200OK);
+      }
+    }
+    public async Task<Result<CosmeticResponse>> DeleteCosmetic(Guid id)
+    {
+      var existcosmetic = _unitOfWork.Cosmetics.GetById(id);
+      if (existcosmetic == null)
+      {
+        return Result<CosmeticResponse>.Failure([CosmeticErrors.CosmeticNotFound], StatusCodes.Status404NotFound);
+      }
+      else
+      {
+        await _unitOfWork.Cosmetics.RemoveAsync(existcosmetic);
+        var output = existcosmetic.Adapt<CosmeticResponse>();
+        return Result<CosmeticResponse>.Success(output, StatusCodes.Status200OK);
+      }
+    }
   }
-
-    public async Task<Result<List<Cosmetic>>> GetCosmeticsByTypeId(Guid typeId)
-    {
-      var cosmetic = await _cosmeticRepository.GetListByAnyId(e => e.CosmeticTypeId == typeId);
-      if (cosmetic != null)
-      {
-        return Result<List<Cosmetic>>.Success(cosmetic, StatusCodes.Status200OK);
-      }
-      else
-  {
-        return Result<List<Cosmetic>>.Failure([CosmeticErrors.CosmeticNotFound], StatusCodes.Status404NotFound);
-      }
-    }
-
-    public Task<Result<UpdateCosmetic>> UpdateCosmetic(Cosmetic cosmetic)
-    {
-      throw new NotImplementedException();
-    }
-  }
-    public async Task<Result<List<CosmeticResponse>>> GetAllCosmeticsAsync()
-    {
-        var cosmetics = await _unitOfWork.Cosmetics.GetCosmeticsAsync();
-
-        return Result<List<CosmeticResponse>>.Success(cosmetics.Select(c => new CosmeticResponse
-        {
-            Id = c.Id,
-            CreateAt = c.CreateAt,
-            CreatedBy = c.CreatedBy,
-            LastModified = c.LastModified,
-            LastModifiedBy = c.LastModifiedBy,
-            IsActive = c.IsActive,
-            BrandId = c.BrandId,
-            Brand = c.Brand,
-            SkinTypeId = c.SkinTypeId,
-            SkinType = c.SkinType,
-            CosmeticTypeId = c.CosmeticTypeId,
-            CosmeticType = c.CosmeticType,
-            Name = c.Name,
-            Price = c.Price,
-            Gender = c.Gender,
-            Notice = c.Notice,
-            Ingredients = c.Ingredients,
-            MainUsage = c.MainUsage,
-            Texture = c.Texture,
-            Origin = c.Origin,
-            Instructions = c.Instructions,
-            CosmeticSubcategories = c.CosmeticSubcategories.ToList(),
-            CosmeticImages = c.CosmeticImages.ToList(),
-            Feedbacks = c.Feedbacks.ToList()
-        }).ToList(), StatusCodes.Status200OK);
-    }
 }

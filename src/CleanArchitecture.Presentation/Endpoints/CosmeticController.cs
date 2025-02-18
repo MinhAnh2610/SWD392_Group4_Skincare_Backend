@@ -12,7 +12,7 @@ public class CosmeticController : ICarterModule
     #region Get Cosmetics API
     group.MapGet("/", async (ICosmeticService service) =>
     {
-      var result = await service.GetAllCosmeticsAsync();
+      var result = await service.GetAllCosmetics();
       if (result != null)
       {
         return Results.Ok(ApiResponse<List<CosmeticResponse>>.SuccessResponse(result.Data!, "Retrieved Cosmetics Successfully."));
