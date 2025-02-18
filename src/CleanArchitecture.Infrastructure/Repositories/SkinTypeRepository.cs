@@ -8,4 +8,13 @@ public class SkinTypeRepository : GenericRepository<SkinType>, ISkinTypeReposito
   {
     
   }
+
+  public async Task<List<SkinType>> GetAllSkinTypesAsync()
+  {
+    return await _context.SkinTypes
+      .Include(st => st.Customers)
+      .Include(st => st.Cosmetics)
+      .Include(st => st.Routines)
+      .ToListAsync();
+  }
 }

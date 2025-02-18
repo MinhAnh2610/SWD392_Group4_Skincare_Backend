@@ -1,5 +1,5 @@
-﻿using CleanArchitecture.Application.DTOs.Role;
-using CleanArchitecture.Application.DTOs.User;
+﻿using CleanArchitecture.Application.DTOs.RoleDto;
+using CleanArchitecture.Application.DTOs.UserDto;
 
 namespace CleanArchitecture.Application.ServiceContracts;
 

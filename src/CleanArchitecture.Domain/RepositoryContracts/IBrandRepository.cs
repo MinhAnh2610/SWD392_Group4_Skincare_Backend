@@ -2,4 +2,5 @@
 
 public interface IBrandRepository : IGenericRepository<Brand>
 {
+  Task<List<Brand>> GetAllBrandsAsync();
 }

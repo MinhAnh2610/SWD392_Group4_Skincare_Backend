@@ -1,4 +1,4 @@
-﻿using CleanArchitecture.Application.DTOs.User;
+﻿using CleanArchitecture.Application.DTOs.UserDto;
 using CleanArchitecture.Application.Enums;
 
 namespace CleanArchitecture.Presentation.Endpoints;
