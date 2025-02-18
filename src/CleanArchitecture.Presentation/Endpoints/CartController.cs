@@ -33,7 +33,7 @@ namespace CleanArchitecture.Presentation.Endpoints
       #endregion
 
       #region Add to Cart API
-      group.MapGet("/add-product", async (ICartService cartService, AddProductRequest addProductRequest) =>
+      group.MapPut("/add-product", async (ICartService cartService, AddProductRequest addProductRequest) =>
       {
         var result = await cartService.AddCartItemAsync(addProductRequest);
         if (result.IsSuccess)
@@ -56,7 +56,7 @@ namespace CleanArchitecture.Presentation.Endpoints
       #endregion
 
       #region Delete Item from Cart API
-      group.MapGet("/delete-product", async (ICartService cartService, RemoveProductRequest removeProductRequest) =>
+      group.MapPut("/delete-product", async (ICartService cartService, RemoveProductRequest removeProductRequest) =>
       {
         var result = await cartService.DeletebyIdAsync(removeProductRequest);
         if (result.IsSuccess)

@@ -4,7 +4,7 @@ public class Order : Entity<Guid>
 {
     public Guid CustomerId { get; set; }
     public User Customer { get; set; } = default!;
-    public Guid CouponId { get; set; }
+    public Guid? CouponId { get; set; }
     public Coupon Coupon { get; set; } = default!;
     public Decimal SubTotal { get; set; }
     public Decimal TotalPrice { get; set; }

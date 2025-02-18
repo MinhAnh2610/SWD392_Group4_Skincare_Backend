@@ -11,10 +11,12 @@ namespace CleanArchitecture.Application.Services
   public class OrderService : IOrderService
   {
     private readonly IOrderRepository _orderRepository;
+    private readonly ICartRepository _cartRepository;
 
-    public OrderService(IOrderRepository orderRepository)
+    public OrderService(IOrderRepository orderRepository, ICartRepository cartRepository)
     {
       _orderRepository = orderRepository;
+      _cartRepository = cartRepository;
     }
 
     public async Task<Result<List<OrderResponse>>> GetAllOrdersAsync()
@@ -71,7 +73,81 @@ namespace CleanArchitecture.Application.Services
         await _orderRepository.UpdateAsync(order);
 
         var response = MapToOrderResponse(order);
-        return Result < OrderResponse >.Success(response, StatusCodes.Status200OK);
+        return Result<OrderResponse>.Success(response, StatusCodes.Status200OK);
+      }
+      catch (Exception ex)
+      {
+        return Result<OrderResponse>.Failure(
+            new List<Error> { new Error("Order.UpdateStatus", ex.Message) },
+            StatusCodes.Status500InternalServerError
+        );
+      }
+    }
+
+    public async Task<Result<OrderResponse>> CheckOut(CheckOutRequest checkOutRequest)
+    {
+      try
+      {
+        var cart = await _cartRepository.GetByIdAsync(checkOutRequest.CartId);
+        if (cart == null)
+        {
+          return Result<OrderResponse>.Failure(
+              new List<Error> { new Error("Order.NotFound", "Order not found") },
+              StatusCodes.Status404NotFound
+          );
+        }
+
+        if (cart.CartItems != null && cart.CartItems.Count == 0)
+        {
+          return Result<OrderResponse>.Failure(
+                 new List<Error> { new Error("Order.CheckOut", "Cart is empty") },
+                 StatusCodes.Status400BadRequest
+                 );
+        }
+
+        if(cart.Customer.Id != checkOutRequest.UserId)
+        {
+          return Result<OrderResponse>.Failure(
+                 new List<Error> { new Error("Order.CheckOut", "Customer Id is not valid") },
+                 StatusCodes.Status400BadRequest
+                 );
+        }
+
+        if(checkOutRequest.ShippingAddress == null)
+        {
+          return Result<OrderResponse>.Failure(
+                 new List<Error> { new Error("Order.CheckOut", "Shipping Address is required") },
+                 StatusCodes.Status400BadRequest
+                 );
+        }
+
+        if(checkOutRequest.BillingAddress == null)
+        {
+          return Result<OrderResponse>.Failure(
+                 new List<Error> { new Error("Order.CheckOut", "Billing Address is required") },
+                 StatusCodes.Status400BadRequest
+                 );
+        }
+
+        Order order = new Order
+        {
+          CustomerId = cart.Customer.Id,
+          CouponId = checkOutRequest.CouponId,
+          SubTotal = cart.TotalPrice,
+          TotalPrice = cart.TotalPrice,
+          OrderDate = DateTime.UtcNow,
+          ShippingAddress = checkOutRequest.ShippingAddress,
+          BillingAddress = checkOutRequest.BillingAddress,
+          TrackingNumber = Guid.NewGuid().ToString(),
+          Status = "Pending",
+          CreateAt = DateTime.UtcNow,
+          CreatedBy = cart.Customer.NormalizedUserName,
+          LastModified = DateTime.UtcNow,
+          LastModifiedBy = cart.Customer.NormalizedUserName
+        };
+
+        var response = MapToOrderResponse(order);
+        return Result<OrderResponse>.Success(response, StatusCodes.Status200OK);
       }
       catch (Exception ex)
       {
