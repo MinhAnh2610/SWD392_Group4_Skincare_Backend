@@ -2,8 +2,7 @@
 
 public class CartItem
 {
-  public Guid CustomerId { get; set; }
-  public User Customer { get; set; } = default!;
+  public Guid CartId { get; set; }
   public Guid CosmeticId { get; set; }
   public Cosmetic Cosmetic { get; set; } = default!;
   public int Quantity { get; set; }
