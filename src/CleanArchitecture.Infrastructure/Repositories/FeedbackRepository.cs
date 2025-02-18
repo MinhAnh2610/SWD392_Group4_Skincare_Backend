@@ -7,13 +7,14 @@ public class FeedbackRepository : GenericRepository<Feedback>, IFeedbackReposito
   public FeedbackRepository(ApplicationDbContext context) : base(context)
   {
   }
-  
+
   public async Task<List<Feedback>> GetAllFeedbacksAsync()
   {
     return await _context.Feedbacks
       .Include(f => f.Cosmetic)
       .Include(f => f.Customer)
       .ToListAsync();
+  }
 
   public async Task<List<Feedback>> GetFeedbacksByCustomerIdAsync(Guid customerId)
   {

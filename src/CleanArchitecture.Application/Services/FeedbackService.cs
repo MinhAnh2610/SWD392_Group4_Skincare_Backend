@@ -28,7 +28,7 @@ public class FeedbackService : IFeedbackService
   {
     try
     {
-      var feedbacks = await _feedbackRepository.GetFeedbacksByCustomerIdAsync(customerId);
+      var feedbacks = await _unitOfWork.Feedbacks.GetFeedbacksByCustomerIdAsync(customerId);
       var responses = feedbacks.Select(MapToFeedbackResponse).ToList();
       return Result<List<FeedbackResponse>>.Success(responses, StatusCodes.Status200OK);
     }
@@ -39,5 +39,16 @@ public class FeedbackService : IFeedbackService
           StatusCodes.Status500InternalServerError
       );
     }
+  }
+
+  private static FeedbackResponse MapToFeedbackResponse(Feedback feedback)
+  {
+    return new FeedbackResponse
+    {
+      Id = feedback.Id,
+      CustomerId = feedback.CustomerId,
+      Content = feedback.Content,
+      Rating = feedback.Rating
+    };
   }
 }
