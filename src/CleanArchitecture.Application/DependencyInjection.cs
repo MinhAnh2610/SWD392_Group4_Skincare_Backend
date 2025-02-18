@@ -17,43 +17,44 @@ namespace CleanArchitecture.Application;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplicationServices
-      (this IServiceCollection services, IConfiguration configuration)
-    {
+  public static IServiceCollection AddApplicationServices
+    (this IServiceCollection services, IConfiguration configuration)
+  {
 
-        services.AddFeatureManagement();
-        services.AddHttpContextAccessor();
+    services.AddFeatureManagement();
+    services.AddHttpContextAccessor();
 
-        // Add validators
-        #region Auth Validators
-        services.AddScoped<IValidator<LoginRequest>, LoginValidator>();
-        services.AddScoped<IValidator<RegisterRequest>, RegisterValidator>();
-        services.AddScoped<IValidator<ForgotPasswordRequest>, ForgotPasswordValidator>();
-        services.AddScoped<IValidator<ResetPasswordRequest>, ResetPasswordValidator>();
-        services.AddScoped<IValidator<RefreshTokenRequest>, RefreshTokenValidator>();
-        #endregion
+    // Add validators
+    #region Auth Validators
+    services.AddScoped<IValidator<LoginRequest>, LoginValidator>();
+    services.AddScoped<IValidator<RegisterRequest>, RegisterValidator>();
+    services.AddScoped<IValidator<ForgotPasswordRequest>, ForgotPasswordValidator>();
+    services.AddScoped<IValidator<ResetPasswordRequest>, ResetPasswordValidator>();
+    services.AddScoped<IValidator<RefreshTokenRequest>, RefreshTokenValidator>();
+    #endregion
 
-        #region User Validators
-        services.AddScoped<IValidator<UpdateProfileRequest>, UpdateProfileValidator>();
-        services.AddScoped<IValidator<UserRequest>, UserValidator>();
-        #endregion
+    #region User Validators
+    services.AddScoped<IValidator<UpdateProfileRequest>, UpdateProfileValidator>();
+    services.AddScoped<IValidator<UserRequest>, UserValidator>();
+    #endregion
 
-        #region Role Validators
-        services.AddScoped<IValidator<AssignRoleRequest>, AssignRoleValidator>();
-        #endregion
+    #region Role Validators
+    services.AddScoped<IValidator<AssignRoleRequest>, AssignRoleValidator>();
+    #endregion
 
-        // Add identity server 4 validator for owner password
-        services.AddTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>();
+    // Add identity server 4 validator for owner password
+    services.AddTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>();
 
-        // Add services
-        services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IPaymentService, PaymentService>();
-        services.AddScoped<IRefundService, RefundService>();
-        services.AddScoped<IRefundItemService, RefundItemService>();
-        //services.AddScoped<IProfileService, ProfileService>();
-        services.AddScoped<IUserService, UserService>();
-        services.AddScoped<IRoleService, RoleService>();
+    // Add services
+    services.AddScoped<IAuthService, AuthService>();
+    services.AddScoped<ICosmeticService, CosmeticService>();
+    services.AddScoped<IPaymentService, PaymentService>();
+    services.AddScoped<IRefundService, RefundService>();
+    services.AddScoped<IRefundItemService, RefundItemService>();
+    //services.AddScoped<IProfileService, ProfileService>();
+    services.AddScoped<IUserService, UserService>();
+    services.AddScoped<IRoleService, RoleService>();
 
-        return services;
-    }
+    return services;
+  }
 }
