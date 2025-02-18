@@ -96,11 +96,7 @@ namespace CleanArchitecture.Application.Services
         BillingAddress = order.BillingAddress,
         TrackingNumber = order.TrackingNumber,
         DeliveryDate = order.DeliveryDate,
-        Status = order.Status,
-        CreateAt = (DateTime)order.CreateAt,
-        CreatedBy = order.CreatedBy,
-        LastModified = order.LastModified,
-        LastModifiedBy = order.LastModifiedBy
+        Status = order.Status
       };
     }
   }
