@@ -62,6 +62,8 @@ public static class DependencyInjection
     services.AddScoped<ICartService, CartService>();
     services.AddScoped<ICouponService, CouponService>();
 
+    services.AddScoped<IOrderService, OrderService>();
+    services.AddScoped<IFeedbackService, FeedbackService>();
     return services;
   }
 }

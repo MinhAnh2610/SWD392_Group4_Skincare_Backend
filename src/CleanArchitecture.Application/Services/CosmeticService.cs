@@ -14,7 +14,7 @@ public class CosmeticService : ICosmeticService
 
   public async Task<Result<List<CosmeticResponse>>> GetAllCosmeticsAsync()
   {
-    var cosmetics = await _unitOfWork.Cosmetics.GetAllAsync();
+    var cosmetics = await _unitOfWork.Cosmetics.GetCosmeticsAsync();
 
     return Result<List<CosmeticResponse>>.Success(cosmetics.Select(c => new CosmeticResponse
     {
