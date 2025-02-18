@@ -47,11 +47,11 @@ public static class DependencyInjection
 
     // Add services
     services.AddScoped<IAuthService, AuthService>();
+    services.AddScoped<IBlogService, BlogService>();
     services.AddScoped<ICosmeticService, CosmeticService>();
     services.AddScoped<IPaymentService, PaymentService>();
     services.AddScoped<IRefundService, RefundService>();
     services.AddScoped<IRefundItemService, RefundItemService>();
-    //services.AddScoped<IProfileService, ProfileService>();
     services.AddScoped<IUserService, UserService>();
     services.AddScoped<IRoleService, RoleService>();
 
