@@ -2,5 +2,4 @@
 
 public interface ICosmeticImageRepository : IGenericRepository<CosmeticImage>
 {
-  Task<List<CosmeticImage>> GetAllCosmeticImagesAsync();
 }

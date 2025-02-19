@@ -1,6 +1,4 @@
 ﻿using CleanArchitecture.Application.DTOs.UserDto;
-using CleanArchitecture.Application.ServiceContracts;
-using FluentValidation;
 using IdentityModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;

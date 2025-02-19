@@ -1,5 +1,4 @@
 ﻿using CleanArchitecture.Application.DTOs.BrandDto;
-using CleanArchitecture.Domain.Entities;
 
 namespace CleanArchitecture.Presentation.Endpoints;
 
@@ -12,7 +11,7 @@ public class BrandController : ICarterModule
     #region Get Brands API
     group.MapGet("/", async (IBrandService service) =>
     {
-      var result = await service.GetBrandsAsync();
+      var result = await service.GetAllBrandsAsync();
       if (result != null)
       {
         return Results.Ok(ApiResponse<List<BrandResponse>>.SuccessResponse(result.Data!, "Retrieved Brands Successfully."));

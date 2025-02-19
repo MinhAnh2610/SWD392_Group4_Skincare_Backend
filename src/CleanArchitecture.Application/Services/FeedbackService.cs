@@ -10,9 +10,9 @@ public class FeedbackService : IFeedbackService
   {
     _unitOfWork = unitOfWork;
   }
-  public async Task<Result<List<FeedbackResponse>>> GetFeedbacksAsync()
+  public async Task<Result<List<FeedbackResponse>>> GetAllFeedbacksAsync()
   {
-    var result = await _unitOfWork.Feedbacks.GetAllFeedbacksAsync();
+    var result = await _unitOfWork.Feedbacks.GetAllAsync();
 
     return Result<List<FeedbackResponse>>.Success(result.Select(f => new FeedbackResponse
     {

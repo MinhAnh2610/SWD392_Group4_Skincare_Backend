@@ -10,9 +10,9 @@ public class CosmeticImageService : ICosmeticImageService
   {
     _unitOfWork = unitOfWork;
   }
-  public async Task<Result<List<CosmeticImageResponse>>> GetCosmeticImagesAsync()
+  public async Task<Result<List<CosmeticImageResponse>>> GetAllCosmeticImagesAsync()
   {
-    var result = await _unitOfWork.CosmeticImages.GetAllCosmeticImagesAsync();
+    var result = await _unitOfWork.CosmeticImages.GetAllAsync();
 
     return Result<List<CosmeticImageResponse>>.Success(result.Select(ci => new CosmeticImageResponse
     {

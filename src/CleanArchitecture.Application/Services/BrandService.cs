@@ -11,9 +11,9 @@ public class BrandService : IBrandService
   {
     _unitOfWork = unitOfWork;
   }
-  public async Task<Result<List<BrandResponse>>> GetBrandsAsync()
+  public async Task<Result<List<BrandResponse>>> GetAllBrandsAsync()
   {
-    var result = await _unitOfWork.Brands.GetAllBrandsAsync();
+    var result = await _unitOfWork.Brands.GetAllAsync();
 
     return Result<List<BrandResponse>>.Success(result.Select(b => new BrandResponse
     {

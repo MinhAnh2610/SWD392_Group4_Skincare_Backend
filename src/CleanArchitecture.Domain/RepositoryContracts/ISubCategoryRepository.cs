@@ -2,5 +2,4 @@
 
 public interface ISubCategoryRepository : IGenericRepository<SubCategory>
 {
-  Task<List<SubCategory>> GetAllSubCategoriesAsync();
 }

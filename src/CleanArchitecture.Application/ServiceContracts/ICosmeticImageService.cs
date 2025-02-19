@@ -4,5 +4,5 @@ namespace CleanArchitecture.Application.ServiceContracts;
 
 public interface ICosmeticImageService
 {
-  Task<Result<List<CosmeticImageResponse>>> GetCosmeticImagesAsync();
+  Task<Result<List<CosmeticImageResponse>>> GetAllCosmeticImagesAsync();
 }

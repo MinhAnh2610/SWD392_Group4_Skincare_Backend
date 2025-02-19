@@ -8,7 +8,7 @@ public class CosmeticTypeRepository : GenericRepository<CosmeticType>, ICosmetic
   {
   }
 
-  public async Task<List<CosmeticType>> GetAllCosmeticTypesAsync()
+  public override async Task<List<CosmeticType>> GetAllAsync()
   {
     return await _context.CosmeticTypes
       .Include(ct => ct.Cosmetics)

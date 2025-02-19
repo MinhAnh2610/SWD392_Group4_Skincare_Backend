@@ -11,7 +11,7 @@ public class SkinTypeController : ICarterModule
     #region Get SkinTypes API
     group.MapGet("/", async (ISkinTypeService service) =>
     {
-      var result = await service.GetSkinTypesAsync();
+      var result = await service.GetAllSkinTypesAsync();
       if (result != null)
       {
         return Results.Ok(ApiResponse<List<SkinTypeResponse>>.SuccessResponse(result.Data!, "Retrieved Skikn Types Successfully."));

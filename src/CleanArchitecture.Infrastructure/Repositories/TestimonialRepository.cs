@@ -9,7 +9,7 @@ public class TestimonialRepository : GenericRepository<Testimonial>, ITestimonia
     
   }
 
-  public async Task<List<Testimonial>> GetAllTestimonialsAsync()
+  public override async Task<List<Testimonial>> GetAllAsync()
   {
     return await _context.Testimonials
       .Include(t => t.Customer)

@@ -10,9 +10,9 @@ public class SkinTypeService : ISkinTypeService
   {
     _unitOfWork = unitOfWork;
   }
-  public async Task<Result<List<SkinTypeResponse>>> GetSkinTypesAsync()
+  public async Task<Result<List<SkinTypeResponse>>> GetAllSkinTypesAsync()
   {
-    var result = await _unitOfWork.SkinTypes.GetAllSkinTypesAsync();
+    var result = await _unitOfWork.SkinTypes.GetAllAsync();
 
     return Result<List<SkinTypeResponse>>.Success(result.Select(st => new SkinTypeResponse
     {

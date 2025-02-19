@@ -1,13 +1,6 @@
 ﻿using CleanArchitecture.Application.DTOs.Cart;
-using CleanArchitecture.Application.ServiceContracts;
-using CleanArchitecture.Domain.Entities;
 using CleanArchitecture.Domain.RepositoryContracts;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CleanArchitecture.Application.Services
 {
@@ -15,17 +8,15 @@ namespace CleanArchitecture.Application.Services
 
   public class CartService : ICartService
   {
-    private readonly ICartRepository _cartRepository;
-    private readonly ICosmeticRepository _cosmeticRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CartService(ICartRepository cartRepository, ICosmeticRepository cosmeticRepository)
+    public CartService(IUnitOfWork unitOfWork)
     {
-      _cartRepository = cartRepository;
-      _cosmeticRepository = cosmeticRepository;
+      _unitOfWork = unitOfWork;
     }
     public async Task<Result<List<CartResponse>>> AddCartItemAsync(AddProductRequest addProductRequest)
     {
-      var cart = await _cartRepository.GetByIdAsync(addProductRequest.CartId);
+      var cart = await _unitOfWork.Carts.GetByIdAsync(addProductRequest.CartId);
       if (cart == null)
       {
         return Result<List<CartResponse>>.Failure(
@@ -33,11 +24,11 @@ namespace CleanArchitecture.Application.Services
               StatusCodes.Status500InternalServerError
               );
       }
-      var cosmetic = await _cosmeticRepository.GetByIdAsync(addProductRequest.CosmeticId);
+      var cosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(addProductRequest.CosmeticId);
       if (cosmetic == null)
       {
         return Result<List<CartResponse>>.Failure(
-              new List<Error> { new Error("Cart.GetAll", "Cosmeti Not Found") },
+              new List<Error> { new Error("Cart.GetAll", "Cosmetic Not Found") },
               StatusCodes.Status500InternalServerError
               );
       }
@@ -91,7 +82,7 @@ namespace CleanArchitecture.Application.Services
 
     public async Task<Result<List<CartResponse>>> DeletebyIdAsync(RemoveProductRequest removeProductRequest)
     {
-      var cart = await _cartRepository.GetByIdAsync(removeProductRequest.CartId);
+      var cart = await _unitOfWork.Carts.GetByIdAsync(removeProductRequest.CartId);
       if (cart == null)
       {
         return Result<List<CartResponse>>.Failure(
@@ -99,7 +90,7 @@ namespace CleanArchitecture.Application.Services
               StatusCodes.Status500InternalServerError
               );
       }
-      var cosmetic = await _cosmeticRepository.GetByIdAsync(removeProductRequest.CosmeticId);
+      var cosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(removeProductRequest.CosmeticId);
       if (cosmetic == null)
       {
         return Result<List<CartResponse>>.Failure(
@@ -139,7 +130,7 @@ namespace CleanArchitecture.Application.Services
     {
       try
       {
-        var carts = await _cartRepository.GetAllAsync();
+        var carts = await _unitOfWork.Carts.GetAllAsync();
         var response = carts.Select(cart => new CartResponse
         {
           Id = cart.Id,
@@ -162,7 +153,7 @@ namespace CleanArchitecture.Application.Services
     {
       try
       {
-        var carts = await _cartRepository.GetAllAsync();
+        var carts = await _unitOfWork.Carts.GetAllAsync();
         var response = carts.Select(cart => new CartResponse
         {
           Id = cart.Id,

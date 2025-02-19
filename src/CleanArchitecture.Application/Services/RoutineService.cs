@@ -1,26 +1,22 @@
-﻿// File: Application/Services/RoutineService.cs
-using CleanArchitecture.Application.DTOs.RoutineDTO;
-using CleanArchitecture.Application.ServiceContracts;
-using CleanArchitecture.Domain.Entities;
-using CleanArchitecture.Domain.RepositoryContracts;
+﻿using CleanArchitecture.Application.DTOs.RoutineDTO;
 using Microsoft.AspNetCore.Http;
 
 namespace CleanArchitecture.Application.Services
 {
   public class RoutineService : IRoutineService
   {
-    private readonly IRoutineRepository _routineRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public RoutineService(IRoutineRepository routineRepository)
+    public RoutineService(IUnitOfWork unitOfWork)
     {
-      _routineRepository = routineRepository;
+      _unitOfWork = unitOfWork;
     }
 
     public async Task<Result<List<RoutineResponse>>> GetAllRoutinesAsync()
     {
       try
       {
-        var routines = await _routineRepository.GetAllAsync();
+        var routines = await _unitOfWork.Routines.GetAllAsync();
         var responses = routines.Select(MapToRoutineResponse).ToList();
         return Result<List<RoutineResponse>>.Success(responses, StatusCodes.Status200OK);
       }
