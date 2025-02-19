@@ -11,7 +11,7 @@ public class FeedbackController : ICarterModule
     #region Get Feedbacks API
     group.MapGet("/", async (IFeedbackService service) =>
     {
-      var result = await service.GetFeedbacksAsync();
+      var result = await service.GetAllFeedbacksAsync();
       if (result != null)
       {
         return Results.Ok(ApiResponse<List<FeedbackResponse>>.SuccessResponse(result.Data!, "Retrieved Feedbacks Successfully."));

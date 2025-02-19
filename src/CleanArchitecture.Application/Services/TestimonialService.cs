@@ -10,9 +10,9 @@ public class TestimonialService : ITestimonialService
   {
     _unitOfWork = unitOfWork;
   }
-  public async Task<Result<List<TestimonialResponse>>> GetTestimonialsAsync()
+  public async Task<Result<List<TestimonialResponse>>> GetAllTestimonialsAsync()
   {
-    var result = await _unitOfWork.Testimonials.GetAllTestimonialsAsync();
+    var result = await _unitOfWork.Testimonials.GetAllAsync();
 
     return Result<List<TestimonialResponse>>.Success(result.Select(t => new TestimonialResponse
     {

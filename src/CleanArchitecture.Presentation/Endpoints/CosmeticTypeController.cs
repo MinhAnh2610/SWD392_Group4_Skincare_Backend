@@ -14,7 +14,7 @@ public class CosmeticTypeController : ICarterModule
     #region Get Cosmetic Types API
     group.MapGet("/", async (ICosmeticTypeService service) =>
     {
-      var result = await service.GetCosmeticTypesAsync();
+      var result = await service.GetAllCosmeticTypesAsync();
       if (result != null)
       {
         return Results.Ok(ApiResponse<List<CosmeticTypeResponse>>.SuccessResponse(result.Data!, "Retrieved Cosmetic Types Successfully."));

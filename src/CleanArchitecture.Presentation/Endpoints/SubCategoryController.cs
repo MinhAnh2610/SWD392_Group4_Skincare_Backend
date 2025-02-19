@@ -13,7 +13,7 @@ public class SubCategoryController : ICarterModule
     #region Get SubCategories API
     group.MapGet("/", async (ISubCategoryService service) =>
     {
-      var result = await service.GetSubCategoriesAsync();
+      var result = await service.GetAllSubCategoriesAsync();
       if (result != null)
       {
         return Results.Ok(ApiResponse<List<SubCategoryResponse>>.SuccessResponse(result.Data!, "Retrieved SubCategories Successfully."));

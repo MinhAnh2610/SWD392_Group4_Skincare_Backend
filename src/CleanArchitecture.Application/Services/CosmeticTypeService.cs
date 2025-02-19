@@ -10,9 +10,9 @@ public class CosmeticTypeService : ICosmeticTypeService
   {
     _unitOfWork = unitOfWork;
   }
-  public async Task<Result<List<CosmeticTypeResponse>>> GetCosmeticTypesAsync()
+  public async Task<Result<List<CosmeticTypeResponse>>> GetAllCosmeticTypesAsync()
   {
-    var result = await _unitOfWork.CosmeticTypes.GetAllCosmeticTypesAsync();
+    var result = await _unitOfWork.CosmeticTypes.GetAllAsync();
 
     return Result<List<CosmeticTypeResponse>>.Success(result.Select(ct => new CosmeticTypeResponse
     {

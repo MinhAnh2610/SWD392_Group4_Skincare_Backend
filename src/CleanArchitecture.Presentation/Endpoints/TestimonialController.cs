@@ -11,7 +11,7 @@ public class TestimonialController : ICarterModule
     #region Get Testimonials API
     group.MapGet("/", async (ITestimonialService service) =>
     {
-      var result = await service.GetTestimonialsAsync();
+      var result = await service.GetAllTestimonialsAsync();
       if (result != null)
       {
         return Results.Ok(ApiResponse<List<TestimonialResponse>>.SuccessResponse(result.Data!, "Retrieved Testimonials Successfully."));

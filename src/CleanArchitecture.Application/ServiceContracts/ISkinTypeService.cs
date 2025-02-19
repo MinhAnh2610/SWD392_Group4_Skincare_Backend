@@ -4,5 +4,5 @@ namespace CleanArchitecture.Application.ServiceContracts;
 
 public interface ISkinTypeService
 {
-  Task<Result<List<SkinTypeResponse>>> GetSkinTypesAsync();
+  Task<Result<List<SkinTypeResponse>>> GetAllSkinTypesAsync();
 }

@@ -4,5 +4,5 @@ namespace CleanArchitecture.Application.ServiceContracts;
 
 public interface IBrandService
 {
-  Task<Result<List<BrandResponse>>> GetBrandsAsync();
+  Task<Result<List<BrandResponse>>> GetAllBrandsAsync();
 }

@@ -8,7 +8,7 @@ public class FeedbackRepository : GenericRepository<Feedback>, IFeedbackReposito
   {
   }
 
-  public async Task<List<Feedback>> GetAllFeedbacksAsync()
+  public override async Task<List<Feedback>> GetAllAsync()
   {
     return await _context.Feedbacks
       .Include(f => f.Cosmetic)

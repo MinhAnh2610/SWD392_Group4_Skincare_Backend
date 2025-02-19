@@ -8,7 +8,7 @@ public class BrandRepository : GenericRepository<Brand>, IBrandRepository
   {
   }
 
-  public async Task<List<Brand>> GetAllBrandsAsync()
+  public override async Task<List<Brand>> GetAllAsync()
   {
     return await _context.Brands
       .Include(c => c.Cosmetics)

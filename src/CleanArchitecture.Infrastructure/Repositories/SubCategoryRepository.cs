@@ -8,7 +8,7 @@ public class SubCategoryRepository : GenericRepository<SubCategory>, ISubCategor
   {
   }
 
-  public async Task<List<SubCategory>> GetAllSubCategoriesAsync()
+  public override async Task<List<SubCategory>> GetAllAsync()
   {
     return await _context.SubCategories
       .Include(sc => sc.CosmeticSubcategories)

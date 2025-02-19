@@ -11,7 +11,7 @@ public class CosmeticImageController : ICarterModule
     #region Get Cosmetic Images API
     group.MapGet("/", async (ICosmeticImageService service) =>
     {
-      var result = await service.GetCosmeticImagesAsync();
+      var result = await service.GetAllCosmeticImagesAsync();
       if (result != null)
       {
         return Results.Ok(ApiResponse<List<CosmeticImageResponse>>.SuccessResponse(result.Data!, "Retrieved Cosmetic Images Successfully."));

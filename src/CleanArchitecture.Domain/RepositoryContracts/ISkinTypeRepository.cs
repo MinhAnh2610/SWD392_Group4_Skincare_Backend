@@ -2,5 +2,4 @@
 
 public interface ISkinTypeRepository : IGenericRepository<SkinType>
 {
-  Task<List<SkinType>> GetAllSkinTypesAsync();
 }

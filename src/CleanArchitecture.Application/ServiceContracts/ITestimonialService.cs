@@ -4,5 +4,5 @@ namespace CleanArchitecture.Application.ServiceContracts;
 
 public interface ITestimonialService
 {
-  Task<Result<List<TestimonialResponse>>> GetTestimonialsAsync();
+  Task<Result<List<TestimonialResponse>>> GetAllTestimonialsAsync();
 }

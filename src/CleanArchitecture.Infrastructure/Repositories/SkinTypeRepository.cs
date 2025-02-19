@@ -9,7 +9,7 @@ public class SkinTypeRepository : GenericRepository<SkinType>, ISkinTypeReposito
     
   }
 
-  public async Task<List<SkinType>> GetAllSkinTypesAsync()
+  public override async Task<List<SkinType>> GetAllAsync()
   {
     return await _context.SkinTypes
       .Include(st => st.Customers)

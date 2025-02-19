@@ -1,29 +1,22 @@
-﻿// OrderService.cs
-using CleanArchitecture.Application.Common;
-using CleanArchitecture.Application.DTOs.Order;
-using CleanArchitecture.Application.ServiceContracts;
-using CleanArchitecture.Domain.Entities;
-using CleanArchitecture.Domain.RepositoryContracts;
+﻿using CleanArchitecture.Application.DTOs.Order;
 using Microsoft.AspNetCore.Http;
 
 namespace CleanArchitecture.Application.Services
 {
   public class OrderService : IOrderService
   {
-    private readonly IOrderRepository _orderRepository;
-    private readonly ICartRepository _cartRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public OrderService(IOrderRepository orderRepository, ICartRepository cartRepository)
+    public OrderService(IUnitOfWork unitOfWork)
     {
-      _orderRepository = orderRepository;
-      _cartRepository = cartRepository;
+      _unitOfWork = unitOfWork;
     }
 
     public async Task<Result<List<OrderResponse>>> GetAllOrdersAsync()
     {
       try
       {
-        var orders = await _orderRepository.GetAllAsync();
+        var orders = await _unitOfWork.Orders.GetAllAsync();
         var response = orders.Select(MapToOrderResponse).ToList();
         return Result<List<OrderResponse>>.Success(response, StatusCodes.Status200OK);
       }
@@ -40,7 +33,7 @@ namespace CleanArchitecture.Application.Services
     {
       try
       {
-        var orders = await _orderRepository.GetOrdersByCustomerIdAsync(customerId);
+        var orders = await _unitOfWork.Orders.GetOrdersByCustomerIdAsync(customerId);
         var response = orders.Select(MapToOrderResponse).ToList();
         return Result<List<OrderResponse>>.Success(response, StatusCodes.Status200OK);
       }
@@ -57,7 +50,7 @@ namespace CleanArchitecture.Application.Services
     {
       try
       {
-        var order = await _orderRepository.GetByIdAsync(orderId);
+        var order = await _unitOfWork.Orders.GetByIdAsync(orderId);
         if (order == null)
         {
           return Result<OrderResponse>.Failure(
@@ -70,7 +63,7 @@ namespace CleanArchitecture.Application.Services
         order.Status = request.Status;
         order.LastModified = DateTime.UtcNow;
 
-        await _orderRepository.UpdateAsync(order);
+        await _unitOfWork.Orders.UpdateAsync(order);
 
         var response = MapToOrderResponse(order);
         return Result<OrderResponse>.Success(response, StatusCodes.Status200OK);
@@ -88,7 +81,7 @@ namespace CleanArchitecture.Application.Services
     {
       try
       {
-        var cart = await _cartRepository.GetByIdAsync(checkOutRequest.CartId);
+        var cart = await _unitOfWork.Carts.GetByIdAsync(checkOutRequest.CartId);
         if (cart == null)
         {
           return Result<OrderResponse>.Failure(

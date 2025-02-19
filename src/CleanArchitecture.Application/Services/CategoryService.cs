@@ -13,7 +13,7 @@ public class CategoryService : ICategoryService
 
   public async Task<Result<List<CategoryResponse>>> GetAllCategoriesAsync()
   {
-    var result = await _unitOfWork.Categories.GetCategoriesAsync();
+    var result = await _unitOfWork.Categories.GetAllAsync();
 
     return Result<List<CategoryResponse>>.Success(result.Select(c => new CategoryResponse
     {
