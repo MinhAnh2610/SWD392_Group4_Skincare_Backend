@@ -4,13 +4,14 @@ namespace CleanArchitecture.Infrastructure.Data.Configuration;
 
 public class CartConfiguration : IEntityTypeConfiguration<Cart>
 {
-    public void Configure(EntityTypeBuilder<Cart> builder)
-    {
-        builder.HasKey(cart => cart.Id);
+  public void Configure(EntityTypeBuilder<Cart> builder)
+  {
+    builder.HasKey(cart => cart.Id);
 
-        builder.HasOne(cart => cart.Customer)
-            .WithOne()
-            .HasForeignKey<Cart>(cart => cart.Id)
-            .IsRequired();
-    }
+    builder.HasOne(cart => cart.Customer);
+
+    builder.HasMany(cart => cart.CartItems)
+      .WithOne(cartItems => cartItems.Cart)
+      .HasForeignKey(cartItems => cartItems.CartId);
+  }
 }
