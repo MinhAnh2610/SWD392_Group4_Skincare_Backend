@@ -2,6 +2,7 @@
 
 public class Cart : Entity<Guid>
 {
+  public Guid CustomerId { get; set; }
   public User Customer { get; set; } = default!;
   public decimal TotalPrice { get; set; }
   public List<CartItem>? CartItems { get; set; } = new List<CartItem>();

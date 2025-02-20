@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CleanArchitecture.Application.DTOs.RoutineStepDto;
+using CleanArchitecture.Application.DTOs.SkinTypeDto;
 
 namespace CleanArchitecture.Application.DTOs.RoutineDTO
 {
@@ -11,6 +8,7 @@ namespace CleanArchitecture.Application.DTOs.RoutineDTO
     public Guid Id { get; set; }
     public string Title { get; set; } = default!;
     public string Period { get; set; } = default!;
-    public Guid SkinTypeId { get; set; }
+    public SkinTypeResponse? SkinType { get; set; }
+    public List<RoutineStepResponse>? RoutineSteps { get; set; }
   }
 }

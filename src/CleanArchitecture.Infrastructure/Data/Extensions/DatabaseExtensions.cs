@@ -15,7 +15,7 @@ public static class DatabaseExtensions
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
-    context.Database.MigrateAsync().GetAwaiter().GetResult();
+    //context.Database.MigrateAsync().GetAwaiter().GetResult();
 
     await SeedAsync(context, roleManager, userManager);
   }

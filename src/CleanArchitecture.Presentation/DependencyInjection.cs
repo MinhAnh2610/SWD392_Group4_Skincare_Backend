@@ -1,10 +1,14 @@
 ﻿using CleanArchitecture.Domain.Entities;
 using CleanArchitecture.Infrastructure.Data;
 using CleanArchitecture.Presentation.Middlewares;
+using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Scalar.AspNetCore;
+using System.Reflection;
 
 namespace CleanArchitecture.Presentation;
 
@@ -12,10 +16,19 @@ public static class DependencyInjection
 {
   public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration config)
   {
-    // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+    var fullVersion = Assembly.GetExecutingAssembly()
+                          .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+                          .InformationalVersion ?? "1.0.0";
+    var version = fullVersion.Split('+')[0]; // Remove commit hash if present
+
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen(options =>
     {
+      options.SwaggerDoc("v1", new OpenApiInfo
+      {
+        Title = $"De Fleur API - {version}",
+        Version = version
+      });
       options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
       {
         In = ParameterLocation.Header,
@@ -59,27 +72,21 @@ public static class DependencyInjection
       .AddUserStore<UserStore<User, Role, ApplicationDbContext, Guid>>()
       .AddRoleStore<RoleStore<Role, ApplicationDbContext, Guid>>();
 
-        // Add authentication & authorization
-        services.AddAuthentication(options =>
+    // Add authentication & authorization
+    services.AddAuthentication(options =>
+    {
+      options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+      options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+      options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+      .AddJwtBearer(options =>
+      {
+        options.Authority = "https://localhost:5051";
+        options.TokenValidationParameters = new TokenValidationParameters
         {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-        })
-          .AddCookie()
-          .AddJwtBearer(options =>
-          {
-              options.Authority = "https://localhost:5051";
-              options.TokenValidationParameters = new TokenValidationParameters
-              {
-                  ValidateAudience = false,
-              };
-          });
-      //.AddGoogle(options =>
-      //{
-      //  options.ClientId = config["Authentication:Google:ClientId"]!;
-      //  options.ClientSecret = config["Authentication:Google:ClientSecret"]!;
-      //  options.CallbackPath = "/signin-google";
-      //});
+          ValidateAudience = false,
+        };
+      });
 
     services.AddAuthorization(options =>
     {
@@ -88,32 +95,59 @@ public static class DependencyInjection
 
     services.AddCarter();
 
-    //services.AddHealthChecks().AddNpgSql(config.GetConnectionString("Database")!);
+    services.AddHealthChecks().AddNpgSql(config.GetConnectionString("DevDatabase")!);
 
     return services;
   }
 
   public static WebApplication UseApiServices(this WebApplication app)
   {
+    if (app.Environment.IsDevelopment())
+    {
+      app.UseSwagger(options =>
+      {
+        //https://localhost:5051/scalar/
+        options.RouteTemplate = "/openapi/{documentName}.json";
+      });
+      app.MapScalarApiReference(options =>
+      {
+        options.WithTheme(ScalarTheme.Purple)
+            .WithDarkMode(true)
+            .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient)
+            .WithDarkModeToggle(false)
+            .WithPreferredScheme("Bearer")
+            .WithHttpBearerAuthentication(bearer =>
+            {
+              bearer.Token = "your-bearer-token";
+            });
+        options.Authentication = new ScalarAuthenticationOptions
+        {
+          PreferredSecurityScheme = JwtBearerDefaults.AuthenticationScheme,
+        };
+      });
+      app.UseSwaggerUI(c =>
+      {
+        c.SwaggerEndpoint("/openapi/v1.json", "De Fleur API");
+        //c.RoutePrefix = string.Empty;
+      });
+    }
+
     app.UseExceptionHandler(options => { });
     app.UseMiddleware<CustomErrorHandler>();
 
     app.UseHttpsRedirection();
-
     app.UseRouting();
-
     app.UseIdentityServer();
-
     app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapCarter();
 
-    //app.UseHealthChecks("health",
-    //  new HealthCheckOptions
-    //  {
-    //    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-    //  });
+    app.UseHealthChecks("/health",
+      new HealthCheckOptions
+      {
+        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+      });
 
     return app;
   }
