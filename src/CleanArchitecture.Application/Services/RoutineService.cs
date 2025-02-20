@@ -59,23 +59,23 @@ namespace CleanArchitecture.Application.Services
       };
     }
 
-    public async Task<Result<RoutineResponse>> GetRoutineBasedOnSkinType(Guid SkinTypeId)
+    public async Task<Result<List<RoutineResponse>?>> GetRoutinesBasedOnSkinType(Guid SkinTypeId)
     {
       try
       {
-        var routine = await _unitOfWork.Routines.GetRoutineBySkinTypeAsync(SkinTypeId);
+        var routines = await _unitOfWork.Routines.GetRoutineBySkinTypeAsync(SkinTypeId);
 
-        if (routine == null)
-          return Result<RoutineResponse>.Failure(new List<Error> { new Error("Routine.GetRoutine", "Cannot found routine") }, StatusCodes.Status404NotFound);
+        if (routines == null)
+          return Result<List<RoutineResponse>?>.Failure(new List<Error> { new Error("Routine.GetRoutines", "Cannot found routines") }, StatusCodes.Status404NotFound);
 
-        var response = MapToRoutineResponse(routine);
+        var response = routines.Select(MapToRoutineResponse).ToList();
 
-        return Result<RoutineResponse>.Success(response, StatusCodes.Status200OK);
+        return Result<List<RoutineResponse>?>.Success(response, StatusCodes.Status200OK);
       }
       catch (Exception ex)
       {
-        return Result<RoutineResponse>.Failure(
-            new List<Error> { new Error("Routine.GetAll", ex.Message) },
+        return Result<List<RoutineResponse>?>.Failure(
+            new List<Error> { new Error("Routine.GetRoutines", ex.Message) },
             StatusCodes.Status500InternalServerError
         );
       }

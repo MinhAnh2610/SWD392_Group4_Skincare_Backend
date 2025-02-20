@@ -2,5 +2,5 @@
 
 public interface IRoutineRepository : IGenericRepository<Routine>
 {
-  Task<Routine?> GetRoutineBySkinTypeAsync(Guid SkinTypeId);
+  Task<List<Routine>?> GetRoutineBySkinTypeAsync(Guid SkinTypeId);
 }
