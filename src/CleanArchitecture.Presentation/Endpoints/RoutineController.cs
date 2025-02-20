@@ -1,7 +1,4 @@
-﻿// File: Presentation/Endpoints/RoutineController.cs
-using CleanArchitecture.Application.DTOs.RoutineDTO;
-using CleanArchitecture.Application.ServiceContracts;
-using Microsoft.AspNetCore.Http;
+﻿using CleanArchitecture.Application.DTOs.RoutineDTO;
 
 namespace CleanArchitecture.Presentation.Endpoints
 {
@@ -9,7 +6,7 @@ namespace CleanArchitecture.Presentation.Endpoints
   {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-      var group = app.MapGroup("/routines").WithTags("Routines");
+      var group = app.MapGroup("/api/routine").WithTags("Routines Management");
 
       // GET /routines → Retrieve all routines
       group.MapGet("/", async (IRoutineService routineService) =>
@@ -27,7 +24,8 @@ namespace CleanArchitecture.Presentation.Endpoints
       .WithName("GetAllRoutines")
       .Produces<ApiResponse<List<RoutineResponse>>>(StatusCodes.Status200OK)
       .ProducesProblem(StatusCodes.Status500InternalServerError)
-      .RequireAuthorization();
+      .WithSummary("GetAllRoutines")
+      .WithDescription("Get All Routines");
     }
   }
 }
