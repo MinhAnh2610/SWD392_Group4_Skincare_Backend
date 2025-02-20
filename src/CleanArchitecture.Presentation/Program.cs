@@ -1,5 +1,6 @@
 using CleanArchitecture.Application;
 using CleanArchitecture.Infrastructure;
+using CleanArchitecture.Infrastructure.Data.Extensions;
 using CleanArchitecture.Presentation;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,7 +16,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-  //await app.InitializeDatabaseAsync();
+  await app.InitializeDatabaseAsync();
 }
 
 app.UseApiServices();

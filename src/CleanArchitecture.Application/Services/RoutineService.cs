@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Application.DTOs.RoutineDTO;
+using CleanArchitecture.Application.DTOs.SkinTypeDto;
 using Microsoft.AspNetCore.Http;
 
 namespace CleanArchitecture.Application.Services
@@ -36,8 +37,22 @@ namespace CleanArchitecture.Application.Services
         Id = routine.Id,
         Title = routine.Title,
         Period = routine.Period,
-        SkinTypeId = routine.SkinTypeId
+        SkinType = new SkinTypeResponse
+        {
+          Id = routine.SkinType.Id,
+          Name = routine.SkinType.Name,
+          Description = routine.SkinType.Description,
+          IsDry = routine.SkinType.IsDry,
+          IsSensitive = routine.SkinType.IsSensitive,
+          IsUneven = routine.SkinType.IsUneven,
+          IsWrinkle = routine.SkinType.IsWrinkle
+        }
       };
+    }
+
+    public Task<Result<RoutineResponse>> GetRoutineBasedOnSkinType(Guid SkinTypeId)
+    {
+      throw new NotImplementedException();
     }
   }
 }
