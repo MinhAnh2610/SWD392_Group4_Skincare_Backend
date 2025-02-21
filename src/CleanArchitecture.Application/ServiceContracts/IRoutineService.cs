@@ -6,6 +6,6 @@ namespace CleanArchitecture.Application.ServiceContracts
   {
     Task<Result<List<RoutineResponse>>> GetAllRoutinesAsync();
 
-    Task<Result<RoutineResponse>> GetRoutineBasedOnSkinType(Guid SkinTypeId);
+    Task<Result<List<RoutineResponse>?>> GetRoutinesBasedOnSkinType(Guid SkinTypeId);
   }
 }

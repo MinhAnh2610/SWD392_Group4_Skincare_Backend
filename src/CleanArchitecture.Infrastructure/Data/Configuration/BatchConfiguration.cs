@@ -9,7 +9,8 @@ namespace CleanArchitecture.Infrastructure.Data.Configuration
       builder.HasKey(batch => batch.Id);
 
       builder.HasOne(batch => batch.Cosmetic)
-          .WithMany(product => product.Batches);
+          .WithMany(product => product.Batches)
+          .HasForeignKey(batch => batch.CosmeticId);
     }
   }
 }

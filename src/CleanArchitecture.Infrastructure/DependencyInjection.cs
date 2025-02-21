@@ -35,7 +35,10 @@ public static class DependencyInjection
     {
       options.AddInterceptors(serviceProvider.GetServices<ISaveChangesInterceptor>());
 
-      string connectionString = configuration.GetConnectionString("DevDatabase");
+      string? connectionString = Environment.GetEnvironmentVariable("databaseConnectionString");
+      if (string.IsNullOrEmpty(connectionString))
+        connectionString = configuration.GetConnectionString("DevDatabase");
+//       options.UseInMemoryDatabase("database");
       options.UseNpgsql(connectionString);
     });
 
