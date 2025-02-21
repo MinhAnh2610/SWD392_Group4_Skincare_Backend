@@ -1,4 +1,4 @@
-﻿using CleanArchitecture.Application.DTOs.CosmeticDto;
+﻿using CleanArchitecture.Application.DTOs.Cosmetic;
 using CleanArchitecture.Domain.Entities;
 
 namespace CleanArchitecture.Presentation.Endpoints;

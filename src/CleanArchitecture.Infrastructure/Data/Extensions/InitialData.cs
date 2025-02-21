@@ -91,232 +91,6 @@ internal class InitialData
     new Role { Id = new Guid("C459402C-64CB-4D36-9238-60B15462CE25"), Name = "Staff" },
     new Role { Id = new Guid("D586839A-B80C-4EBB-8488-95CDD857D1BF"), Name = "Manager" }
   };
-
-  public static IEnumerable<Batch> Batches
-  {
-    get
-    {
-      var cosmetics = Cosmetics.ToList();
-      var batches = new List<Batch>();
-
-      foreach (var cosmetic in cosmetics)
-      {
-        batches.Add(new Batch
-        {
-          Id = Guid.NewGuid(),
-          CosmeticId = cosmetic.Id,
-          Quantity = 200,
-          ManufactureDate = new DateOnly(2025, 3, 15),
-          ExportedDate = new DateOnly(2025, 4, 1),
-          ExpirationDate = new DateOnly(2027, 3, 15),
-        });
-      }
-      return batches;
-    }
-  }
-
-  public static IEnumerable<Blog> Blogs
-  {
-    get
-    {
-      var staffs = Users.ToList();
-      return new List<Blog>
-      {
-        new Blog
-        {
-          Id = new Guid("CB64A508-526E-4156-A512-1D1BF7A5A032"),
-          StaffId = staffs[3].Id,
-          Title = "The Future of AI",
-          Content = "AI is transforming industries...",
-          BlogTags = new List<BlogTag>() // BlogTags will be assigned later
-        },
-        new Blog
-        {
-          Id = new Guid("C9DED966-A2F7-4328-B899-8201508D5476"),
-          StaffId = staffs[3].Id,
-          Title = "Starting a Business in 2024",
-          Content = "Starting a business has never been easier...",
-          BlogTags = new List<BlogTag>()
-        }
-      };
-    }
-  }
-
-  public static IEnumerable<BlogTag> BlogTags
-  {
-    get
-    {
-      var blogs = Blogs.ToList();
-      var tags = Tags.ToList();
-
-      return new List<BlogTag>
-      {
-        new BlogTag { BlogId = blogs[0].Id, TagId = tags[0].Id }, // AI & Tech
-        new BlogTag { BlogId = blogs[1].Id, TagId = tags[1].Id }  // Business  
-      };
-    }
-  }
-
-  public static IEnumerable<Brand> Brands => new List<Brand>
-  {
-    new Brand { Id = new Guid("9286DAB7-CCA8-4C04-9D2D-FF1072A1746A"), Name = "L'Oreal", Description = "Global beauty brand", WebsiteUrl = "https://www.loreal.com", LogoUrl = "https://example.com/loreal-logo.png" },
-    new Brand { Id = new Guid("A6ACE76F-5DA7-4EEB-A909-49B0390F34A2"), Name = "Clinique", Description = "Fragrance-free skincare products", WebsiteUrl = "https://www.clinique.com", LogoUrl = "https://example.com/clinique-logo.png" },
-    new Brand { Id = new Guid("735B21D1-AB56-45BD-8404-7722112AE8E2"), Name = "Neutrogena", Description = "Dermatologist-recommended skincare", WebsiteUrl = "https://www.neutrogena.com", LogoUrl = "https://example.com/neutrogena-logo.png" },
-    new Brand { Id = new Guid("B4D858D8-28D6-476A-9BDF-B9265DA3E160"), Name = "CeraVe", Description = "Skincare with essential ceramides", WebsiteUrl = "https://www.cerave.com", LogoUrl = "https://example.com/cerave-logo.png" },
-    new Brand { Id = new Guid("0F7ABD8F-0905-4EDE-A573-C46B6EF86267"), Name = "The Ordinary", Description = "Clinical formulations with integrity", WebsiteUrl = "https://www.theordinary.com", LogoUrl = "https://example.com/theordinary-logo.png" }
-  };
-
-  public static IEnumerable<Cart> Carts
-  {
-    get
-    {
-      var customers = Users.ToList();
-      return new List<Cart>
-      {
-        new Cart
-        {
-          Id = new Guid("A5D8471E-7C24-48D9-8233-CD598E6DD1C3"),
-          CustomerId = customers[5].Id,
-          TotalPrice = 89.97m
-        }
-      };
-    }
-  }
-
-  public static IEnumerable<CartItem> CartItems
-  {
-    get
-    {
-      var carts = Carts.ToList();
-      var cosmetics = Cosmetics.ToList();
-      return new List<CartItem>
-      {
-        new CartItem
-        {
-          CartId = carts[0].Id,
-          CosmeticId = cosmetics[0].Id,
-          Quantity = 2
-        },
-        new CartItem
-        {
-          CartId = carts[0].Id,
-          CosmeticId = cosmetics[1].Id,
-          Quantity = 1
-        }
-      };
-    }
-  }
-
-  public static IEnumerable<Category> Categories => new List<Category>
-  {
-    new Category
-    {
-      Id = new Guid("0419D5D4-1C6A-4F2D-ACFA-D3E5687C5A73"),
-      Name = "Radiance",
-      Description = "Enhance your natural glow and brighten your complexion."
-    },
-    new Category
-    {
-      Id = new Guid("0CDF8B34-6D34-4669-9757-10C68A69ECAA"),
-      Name = "Rejuvenation",
-      Description = "Age-defying and skin renewal solutions."
-    },
-    new Category
-    {
-      Id = new Guid("222AFB3A-879D-4FB1-AEB4-BCD4EECE09C4"),
-      Name = "Purity",
-      Description = "Deep cleansing and detoxifying products."
-    },
-    new Category
-    {
-      Id = new Guid("ECBE8150-1FF8-4DE8-B13F-44E007E2487D"),
-      Name = "Hydration",
-      Description = "Products to lock in moisture and nourish your skin."
-    },
-    new Category
-    {
-      Id = new Guid("E187FB64-B583-4BF6-A9F7-34C8DCE1CDCF"),
-      Name = "Balance",
-      Description = "Formulations to maintain skin pH and soothe irritation."
-    },
-    new Category
-    {
-      Id = new Guid("16C105C4-D38D-46A1-98CA-48852724DA8F"),
-      Name = "Protection",
-      Description = "Guard your skin against environmental stressors."
-    },
-    new Category
-    {
-      Id = new Guid("67D4B89F-17EE-4458-9678-6454E89547DD"),
-      Name = "Specialized Care",
-      Description = "Targeted solutions for specific skin concerns."
-    },
-    new Category
-    {
-      Id = new Guid("D5E75588-1D27-4FF4-8DDA-6220DF581268"),
-      Name = "Masking",
-      Description = "Intensive treatments delivered via masks."
-    }
-  };
-
-  public static IEnumerable<CosmeticType> CosmeticTypes => new List<CosmeticType>
-  {
-    new CosmeticType
-    {
-      Id = new Guid("AC635372-0D15-44F7-BF5F-7496C4F16051"),
-      Name = "Cleansers",
-      Description = "Products that clean the skin."
-    },
-    new CosmeticType
-    {
-      Id = new Guid("119B5F44-626F-4831-8978-388A8B2AD23C"),
-      Name = "Exfoliators",
-      Description = "Products to remove dead skin cells."
-    },
-    new CosmeticType
-    {
-      Id = new Guid("A0F0DF4B-07C2-4984-A914-184479DB31B0"),
-      Name = "Toners",
-      Description = "Products to balance and refresh the skin."
-    },
-    new CosmeticType
-    {
-      Id = new Guid("22D4240D-9674-4E6C-B0B7-72F84CA010B8"),
-      Name = "Serums",
-      Description = "Concentrated treatments for skin."
-    },
-    new CosmeticType
-    {
-      Id = new Guid("4CCDED92-BB02-4B8E-9119-95F59628C5D2"),
-      Name = "Moisturizers",
-      Description = "Products to hydrate and nourish the skin."
-    },
-    new CosmeticType
-    {
-      Id = new Guid("79406AF7-46EE-49B4-9D4C-6812A2C396A0"),
-      Name = "Eye Creams",
-      Description = "Specialized creams for the eye area."
-    },
-    new CosmeticType
-    {
-      Id = new Guid("79BD1C90-FAF6-4A08-9893-DBA2552FEE68"),
-      Name = "Sunscreens",
-      Description = "Products that protect the skin from UV rays."
-    },
-    new CosmeticType
-    {
-      Id = new Guid("C6C92631-D452-4C16-A065-3FA93CE750D8"),
-      Name = "Lip Care Products",
-      Description = "Products to care for and enhance the lips."
-    },
-    new CosmeticType
-    {
-      Id = new Guid("C4FDAAE7-B369-4842-B31B-37EAA3072534"),
-      Name = "Face Masks",
-      Description = "Treatments that refresh and rejuvenate the skin."
-    }
-  };
-
   public static IEnumerable<Cosmetic> Cosmetics
   {
     get
@@ -601,6 +375,233 @@ internal class InitialData
     }
   }
 
+  public static IEnumerable<Batch> Batches
+  {
+    get
+    {
+      var cosmetics = Cosmetics.ToList();
+      var batches = new List<Batch>();
+
+      foreach (var cosmetic in cosmetics)
+      {
+        batches.Add(new Batch
+        {
+          Id = Guid.NewGuid(),
+          CosmeticId = cosmetic.Id,
+          Quantity = 200,
+          ManufactureDate = new DateOnly(2025, 3, 15),
+          ExportedDate = new DateOnly(2025, 4, 1),
+          ExpirationDate = new DateOnly(2027, 3, 15),
+        });
+      }
+      return batches;
+    }
+  }
+
+  public static IEnumerable<Blog> Blogs
+  {
+    get
+    {
+      var staffs = Users.ToList();
+      return new List<Blog>
+      {
+        new Blog
+        {
+          Id = new Guid("CB64A508-526E-4156-A512-1D1BF7A5A032"),
+          StaffId = staffs[3].Id,
+          Title = "The Future of AI",
+          Content = "AI is transforming industries...",
+          BlogTags = new List<BlogTag>() // BlogTags will be assigned later
+        },
+        new Blog
+        {
+          Id = new Guid("C9DED966-A2F7-4328-B899-8201508D5476"),
+          StaffId = staffs[3].Id,
+          Title = "Starting a Business in 2024",
+          Content = "Starting a business has never been easier...",
+          BlogTags = new List<BlogTag>()
+        }
+      };
+    }
+  }
+
+  public static IEnumerable<BlogTag> BlogTags
+  {
+    get
+    {
+      var blogs = Blogs.ToList();
+      var tags = Tags.ToList();
+
+      return new List<BlogTag>
+      {
+        new BlogTag { BlogId = blogs[0].Id, TagId = tags[0].Id }, // AI & Tech
+        new BlogTag { BlogId = blogs[1].Id, TagId = tags[1].Id }  // Business  
+      };
+    }
+  }
+
+  public static IEnumerable<Brand> Brands => new List<Brand>
+  {
+    new Brand { Id = new Guid("9286DAB7-CCA8-4C04-9D2D-FF1072A1746A"), Name = "L'Oreal", Description = "Global beauty brand", WebsiteUrl = "https://www.loreal.com", LogoUrl = "https://example.com/loreal-logo.png" },
+    new Brand { Id = new Guid("A6ACE76F-5DA7-4EEB-A909-49B0390F34A2"), Name = "Clinique", Description = "Fragrance-free skincare products", WebsiteUrl = "https://www.clinique.com", LogoUrl = "https://example.com/clinique-logo.png" },
+    new Brand { Id = new Guid("735B21D1-AB56-45BD-8404-7722112AE8E2"), Name = "Neutrogena", Description = "Dermatologist-recommended skincare", WebsiteUrl = "https://www.neutrogena.com", LogoUrl = "https://example.com/neutrogena-logo.png" },
+    new Brand { Id = new Guid("B4D858D8-28D6-476A-9BDF-B9265DA3E160"), Name = "CeraVe", Description = "Skincare with essential ceramides", WebsiteUrl = "https://www.cerave.com", LogoUrl = "https://example.com/cerave-logo.png" },
+    new Brand { Id = new Guid("0F7ABD8F-0905-4EDE-A573-C46B6EF86267"), Name = "The Ordinary", Description = "Clinical formulations with integrity", WebsiteUrl = "https://www.theordinary.com", LogoUrl = "https://example.com/theordinary-logo.png" }
+  };
+
+  public static IEnumerable<Cart> Carts
+  {
+    get
+    {
+      var customers = Users.ToList();
+      return new List<Cart>
+      {
+        new Cart
+        {
+          Id = new Guid("A5D8471E-7C24-48D9-8233-CD598E6DD1C3"),
+          CustomerId = customers[5].Id,
+          TotalPrice = 89.97m
+        }
+      };
+    }
+  }
+
+  public static IEnumerable<CartItem> CartItems
+  {
+    get
+    {
+      var carts = Carts.ToList();
+      var cosmetics = Cosmetics.ToList();
+      return new List<CartItem>
+      {
+        new CartItem
+        {
+          CartId = carts[0].Id,
+          CosmeticId = cosmetics[0].Id,
+          Quantity = 2
+        },
+        new CartItem
+        {
+          CartId = carts[0].Id,
+          CosmeticId = cosmetics[1].Id,
+          Quantity = 1
+        }
+      };
+    }
+  }
+
+  public static IEnumerable<Category> Categories => new List<Category>
+  {
+    new Category
+    {
+      Id = new Guid("0419D5D4-1C6A-4F2D-ACFA-D3E5687C5A73"),
+      Name = "Radiance",
+      Description = "Enhance your natural glow and brighten your complexion."
+    },
+    new Category
+    {
+      Id = new Guid("0CDF8B34-6D34-4669-9757-10C68A69ECAA"),
+      Name = "Rejuvenation",
+      Description = "Age-defying and skin renewal solutions."
+    },
+    new Category
+    {
+      Id = new Guid("222AFB3A-879D-4FB1-AEB4-BCD4EECE09C4"),
+      Name = "Purity",
+      Description = "Deep cleansing and detoxifying products."
+    },
+    new Category
+    {
+      Id = new Guid("ECBE8150-1FF8-4DE8-B13F-44E007E2487D"),
+      Name = "Hydration",
+      Description = "Products to lock in moisture and nourish your skin."
+    },
+    new Category
+    {
+      Id = new Guid("E187FB64-B583-4BF6-A9F7-34C8DCE1CDCF"),
+      Name = "Balance",
+      Description = "Formulations to maintain skin pH and soothe irritation."
+    },
+    new Category
+    {
+      Id = new Guid("16C105C4-D38D-46A1-98CA-48852724DA8F"),
+      Name = "Protection",
+      Description = "Guard your skin against environmental stressors."
+    },
+    new Category
+    {
+      Id = new Guid("67D4B89F-17EE-4458-9678-6454E89547DD"),
+      Name = "Specialized Care",
+      Description = "Targeted solutions for specific skin concerns."
+    },
+    new Category
+    {
+      Id = new Guid("D5E75588-1D27-4FF4-8DDA-6220DF581268"),
+      Name = "Masking",
+      Description = "Intensive treatments delivered via masks."
+    }
+  };
+
+  public static IEnumerable<CosmeticType> CosmeticTypes => new List<CosmeticType>
+  {
+    new CosmeticType
+    {
+      Id = new Guid("AC635372-0D15-44F7-BF5F-7496C4F16051"),
+      Name = "Cleansers",
+      Description = "Products that clean the skin."
+    },
+    new CosmeticType
+    {
+      Id = new Guid("119B5F44-626F-4831-8978-388A8B2AD23C"),
+      Name = "Exfoliators",
+      Description = "Products to remove dead skin cells."
+    },
+    new CosmeticType
+    {
+      Id = new Guid("A0F0DF4B-07C2-4984-A914-184479DB31B0"),
+      Name = "Toners",
+      Description = "Products to balance and refresh the skin."
+    },
+    new CosmeticType
+    {
+      Id = new Guid("22D4240D-9674-4E6C-B0B7-72F84CA010B8"),
+      Name = "Serums",
+      Description = "Concentrated treatments for skin."
+    },
+    new CosmeticType
+    {
+      Id = new Guid("4CCDED92-BB02-4B8E-9119-95F59628C5D2"),
+      Name = "Moisturizers",
+      Description = "Products to hydrate and nourish the skin."
+    },
+    new CosmeticType
+    {
+      Id = new Guid("79406AF7-46EE-49B4-9D4C-6812A2C396A0"),
+      Name = "Eye Creams",
+      Description = "Specialized creams for the eye area."
+    },
+    new CosmeticType
+    {
+      Id = new Guid("79BD1C90-FAF6-4A08-9893-DBA2552FEE68"),
+      Name = "Sunscreens",
+      Description = "Products that protect the skin from UV rays."
+    },
+    new CosmeticType
+    {
+      Id = new Guid("C6C92631-D452-4C16-A065-3FA93CE750D8"),
+      Name = "Lip Care Products",
+      Description = "Products to care for and enhance the lips."
+    },
+    new CosmeticType
+    {
+      Id = new Guid("C4FDAAE7-B369-4842-B31B-37EAA3072534"),
+      Name = "Face Masks",
+      Description = "Treatments that refresh and rejuvenate the skin."
+    }
+  };
+
+
+
   public static IEnumerable<CosmeticImage> CosmeticImages
   {
     get
@@ -671,8 +672,8 @@ internal class InitialData
     {
       Id = new Guid("6E8F40E3-7A19-4A41-B3F8-4DFF00FD8C21"),
       Code = "DISCOUNT10",
-      StartDate = new DateTime(2025, 1, 1),
-      EndDate = new DateTime(2025, 2, 1),
+      StartDate = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc), // Explicitly set to UTC
+      EndDate = new DateTime(2025, 2, 1, 0, 0, 0, DateTimeKind.Utc), // Explicitly set to UTC
       DiscountAmount = 10.00,
       UsageLimit = 100
     }
