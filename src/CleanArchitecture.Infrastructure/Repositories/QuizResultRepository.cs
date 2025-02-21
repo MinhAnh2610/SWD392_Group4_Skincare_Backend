@@ -8,4 +8,14 @@ public class QuizResultRepository : GenericRepository<QuizResult>, IQuizResultRe
   {
     
   }
+
+  public override async Task<List<QuizResult>> GetAllAsync()
+  {
+    return await _context.QuizResults
+      .Include(qr => qr.Customer)
+      .Include(qr => qr.Quiz)
+      .Include(qr => qr.SkinType)
+      .Include(qr => qr.QuizAnswers)
+        .ThenInclude(qa => qa.Question).ToListAsync();
+  }
 }

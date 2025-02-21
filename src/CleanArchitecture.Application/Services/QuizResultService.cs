@@ -1,5 +1,9 @@
-﻿using CleanArchitecture.Application.DTOs.QuizDto;
+﻿using Castle.Core.Resource;
+using CleanArchitecture.Application.DTOs.QuizAnswerDto;
+using CleanArchitecture.Application.DTOs.QuizDto;
+using CleanArchitecture.Application.DTOs.QuizResultDto;
 using CleanArchitecture.Application.DTOs.RoutineDTO;
+using Microsoft.AspNetCore.Http;
 
 namespace CleanArchitecture.Application.Services;
 
@@ -9,6 +13,81 @@ public class QuizResultService : IQuizResultService
   public QuizResultService(IUnitOfWork unitOfWork)
   {
     _unitOfWork = unitOfWork;
+  }
+
+  public async Task<Result<List<QuizResultResponse>>> GetAllCustomerQuizResultsAsync()
+  {
+    try
+    {
+      var quizResults = await _unitOfWork.QuizResults.GetAllAsync();
+
+      var results = quizResults.Select(qr => new QuizResultResponse
+      {
+        Id = qr.QuizId,
+        CustomerId = qr.CustomerId,
+        CustomerName = qr.Customer.UserName!,
+        SkinTypeId = qr.SkinTypeId,
+        SkinType = qr.SkinType.Name,
+        QuizAnswers = qr.QuizAnswers.Select(qa => new QuizAnswerResponse
+        {
+          Id = qa.Id,
+          QuestionId = qa.QuestionId,
+          QuestionTitle = qa.Question.Title!,
+          QuizResultId = qa.QuizResultId,
+          SelectedOptions = qa.SelectedOptions
+        }).ToList()
+      }).ToList();
+
+      return Result<List<QuizResultResponse>>.Success(results, StatusCodes.Status200OK);
+    }
+    catch (Exception)
+    {
+      return Result<List<QuizResultResponse>>.Failure(new List<Error>
+      {
+        new Error("QuizResult.ServerError", "Server Error Occurred.")
+      }, StatusCodes.Status500InternalServerError);
+    }
+  }
+
+  public async Task<Result<List<QuizResultResponse>>> GetUserQuizResultsAsync(Guid customerId)
+  {
+    try
+    {
+      var quizResults = await _unitOfWork.QuizResults.GetAllAsync();
+      var customerResults = quizResults.Where(q => q.CustomerId == customerId);
+
+      if (customerResults == null)
+        return Result<List<QuizResultResponse>>.Failure(new List<Error>
+        {
+          new Error("QuizResult.NotFound", "Couldn't Load Customer's Quiz Results.")
+        }, StatusCodes.Status404NotFound);
+
+      var results = quizResults.Select(qr => new QuizResultResponse
+      {
+        Id = qr.QuizId,
+        CustomerId = customerId,
+        CustomerName = qr.Customer.UserName!,
+        SkinTypeId = qr.SkinTypeId,
+        SkinType = qr.SkinType.Name,
+        QuizAnswers = qr.QuizAnswers.Select(qa => new QuizAnswerResponse
+        {
+          Id = qa.Id,
+          QuestionId = qa.QuestionId,
+          QuestionTitle = qa.Question.Title!,
+          QuizResultId = qa.QuizResultId,
+          SelectedOptions = qa.SelectedOptions
+        }).ToList()
+      }).ToList();
+
+      return Result<List<QuizResultResponse>>.Success(results, StatusCodes.Status200OK);
+    }
+    catch (Exception)
+    {
+      return Result<List<QuizResultResponse>>.Failure(new List<Error>
+      {
+        new Error("QuizResult.ServerError", "Server Error Occurred.")
+      }, StatusCodes.Status500InternalServerError);
+    }
   }
 
   public async Task SaveQuizResultAsync(Guid customerId, Guid quizId, QuizSubmitRequest quizSubmission, RoutineResponse quizResponse)
