@@ -1,5 +1,6 @@
 ﻿using CleanArchitecture.Application.DTOs.Cosmetic;
 using CleanArchitecture.Domain.Entities;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CleanArchitecture.Presentation.Endpoints;
 
@@ -28,7 +29,7 @@ public class CosmeticController : ICarterModule
     #endregion
 
     #region Get Cosmetic By Id API
-    group.MapGet("/get-by-Id", async (ICosmeticService service, Guid id) =>
+    group.MapGet("/get-by-Id", async (ICosmeticService service, [FromQuery]Guid id) =>
     {
       var result = await service.GetCosmeticById(id);
       if (result != null)
@@ -82,12 +83,12 @@ public class CosmeticController : ICarterModule
     #endregion
 
     #region Create Cosmetic By Id API
-    group.MapPost("/create", async (ICosmeticService service, Cosmetic cosmetic) =>
+    group.MapPost("/create", async (ICosmeticService service, CreateCosmetic cosmetic) =>
     {
       var result = await service.CreateCosmetic(cosmetic);
       if (result != null)
       {
-        return Results.Ok(ApiResponse<CreateCosmetic>.SuccessResponse(result.Data!, "Create Cosmetic Successfully."));
+        return Results.Ok(ApiResponse<CosmeticResponse>.SuccessResponse(result.Data!, "Create Cosmetic Successfully."));
       }
 
       return Results.StatusCode(StatusCodes.Status500InternalServerError);
@@ -100,7 +101,7 @@ public class CosmeticController : ICarterModule
     #endregion
 
     #region Filter Cosmetic  API
-    group.MapGet("/filter", async (ICosmeticService service, FilterCosmeticRequest request) =>
+    group.MapGet("/filter", async (ICosmeticService service, [AsParameters] FilterCosmeticRequest request) =>
     {
       var result = await service.SearchCosmetics(request);
       if (result != null)
@@ -110,11 +111,11 @@ public class CosmeticController : ICarterModule
 
       return Results.StatusCode(StatusCodes.Status500InternalServerError);
     })
-    .WithName("CreateCosmeticById")
+    .WithName("FilterCosmetic")
     .Produces<ApiResponse<List<CosmeticResponse>>>(StatusCodes.Status200OK)
     .ProducesProblem(StatusCodes.Status500InternalServerError)
-    .WithSummary("CreateCosmeticById")
-    .WithDescription("CreateCosmetic By Id");
+    .WithSummary("FilterCosmetic")
+    .WithDescription("FilterCosmetic");
     #endregion
   }
 }

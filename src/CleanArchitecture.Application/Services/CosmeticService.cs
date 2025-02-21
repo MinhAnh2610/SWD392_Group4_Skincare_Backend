@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -26,19 +27,12 @@ namespace CleanArchitecture.Application.Services
       _unitOfWork = unitOfWork;
       _mapper = mapper;
     }
-    public async Task<Result<CreateCosmetic>> CreateCosmetic(Cosmetic cosmetic)
+    public async Task<Result<CosmeticResponse>> CreateCosmetic(CreateCosmetic cosmetic)
     {
-      var existcosmetic = _unitOfWork.Cosmetics.GetById(cosmetic.Id);
-      if (existcosmetic != null)
-      {
-        return Result<CreateCosmetic>.Failure([CosmeticErrors.CosmeticAlreadyExist], StatusCodes.Status400BadRequest);
-      }
-      else
-      {
-        await _unitOfWork.Cosmetics.CreateAsync(cosmetic);
-        var output = cosmetic.Adapt<CreateCosmetic>();
-        return Result<CreateCosmetic>.Success(output, StatusCodes.Status201Created);
-      }
+        var orgcosmetic = cosmetic.Adapt<Cosmetic>();
+        await _unitOfWork.Cosmetics.CreateAsync(orgcosmetic);
+        var output = orgcosmetic.Adapt<CosmeticResponse>();
+        return Result<CosmeticResponse>.Success(output, StatusCodes.Status201Created);
     }
 
     public async Task<Result<List<CosmeticResponse>>> GetAllCosmetics()

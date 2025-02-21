@@ -9,5 +9,7 @@ public class CosmeticMappingConfig : IRegister
     // Configure the mapping from Cosmetic to CosmeticResponse
     config.NewConfig<Cosmetic, CosmeticResponse>();
     config.NewConfig<UpdateCosmetic, CosmeticResponse>();
+    config.NewConfig<CreateCosmetic, CosmeticResponse>();
+    config.NewConfig<Cosmetic, CreateCosmetic>();
   }
 }
