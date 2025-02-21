@@ -153,7 +153,7 @@ namespace CleanArchitecture.Application.Services
     }
     public async Task<Result<CosmeticResponse>> DeleteCosmetic(Guid id)
     {
-      var existcosmetic = _unitOfWork.Cosmetics.GetById(id);
+      var existcosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(id);
       if (existcosmetic == null)
       {
         return Result<CosmeticResponse>.Failure([CosmeticErrors.CosmeticNotFound], StatusCodes.Status404NotFound);

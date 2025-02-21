@@ -122,6 +122,10 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
   }
   public virtual void Attach (T entity) 
   {
+      if (entity == null)
+        {
+      throw new ArgumentNullException(nameof(entity));
+       }
     _context.Attach(entity);
   }
 }
