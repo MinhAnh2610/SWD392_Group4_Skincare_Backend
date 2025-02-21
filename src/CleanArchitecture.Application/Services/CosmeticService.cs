@@ -155,5 +155,44 @@ namespace CleanArchitecture.Application.Services
         return Result<CosmeticResponse>.Success(output, StatusCodes.Status200OK);
       }
     }
+
+    public async Task<Result<List<CosmeticResponse>>> SearchCosmetics(FilterCosmeticRequest filter)
+    {
+      var query = await _unitOfWork.Cosmetics.GetAllAsync();
+
+      if (query == null)
+      {
+        return Result<List<CosmeticResponse>>.Failure(
+            [CosmeticErrors.CosmeticNotFound],
+            StatusCodes.Status404NotFound
+        );
+      }
+
+      // Apply filters if they exist
+      var filteredResults = query.Where(c =>
+          // Name filter (case-insensitive contains)
+          (string.IsNullOrEmpty(filter.Name) || c.Name.ToLower().Contains(filter.Name.ToLower())) &&
+          // Type filter
+          (!filter.TypeId.HasValue || c.CosmeticTypeId == filter.TypeId) &&
+          // Brand filter
+          (!filter.BrandId.HasValue || c.BrandId == filter.BrandId) &&
+          // Skin type filter
+          (!filter.SkinTypeId.HasValue || c.SkinTypeId == filter.SkinTypeId)
+      ).ToList();
+
+      if (!filteredResults.Any())
+      {
+        return Result<List<CosmeticResponse>>.Failure(
+            [CosmeticErrors.CosmeticNotFound],
+            StatusCodes.Status404NotFound
+        );
+      }
+
+      var cosmeticResponse = filteredResults.Adapt<List<CosmeticResponse>>();
+      return Result<List<CosmeticResponse>>.Success(
+          cosmeticResponse,
+          StatusCodes.Status200OK
+      );
+    }
   }
 }
