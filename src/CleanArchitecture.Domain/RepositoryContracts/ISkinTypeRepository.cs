@@ -2,4 +2,5 @@
 
 public interface ISkinTypeRepository : IGenericRepository<SkinType>
 {
+  Task<SkinType?> FindSkinTypeBasedOnBaumannAsync(string name);
 }

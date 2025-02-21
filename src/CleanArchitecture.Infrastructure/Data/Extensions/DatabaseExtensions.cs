@@ -42,6 +42,8 @@ public static class DatabaseExtensions
     await SeedOrderAsync(context);
     await SeedOrderItemAsync(context);
     await SeedPolicyAsync(context);
+    await SeedQuestionTypeAsync(context);
+    await SeedQuizAsync(context);
     await SeedRoutineAsync(context);
     await SeedRoutineStepAsync(context);
     await SeedSkinTypeAsync(context);
@@ -231,6 +233,22 @@ public static class DatabaseExtensions
     if (!await context.Policies.AnyAsync())
     {
       await context.Policies.AddRangeAsync(InitialData.Policies);
+    }
+  }
+
+  private static async Task SeedQuestionTypeAsync(ApplicationDbContext context)
+  {
+    if (!await context.QuestionTypes.AnyAsync())
+    {
+      await context.QuestionTypes.AddRangeAsync(InitialData.QuestionsTypes);
+    }
+  }
+
+  private static async Task SeedQuizAsync(ApplicationDbContext context)
+  {
+    if (!await context.Quizzes.AnyAsync())
+    {
+      await context.Quizzes.AddRangeAsync(InitialData.Quiz);
     }
   }
 

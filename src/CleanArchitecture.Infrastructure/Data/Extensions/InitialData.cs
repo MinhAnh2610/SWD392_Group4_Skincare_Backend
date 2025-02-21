@@ -1,4 +1,6 @@
-﻿namespace CleanArchitecture.Infrastructure.Data.Extensions;
+﻿using System.Reflection.Metadata.Ecma335;
+
+namespace CleanArchitecture.Infrastructure.Data.Extensions;
 
 internal class InitialData
 {
@@ -957,6 +959,298 @@ internal class InitialData
     new Policy { Id = new Guid("70B1B2A8-8361-468C-A602-04E1A815495E"), Title = "Privacy Policy", Content = "This is the privacy policy content." },
     new Policy { Id = new Guid("EC19577C-8D19-4497-801A-11B66E55666D"), Title = "Terms of Service", Content = "These are the terms of service." }
   };
+
+  public static IEnumerable<QuestionType> QuestionsTypes => new List<QuestionType>
+  {
+    new QuestionType()
+    {
+      Id = new Guid("AAAC424F-B3E1-4E13-8E3F-F06C7AD1A141"),
+      Name = "SingleChoice",
+    },
+    new QuestionType()
+    {
+      Id = new Guid("7F9D392B-1673-4227-A3A4-ACDCD6E1ACF5"),
+      Name = "MultipleChoice",
+    },
+  };
+
+  public static Quiz Quiz
+  {
+    get
+    {
+      var questionTypes = QuestionsTypes.ToList();
+
+      return new Quiz
+      {
+        Id = new Guid("4330503E-4488-4272-80D5-34B25D5A8677"),
+        Title = "Which of the 16 Baumann Skin Types® Are You?",
+        Description = "Take the 3 minute skin type quiz now and build a skin care routine with medical grade skin care brands. You will be amazed by how great your skin will look!",
+        TargetAgeFrom = 18,
+        TargetAgeTo = 65,
+        Questions = new List<Question>
+        {
+          // Oiliness (score > 0 is oily)
+          new Question
+          {
+            Id = new Guid("6273C0C4-FDF1-416C-A5ED-4E89C071BF90"),
+            QuizId = new Guid("A184BF67-B94A-4787-A78D-9C35EE913451"),
+            Title = "Assess your skin moisturization needs",
+            Description = "Please check what is true about how often you must use a moisturizer for your skin to feel hydrated.",
+            Instruction = "(Multiple answers allowed)",
+            Section = "Oiliness",
+            QuestionTypeId = questionTypes[1].Id,
+            QuestionOptions = new List<QuestionOption>
+            {
+              new QuestionOption
+              {
+                Id = new Guid("A3D27E0B-E737-4B7E-92C9-529A3978B52A"),
+                QuestionId = new Guid("1E619B1A-E08B-4735-95A1-B785ACBCE5D6"),
+                Content = "I can use any soap to wash my face without developing dryness.",
+                Score = 2,
+              },
+              new QuestionOption
+              {
+                Id = new Guid("DADD010D-E2CB-47C1-B3DD-6B9E7554EAA6"),
+                QuestionId = new Guid("9C333E2A-0D24-4A5C-9874-38BF49796ABE"),
+                Content = "I never or only occasionally apply a moisturizer.",
+                Score = 1,
+              },
+              new QuestionOption
+              {
+                Id = new Guid("763ED597-5BB7-49AC-9826-7FCD63CE24EE"),
+                QuestionId = new Guid("3EBFBEBD-EA4A-4388-B8F9-09C594B1B481"),
+                Content = "I do not apply any products to my facial skin after cleansing.",
+                Score = 0,
+              },
+              new QuestionOption
+              {
+                Id = new Guid("FFE5E5DC-9786-4EB1-817E-1DEA8FFEE8AB"),
+                QuestionId = new Guid("B987D596-124D-48B5-ACF4-F50966E17B25"),
+                Content = "I apply a moisturizer to my face once a day.",
+                Score = -1,
+              },
+              new QuestionOption
+              {
+                Id = new Guid("00347781-0390-402A-86AC-223839172276"),
+                QuestionId = new Guid("4970FD6B-D7D7-4F51-B812-EE679E5A3F8A"),
+                Content = "I apply a moisturizer to my face twice a day.",
+                Score = -2,
+              }
+            }
+          },
+          new Question
+          {
+            Id = new Guid("678D1C72-9888-44F1-B2C3-E793568ACA9A"),
+            QuizId = new Guid("E7F686E9-57EE-4CBD-807D-D61D5A97F9B3"),
+            Title = "Assess your skin's sebum production",
+            Description = "Please check what is true about your facial skin.",
+            Instruction = "(Multiple answers allowed)",
+            Section = "Oiliness",
+            QuestionTypeId = questionTypes[1].Id,
+            QuestionOptions = new List<QuestionOption>
+            {
+              new QuestionOption
+              {
+                Id = new Guid("4C9A9592-4BAD-4C39-94A8-C72693956E5F"),
+                QuestionId = new Guid("9D6B8570-23E9-4E68-983E-9BC49605AEDA"),
+                Content = "My facial skin is rough or dry.",
+                Score = -2,
+              },
+              new QuestionOption
+              {
+                Id = new Guid("530552D6-F817-4E42-AF24-6F86070E1BA5"),
+                QuestionId = new Guid("655D6860-0ABE-4C61-8A5B-366F159ACBD9"),
+                Content = "My facial skin is oily in some areas.",
+                Score = 1,
+              },
+              new QuestionOption
+              {
+                Id = new Guid("BE4749FF-6BF4-450C-8486-345A2D248135"),
+                QuestionId = new Guid("66E7EA6F-3C55-4B0F-B56F-38692A833DDD"),
+                Content = "My face is very oily.",
+                Score = 2,
+              },
+              new QuestionOption
+              {
+                Id = new Guid("FCE0D8BE-FE60-4DCA-B672-F2D0655E4509"),
+                QuestionId = new Guid("53401F2D-A377-4546-8339-A991E2328ADA"),
+                Content = "My face is uncomfortable if I do not use a moisturizer.",
+                Score = -2,
+              },
+              new QuestionOption
+              {
+                Id = new Guid("8CC40510-4BF6-4E2D-B24D-AE22F9EA20F2"),
+                QuestionId = new Guid("ED08CFF3-0D6E-4679-B562-3167B769D7CF"),
+                Content = "I like the feel of heavy creams and/or oil on my skin.",
+                Score = -2,
+              },
+            }
+          },
+          // Sensitivity (score > 0 is sensitive)
+          new Question
+          {
+            Id = new Guid("BBE970DB-0609-469F-9B0A-6A736A5F1F47"),
+            QuizId = new Guid("C24472F3-21D7-4331-9F96-BBA2CE114C99"),
+            Title = "Assess your skin's underlying inflammation",
+            Description = "Check the following that you have had in the last 4 weeks",
+            Instruction = "(Multiple answers allowed)",
+            Section = "Sensitivity",
+            QuestionTypeId = questionTypes[1].Id,
+            QuestionOptions = new List<QuestionOption>
+            {
+              new QuestionOption
+              {
+                  Id = new Guid("738CE3A0-0E2E-4913-8CE6-5E942A1C2CDB"),
+                  QuestionId = new Guid("0370A764-93FB-4458-993F-F92D242A876E"),
+                  Content = "Acne (pimples)",
+                  Score = 1,
+              },
+              new QuestionOption
+              {
+                  Id = new Guid("FFE74667-33BD-4ACC-9904-5274C5985005"),
+                  QuestionId = new Guid("5A2D5237-F1BA-4508-BB19-F30C89EC05A9"),
+                  Content = "Facial redness and/or flushing",
+                  Score = 1,
+              },
+              new QuestionOption
+              {
+                  Id = new Guid("D7F8E751-8C8C-403D-BEFE-9C048176AC8B"),
+                  QuestionId = new Guid("8136C736-F111-40C3-992D-B11AEDB84863"),
+                  Content = "Stinging or burning",
+                  Score = 1,
+              },
+              new QuestionOption
+              {
+                  Id = new Guid("D3724236-B2C3-4374-8C53-C312DF4F71E8"),
+                  QuestionId = new Guid("18F0763B-3F7A-4FCB-B43D-D6D19B53E842"),
+                  Content = "A rash with itching, scaling and redness",
+                  Score = 1,
+              },
+              new QuestionOption
+              {
+                  Id = new Guid("104B5D59-7634-4EA3-AFDB-26C9E267DE6B"),
+                  QuestionId = new Guid("8DF17F50-9702-4897-A145-AD1EB2D42C2D"),
+                  Content = "Irritation from shaving the face",
+                  Score = 1,
+              },
+            }
+          },
+          // Pigmentation (score > 0 is uneven)
+          new Question
+          {
+            Id = new Guid("91B1AD98-3DC6-490D-AFFA-B1C3483157F5"),
+            QuizId = new Guid("995DF52D-8C2E-472C-BE1D-4DF12ED1F416"),
+            Title = "Do you want to lighten dark spots on your skin?",
+            Description = "Do you want skin lighteners in your skin care products to treat hyper pigmentation?",
+            Instruction = "(Choose one answer)",
+            Section = "Pigmentation",
+            QuestionTypeId = questionTypes[0].Id,
+            QuestionOptions = new List<QuestionOption>
+            {
+              new QuestionOption
+              {
+                  Id = new Guid("EB06FC0F-BA5A-45B3-8779-92553D53EC0F"),
+                  QuestionId = new Guid("2E7CD29A-DD8C-4112-9353-F32542B4D34E"),
+                  Content = "My skin pigment is uneven AND I want to lighten darker areas on my face",
+                  Score= 1,
+              },
+              new QuestionOption
+              {
+                  Id = new Guid("666FFAEA-0A76-46F5-9544-6B45BF0641E6"),
+                  QuestionId = new Guid("CF714571-92F5-4594-84D7-FE7CFF500D25"),
+                  Content = "My skin pigment is even AND I have no dark spots or darker areas",
+                  Score = -1,
+              },
+              new QuestionOption
+              {
+                  Id = new Guid("2911A59A-D1A6-46CA-896B-6F1B944F005B"),
+                  QuestionId = new Guid("0EE02D34-41EA-493C-B53E-D2C19BB64E18"),
+                  Content = "I have freckles or dark spots AND I do not want to remove",
+                  Score = 0,
+              },
+            }
+          },
+          // Aging / Wrinkles (score > 0 is aging)
+          new Question
+          {
+            Id = new Guid("B6C91837-8EB4-4558-98B2-79B9165DF3C2"),
+            QuizId = new Guid("64E06944-1EA1-4770-B73E-217D50460DC5"),
+            Title = "Lifestyle habits",
+            Description = "Check all that apply to you.",
+            Instruction = "(Multiple answers allowed)",
+            Section = "Aging",
+            QuestionTypeId = questionTypes[1].Id,
+            QuestionOptions = new List<QuestionOption>
+            {
+              new QuestionOption
+              {
+                  Id = new Guid("B9367A38-C8E9-482E-A962-37D6F9ED4BCE"),
+                  QuestionId = new Guid("E6CFD235-84F9-4A34-A3B7-D90A940AE619"),
+                  Content = "I have smoked over 50 cigarettes or cigars in my life.",
+                  Score = -2
+              },
+              new QuestionOption
+              {
+                  Id = new Guid("9C070F77-3962-45CF-A47D-537E087863FA"),
+                  QuestionId = new Guid("0D767C75-8295-45A6-8DB2-122325EEC395"),
+                  Content = "I am exposed to second hand smoke on a weekly basis.",
+                  Score = -1,
+              },
+              new QuestionOption
+              {
+                  Id = new Guid("DF98BB35-3350-44BE-A1EA-12BD4557A7EC"),
+                  QuestionId = new Guid("19FE99F7-324F-4ABB-BBE3-435668C5D015"),
+                  Content = "I currently smoke cigarettes or cigars",
+                  Score = -2,
+              },
+              new QuestionOption
+              {
+                  Id = new Guid("28CA8B91-34B5-4AFD-A2F7-8AC3E5EE71B4"),
+                  QuestionId = new Guid("7CE65305-8848-4987-9D86-B748A643C4A0"),
+                  Content = "I often get less than 7 hours of sleep a night.",
+                  Score = 2,
+              },
+              new QuestionOption
+              {
+                  Id = new Guid("B2CE0FF3-FE77-442B-B77D-3445433F38F9"),
+                  QuestionId = new Guid("D4E68CEA-4204-473C-B200-D1085A937BCC"),
+                  Content = "I feel stress at least 2 hours a day.",
+                  Score = 2,
+              },
+              new QuestionOption
+              {
+                  Id = new Guid("242A9DAB-CDFE-498D-B6A2-D4FD3CC3BDE2"),
+                  QuestionId = new Guid("70127183-BBF5-4B30-891B-552552E0D3DE"),
+                  Content = "Are you exposed to pollution or bad air quality more than 3 times a week?",
+                  Score = 2,
+              },
+              new QuestionOption
+              {
+                  Id = new Guid("D5F4C05E-59D3-4DC7-B73C-D5971A890BEE"),
+                  QuestionId = new Guid("5745A1C7-4E8C-4E40-8473-DEFC062C4555"),
+                  Content = "I eat sugary foods over 3 times a week.",
+                  Score = 1,
+              },
+              new QuestionOption
+              {
+                  Id = new Guid("03991A2E-D887-4967-B3B8-8D1E78AFAC53"),
+                  QuestionId = new Guid("878035E2-E137-4BF2-ABEF-EFEDF41E9D2F"),
+                  Content = "I exercise less than 3 hours a week.",
+                  Score = 1,
+              },
+              new QuestionOption
+              {
+                  Id = new Guid("825D7C7D-C003-484E-81B0-B866BD019DB0"),
+                  QuestionId = new Guid("7D50D71D-2715-4FF5-AD13-EE82F21D1771"),
+                  Content = "I do not eat fruit or vegetables every day.",
+                  Score = 1,
+              },
+            }
+          }
+        }
+      };
+    }
+  }
 
   public static IEnumerable<Routine> Routines
   {

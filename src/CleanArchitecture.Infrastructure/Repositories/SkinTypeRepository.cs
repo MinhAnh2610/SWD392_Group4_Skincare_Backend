@@ -9,6 +9,12 @@ public class SkinTypeRepository : GenericRepository<SkinType>, ISkinTypeReposito
     
   }
 
+  public async Task<SkinType?> FindSkinTypeBasedOnBaumannAsync(string name)
+  {
+    var skinType = await _context.SkinTypes.Where(st => st.Name == name).FirstOrDefaultAsync();
+    return (skinType != null) ? skinType : default;
+  }
+
   public override async Task<List<SkinType>> GetAllAsync()
   {
     return await _context.SkinTypes
