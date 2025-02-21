@@ -5,7 +5,7 @@ Backend for a Skincare System
 # Guide to initialize Development Environment using Docker
 ## Prerequisites
 - Docker is installed
-- A `.env` file which configured the local database connection (put it in the root folder of the project). 
+- Create a .env folder, then create a dbcon.env at the root of your project solution ( on the same level of the docker compose)
 ##### dbcon.env
 ```
 databaseConnectionString=Server=skincare.db;Database=skincare;User Id=admin;Password=secret;
@@ -15,7 +15,7 @@ databaseConnectionString=Server=skincare.db;Database=skincare;User Id=admin;Pass
 -  ### Step 0: 
  - Disable the current PostgreSQL service in services.msc.
 - ### Step 1:
- - Run `docker-compose`, this will create two services (Web API and Database).
+ - Run `docker-compose up`, this will create two services (Web API and Database).
 - ### Step 2:
  - Web API should be accessible at http://localhost:8080/swagger/index.html
  
@@ -39,7 +39,7 @@ dotnet ef database update --startup-project ./src/CleanArchitecture.Presentation
 - ### Step 2: 
   - Connect by **Host** with the following settings:
    - Host: localhost
-   - Database: skincare
+   - Database: skincare   
    - Authentication: Database Native
    - Username: admin
    - Password: secret

@@ -1,0 +1,17 @@
+﻿using Mapster;
+using CleanArchitecture.Domain.Entities;
+using CleanArchitecture.Application.DTOs;
+using CleanArchitecture.Application.DTOs.Category;
+
+public class CategoryMappingConfig : IRegister
+{
+  public void Register(TypeAdapterConfig config)
+  {
+    // Map Category → CategoryResponse
+    config.NewConfig<Category, CategoryResponse>()
+    .Map(dest => dest.Subcategories, src => src.SubCategories);
+
+    // Map CategoryRequest → Category (for creating/updating)
+    config.NewConfig<UpdateCategory, CategoryResponse>();
+  }
+}
