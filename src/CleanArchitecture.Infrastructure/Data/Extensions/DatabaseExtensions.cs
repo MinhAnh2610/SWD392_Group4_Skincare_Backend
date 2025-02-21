@@ -99,7 +99,7 @@ public static class DatabaseExtensions
 
   public static async Task SeedBatchAsync(ApplicationDbContext context)
   {
-    if (!context.Batches.Any())
+    if (!await context.Batches.AnyAsync())
     {
       // Retrieve the persisted cosmetics from the database
       var cosmetics = await context.Cosmetics.ToListAsync();
@@ -130,7 +130,7 @@ public static class DatabaseExtensions
 
   public static async Task SeedBlogTagAsync(ApplicationDbContext context)
   {
-    if (!context.BlogsTags.Any())
+    if (!await context.BlogsTags.AnyAsync())
     {
       // Retrieve existing blogs and tags from the database
       var blogs = await context.Blogs.ToListAsync();
@@ -165,7 +165,7 @@ public static class DatabaseExtensions
 
   public static async Task SeedCartAsync(ApplicationDbContext context)
   {
-    if (!context.Carts.Any())
+    if (!await context.Carts.AnyAsync())
     {
       // Retrieve existing customers from the database
       var customers = await context.Users.ToListAsync();
@@ -193,7 +193,7 @@ public static class DatabaseExtensions
 
   public static async Task SeedCartItemAsync(ApplicationDbContext context)
   {
-    if (!context.CartItems.Any())
+    if (!await context.CartItems.AnyAsync())
     {
       // Retrieve existing carts and cosmetics from the database
       var carts = await context.Carts.ToListAsync();
@@ -257,7 +257,7 @@ public static class DatabaseExtensions
 
   public static async Task SeedCosmeticImageAsync(ApplicationDbContext context)
   {
-    if (!context.CosmeticsImages.Any())
+    if (!await context.CosmeticsImages.AnyAsync())
     {
       // Retrieve the cosmetics that have already been saved to the database.
       var cosmetics = await context.Cosmetics.ToListAsync();
@@ -292,7 +292,7 @@ public static class DatabaseExtensions
 
   public static async Task SeedCosmeticSubCategoryAsync(ApplicationDbContext context)
   {
-    if (!context.CosmeticSubCategories.Any())
+    if (!await context.CosmeticSubCategories.AnyAsync())
     {
       // Retrieve existing cosmetics and subcategories from the database
       var cosmetics = await context.Cosmetics.ToListAsync();
@@ -355,7 +355,7 @@ public static class DatabaseExtensions
 
   public static async Task SeedFeedbackAsync(ApplicationDbContext context)
   {
-    if (!context.Feedbacks.Any())
+    if (!await context.Feedbacks.AnyAsync())
     {
       // Retrieve existing users and cosmetics from the database
       var users = await context.Users.ToListAsync();
@@ -451,7 +451,7 @@ public static class DatabaseExtensions
 
   public static async Task SeedRoutineStepAsync(ApplicationDbContext context)
   {
-    if (!context.RoutineSteps.Any())
+    if (!await context.RoutineSteps.AnyAsync())
     {
       // Retrieve existing routines and cosmetics from the database
       var routines = await context.Routines.ToListAsync();
@@ -460,10 +460,10 @@ public static class DatabaseExtensions
 
       foreach (var routine in routines)
       {
-        var cleanser = cosmetics.FirstOrDefault(c => c.Name.ToLower().Contains("cleanser") && c.SkinTypeId == routine.SkinTypeId);
-        var moisturizer = cosmetics.FirstOrDefault(c => c.Name.ToLower().Contains("moisturizer") && c.SkinTypeId == routine.SkinTypeId);
-        var sunscreen = cosmetics.FirstOrDefault(c => c.Name.ToLower().Contains("sunscreen") && c.SkinTypeId == routine.SkinTypeId);
-        var retinoid = cosmetics.FirstOrDefault(c => c.Name.ToLower().Contains("retinoid") && c.SkinTypeId == routine.SkinTypeId);
+        var cleanser = cosmetics.FirstOrDefault(c => c.Name.Contains("cleanser", StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
+        var moisturizer = cosmetics.FirstOrDefault(c => c.Name.Contains("moisturizer",StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
+        var sunscreen = cosmetics.FirstOrDefault(c => c.Name.Contains("sunscreen", StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
+        var retinoid = cosmetics.FirstOrDefault(c => c.Name.Contains("retinoid", StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
 
         if (routine.Period.Equals("Morning", StringComparison.OrdinalIgnoreCase))
         {
@@ -551,7 +551,7 @@ public static class DatabaseExtensions
 
   public static async Task SeedSubCategoryAsync(ApplicationDbContext context)
   {
-    if (!context.SubCategories.Any())
+    if (!await context.SubCategories.AnyAsync())
     {
       // Retrieve existing categories from the database
       var categories = await context.Categories.ToListAsync();
