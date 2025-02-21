@@ -24,18 +24,22 @@ public static class DatabaseExtensions
   {
     await SeedRoleAsync(context, roleManager);
     await SeedUserAsync(context, userManager);
+    await SeedSkinTypeAsync(context);
+    await SeedBrandAsync(context);
+    await SeedCosmeticTypeAsync(context);
+    await SeedCosmeticAsync(context);
     await SeedBatchAsync(context);
     await SeedBlogAsync(context);
     await SeedBlogTagAsync(context);
-    await SeedBrandAsync(context);
+
     await SeedCartAsync(context);
     await SeedCartItemAsync(context);
     await SeedCategoryAsync(context);
     await SeedCompanyInformationAsync(context);
-    await SeedCosmeticAsync(context);
+
     await SeedCosmeticImageAsync(context);
     await SeedCosmeticSubCategoryAsync(context);
-    await SeedCosmeticTypeAsync(context);
+
     await SeedCouponAsync(context);
     await SeedFAQAsync(context);
     await SeedFeedbackAsync(context);
@@ -44,7 +48,7 @@ public static class DatabaseExtensions
     await SeedPolicyAsync(context);
     await SeedRoutineAsync(context);
     await SeedRoutineStepAsync(context);
-    await SeedSkinTypeAsync(context);
+
     await SeedSubCategoryAsync(context);
     await SeedTagAsync(context);
     await SeedTestimonialAsync(context);
@@ -119,6 +123,7 @@ public static class DatabaseExtensions
     if (!await context.Brands.AnyAsync())
     {
       await context.Brands.AddRangeAsync(InitialData.Brands);
+      await context.SaveChangesAsync();
     }
   }
 
@@ -158,7 +163,9 @@ public static class DatabaseExtensions
   {
     if (!await context.Cosmetics.AnyAsync())
     {
+
       await context.Cosmetics.AddRangeAsync(InitialData.Cosmetics);
+      await context.SaveChangesAsync();
     }
   }
 
