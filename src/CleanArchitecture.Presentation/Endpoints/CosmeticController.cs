@@ -47,9 +47,9 @@ public class CosmeticController : ICarterModule
     #endregion
 
     #region Update Cosmetic  API
-    group.MapPut("/{id}/update", async (ICosmeticService service, UpdateCosmetic updateRequest) =>
+    group.MapPut("/{id}/update", async (Guid id, ICosmeticService service, UpdateCosmetic updateRequest) =>
     {
-      var result = await service.UpdateCosmetic(updateRequest);
+      var result = await service.UpdateCosmetic(updateRequest,id);
       if (result != null)
       {
         return Results.Ok(ApiResponse<CosmeticResponse>.SuccessResponse(result.Data!, "Update Cosmetic Successfully."));

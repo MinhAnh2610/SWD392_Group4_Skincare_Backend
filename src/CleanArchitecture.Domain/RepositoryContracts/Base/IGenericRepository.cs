@@ -16,5 +16,6 @@
     Task<bool> RemoveAsync(T entity);
     void Update(T entity);
     Task<int> UpdateAsync(T entity);
+    void Attach(T entity);  
   }
 }
