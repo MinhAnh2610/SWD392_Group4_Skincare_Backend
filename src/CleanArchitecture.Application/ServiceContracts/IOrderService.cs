@@ -12,5 +12,6 @@ namespace CleanArchitecture.Application.ServiceContracts
     Task<Result<List<OrderResponse>>> GetAllOrdersAsync();
     Task<Result<List<OrderResponse>>> GetOrdersByCustomerIdAsync(Guid customerId);
     Task<Result<OrderResponse>> UpdateOrderStatusAsync(Guid orderId, UpdateOrderStatusRequest request);
+    Task<Result<OrderResponse>> CheckOut(CheckOutRequest checkOutRequest);
   }
 }

@@ -186,7 +186,13 @@ public class AuthController : ICarterModule
       await httpContext.SignInAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme, principal);
 
       return Results.Ok("Hey");
-    });
+    })
+    .WithName("GoogleSignIn")
+    .Produces<ApiResponse<string>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status400BadRequest)
+    .ProducesProblem(StatusCodes.Status500InternalServerError)
+    .WithSummary("GoogleSignIn")
+    .WithDescription("Enter Your Credentials To Sign In With Google");
     #endregion
   }
 }

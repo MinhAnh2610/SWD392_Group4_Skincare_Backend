@@ -97,27 +97,21 @@ internal class InitialData
     get
     {
       var cosmetics = Cosmetics.ToList();
-      return new List<Batch>
+      var batches = new List<Batch>();
+
+      foreach (var cosmetic in cosmetics)
       {
-        new Batch
+        batches.Add(new Batch
         {
-          Id = new Guid("8342CF0F-182F-4B7E-963D-6F4061939B9C"),
-          CosmeticId = cosmetics[0].Id,
-          Quantity = 100,
-          ManufactureDate = new DateOnly(2025, 1, 1),
-          ExportedDate = new DateOnly(2025, 2, 1),
-          ExpirationDate = new DateOnly(2026, 1, 1),
-        },
-        new Batch
-        {
-          Id = new Guid("96F6C0EA-FB8E-4DFB-947A-A77027006B36"),
-          CosmeticId = cosmetics[1].Id,
+          Id = Guid.NewGuid(),
+          CosmeticId = cosmetic.Id,
           Quantity = 200,
           ManufactureDate = new DateOnly(2025, 3, 15),
           ExportedDate = new DateOnly(2025, 4, 1),
           ExpirationDate = new DateOnly(2027, 3, 15),
-        },
-      };
+        });
+      }
+      return batches;
     }
   }
 
@@ -181,7 +175,8 @@ internal class InitialData
       {
         new Cart
         {
-          Id = customers[5].Id,
+          Id = new Guid("A5D8471E-7C24-48D9-8233-CD598E6DD1C3"),
+          CustomerId = customers[5].Id,
           TotalPrice = 89.97m
         }
       };
@@ -192,17 +187,19 @@ internal class InitialData
   {
     get
     {
-      var customer = Users.ToList();
+      var carts = Carts.ToList();
       var cosmetics = Cosmetics.ToList();
       return new List<CartItem>
       {
         new CartItem
         {
+          CartId = carts[0].Id,
           CosmeticId = cosmetics[0].Id,
           Quantity = 2
         },
         new CartItem
         {
+          CartId = carts[0].Id,
           CosmeticId = cosmetics[1].Id,
           Quantity = 1
         }
@@ -327,7 +324,85 @@ internal class InitialData
       var brands = Brands.ToList();
       var skinTypes = SkinTypes.ToList();
       var cosmeticTypes = CosmeticTypes.ToList();
-      return new List<Cosmetic>
+
+      var cosmetics = new List<Cosmetic>();
+      // We'll use Brand[0] for cleanser and moisturizer, and Brand[1] for sunscreen and retinoid.
+      foreach (var skin in skinTypes)
+      {
+        // Cleanser for this skin type
+        cosmetics.Add(new Cosmetic
+        {
+          Id = Guid.NewGuid(),
+          Name = $"{skin.Name} Cleanser",
+          BrandId = brands[0].Id,
+          SkinTypeId = skin.Id,
+          CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Cleansers").Id,
+          Price = 15.99m,
+          Gender = true,
+          Notice = "A gentle cleanser to prepare the skin.",
+          Ingredients = "Water, Mild Surfactants, Herbal Extracts",
+          MainUsage = "Cleansing and prepping the skin",
+          Texture = "Gel",
+          Origin = "USA",
+          Instructions = "Apply to wet skin, massage gently, then rinse."
+        });
+
+        // Moisturizer for this skin type
+        cosmetics.Add(new Cosmetic
+        {
+          Id = Guid.NewGuid(),
+          Name = $"{skin.Name} Moisturizer",
+          BrandId = brands[0].Id,
+          SkinTypeId = skin.Id,
+          CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Moisturizers").Id,
+          Price = 25.99m,
+          Gender = true,
+          Notice = "Hydrates and nourishes the skin.",
+          Ingredients = "Hyaluronic Acid, Glycerin, Ceramides",
+          MainUsage = "Moisturizing and protection",
+          Texture = "Cream",
+          Origin = "France",
+          Instructions = "Apply to face after cleansing."
+        });
+
+        // Sunscreen for this skin type
+        cosmetics.Add(new Cosmetic
+        {
+          Id = Guid.NewGuid(),
+          Name = $"{skin.Name} Sunscreen",
+          BrandId = brands[1].Id,
+          SkinTypeId = skin.Id,
+          CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Sunscreens").Id,
+          Price = 19.99m,
+          Gender = true,
+          Notice = "Provides broad-spectrum protection.",
+          Ingredients = "Zinc Oxide, Titanium Dioxide",
+          MainUsage = "Sun protection",
+          Texture = "Lotion",
+          Origin = "USA",
+          Instructions = "Apply generously 15 minutes before sun exposure."
+        });
+
+        // Retinoid (using the Serums type) for this skin type
+        cosmetics.Add(new Cosmetic
+        {
+          Id = Guid.NewGuid(),
+          Name = $"{skin.Name} Anti-Aging Retinoid",
+          BrandId = brands[1].Id,
+          SkinTypeId = skin.Id,
+          CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Serums").Id,
+          Price = 39.99m,
+          Gender = true,
+          Notice = "Helps reduce wrinkles and improve skin texture.",
+          Ingredients = "Retinol, Hyaluronic Acid",
+          MainUsage = "Anti-aging treatment",
+          Texture = "Cream",
+          Origin = "Italy",
+          Instructions = "Apply a pea-sized amount to cleansed skin at night."
+        });
+      }
+
+      cosmetics.AddRange(new List<Cosmetic>
       {
         new Cosmetic
         {
@@ -504,8 +579,25 @@ internal class InitialData
           Texture = "Sheet Mask",
           Origin = "South Korea",
           Instructions = "Apply for 15-20 minutes, then remove and pat remaining essence."
+        },
+        new Cosmetic
+        {
+          Id = new Guid("8B4343AB-99C1-49C4-92A8-18D44556CDFA"),
+          Name = "Anti-Aging Retinoid",
+          BrandId = brands[2].Id,
+          SkinTypeId = skinTypes[3].Id,
+          CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Serums").Id,
+          Price = 39.99m,
+          Gender = true,
+          Notice = "Apply at night.",
+          Ingredients = "Retinol, Hyaluronic Acid",
+          MainUsage = "Reduces fine lines and prevents acne",
+          Texture = "Cream",
+          Origin = "USA",
+          Instructions = "Apply a pea-sized amount to cleansed skin at night."
         }
-      };
+      });
+      return cosmetics;
     }
   }
 
@@ -579,7 +671,10 @@ internal class InitialData
     {
       Id = new Guid("6E8F40E3-7A19-4A41-B3F8-4DFF00FD8C21"),
       Code = "DISCOUNT10",
-      DiscountAmount = 10.00
+      StartDate = new DateTime(2025, 1, 1),
+      EndDate = new DateTime(2025, 2, 1),
+      DiscountAmount = 10.00,
+      UsageLimit = 100
     }
   };
 
@@ -633,20 +728,20 @@ internal class InitialData
       var coupon = Coupons.First();
       return new List<Order>
       {
-        new Order
-        {
-          Id = new Guid("F72B5E3B-C443-4920-9D03-BB774721F70A"),
-          CustomerId = customer[5].Id,
-          CouponId = coupon.Id,
-          SubTotal = 89.97m,
-          TotalPrice = 79.97m,
-          OrderDate = DateTime.UtcNow,
-          ShippingAddress = "123 Main Street, City, Country",
-          BillingAddress = "123 Main Street, City, Country",
-          TrackingNumber = "TRACK123",
-          DeliveryDate = DateTime.UtcNow.AddDays(5),
-          Status = "Processing"
-        }
+        //new Order
+        //{
+        //  Id = new Guid("F72B5E3B-C443-4920-9D03-BB774721F70A"),
+        //  CustomerId = customer[5].Id,
+        //  CouponId = coupon.Id,
+        //  SubTotal = 89.97m,
+        //  TotalPrice = 79.97m,
+        //  OrderDate = DateTime.UtcNow,
+        //  ShippingAddress = "123 Main Street, City, Country",
+        //  BillingAddress = "123 Main Street, City, Country",
+        //  TrackingNumber = "TRACK123",
+        //  DeliveryDate = DateTime.UtcNow.AddDays(5),
+        //  Status = "Processing"
+        //}
       };
     }
   }
@@ -655,22 +750,22 @@ internal class InitialData
   {
     get
     {
-      var order = Orders.First();
+      //var order = Orders.First();
       var cosmetics = Cosmetics.ToList();
       return new List<OrderItem>
       {
-        new OrderItem
-        {
-          OrderId = order.Id,
-          CosmeticId = cosmetics[0].Id,
-          Quantity = 2
-        },
-        new OrderItem
-        {
-          OrderId = order.Id,
-          CosmeticId = cosmetics[1].Id,
-          Quantity = 1
-        }
+        //new OrderItem
+        //{
+        //  OrderId = order.Id,
+        //  CosmeticId = cosmetics[0].Id,
+        //  Quantity = 2
+        //},
+        //new OrderItem
+        //{
+        //  OrderId = order.Id,
+        //  CosmeticId = cosmetics[1].Id,
+        //  Quantity = 1
+        //}
       };
     }
   }
@@ -686,23 +781,33 @@ internal class InitialData
     get
     {
       var skinTypes = SkinTypes.ToList();
-      var morningRoutine = new Routine
-      {
-        Id = new Guid("A453329C-9635-4DC9-82A5-5D50883F52C9"),
-        SkinTypeId = skinTypes[0].Id,
-        Title = "Morning Routine",
-        Period = "Morning",
-      };
+      var routines = new List<Routine>();
 
-      var eveningRoutine = new Routine
+      foreach (var skin in skinTypes)
       {
-        Id = new Guid("A194BD2B-2BCD-4CB1-9E28-45F9F4C5CD85"),
-        SkinTypeId = skinTypes[13].Id,
-        Title = "Evening Routine",
-        Period = "Evening",
-      };
+        // Morning Routine for this skin type
+        var morningRoutine = new Routine
+        {
+          Id = Guid.NewGuid(),
+          SkinTypeId = skin.Id,
+          Title = $"{skin.Name} Morning Routine",
+          Period = "Morning",
+        };
 
-      return new List<Routine> { morningRoutine, eveningRoutine };
+        // Evening Routine for this skin type
+        var eveningRoutine = new Routine
+        {
+          Id = Guid.NewGuid(),
+          SkinTypeId = skin.Id,
+          Title = $"{skin.Name} Evening Routine",
+          Period = "Evening",
+        };
+
+        routines.Add(morningRoutine);
+        routines.Add(eveningRoutine);
+      }
+
+      return routines;
     }
   }
 
@@ -712,61 +817,65 @@ internal class InitialData
     {
       var routines = Routines.ToList();
       var cosmetics = Cosmetics.ToList();
-      var steps = new List<RoutineStep>
-      {
-        // Morning Routine Steps (for oily, sensitive skin)
-        new RoutineStep
-        {
-          Id = new Guid("A64ACFD4-2352-4A5F-AF71-F010549139F8"),
-          RoutineId = routines[0].Id,
-          CosmeticId = cosmetics[1].Id,
-          StepNumber = 1
-        },
-        new RoutineStep
-        {
-          Id = new Guid("A26909AB-7E98-4241-8967-5C1099C1D12B"),
-          RoutineId = routines[0].Id,
-          CosmeticId = cosmetics[4].Id,
-          StepNumber = 2
-        },
-        new RoutineStep
-        {
-          Id = new Guid("92867F27-6111-4DE4-A4A3-50A28031BDE6"),
-          RoutineId = routines[0].Id,
-          CosmeticId = cosmetics[2].Id,
-          StepNumber = 3
-        },
-        new RoutineStep
-        {
-          Id = new Guid("4C7362B9-D2C3-4013-8637-94AD06193845"),
-          RoutineId = routines[0].Id,
-          CosmeticId = cosmetics[3].Id,
-          StepNumber = 4
-        },
+      var steps = new List<RoutineStep>();
 
-        // Evening Routine Steps (for dry, sensitive skin)
-        new RoutineStep
+      foreach (var routine in routines)
+      {
+        var cleanser = cosmetics.FirstOrDefault(c => c.Name.ToLower().Contains("cleanser") && c.SkinTypeId == routine.SkinTypeId);
+        var moisturizer = cosmetics.FirstOrDefault(c => c.Name.ToLower().Contains("moisturizer") && c.SkinTypeId == routine.SkinTypeId);
+        var sunscreen = cosmetics.FirstOrDefault(c => c.Name.ToLower().Contains("sunscreen") && c.SkinTypeId == routine.SkinTypeId);
+        var retinoid = cosmetics.FirstOrDefault(c => c.Name.ToLower().Contains("retinoid") && c.SkinTypeId == routine.SkinTypeId);
+        if (routine.Period.Equals("Morning", StringComparison.OrdinalIgnoreCase))
         {
-          Id = new Guid("BCDCA4D0-45BB-4074-B0DD-E50D5FF4A823"),
-          RoutineId = routines[1].Id,
-          CosmeticId = cosmetics[1].Id,
-          StepNumber = 1
-        },
-        new RoutineStep
-        {
-          Id = new Guid("26EFC8B8-3139-4EEA-8442-2BABC1D54326"),
-          RoutineId = routines[1].Id,
-          CosmeticId = cosmetics[2].Id,
-          StepNumber = 2
-        },
-        new RoutineStep
-        {
-          Id = new Guid("5EBF2F4F-78EB-4159-9780-47D01D1826FD"),
-          RoutineId = routines[1].Id,
-          CosmeticId = cosmetics[3].Id,
-          StepNumber = 3
+          // Morning Routine Steps
+          steps.Add(new RoutineStep
+          {
+            Id = Guid.NewGuid(),
+            RoutineId = routine.Id,
+            CosmeticId = cleanser?.Id ?? Guid.Empty,
+            StepNumber = 1
+          });
+          steps.Add(new RoutineStep
+          {
+            Id = Guid.NewGuid(),
+            RoutineId = routine.Id,
+            CosmeticId = moisturizer?.Id ?? Guid.Empty,
+            StepNumber = 2
+          });
+          steps.Add(new RoutineStep
+          {
+            Id = Guid.NewGuid(),
+            RoutineId = routine.Id,
+            CosmeticId = sunscreen?.Id ?? Guid.Empty,
+            StepNumber = 3
+          });
         }
-      };
+        else if (routine.Period.Equals("Evening", StringComparison.OrdinalIgnoreCase))
+        {
+          // Evening Routine Steps
+          steps.Add(new RoutineStep
+          {
+            Id = Guid.NewGuid(),
+            RoutineId = routine.Id,
+            CosmeticId = cleanser?.Id ?? Guid.Empty,
+            StepNumber = 1
+          });
+          steps.Add(new RoutineStep
+          {
+            Id = Guid.NewGuid(),
+            RoutineId = routine.Id,
+            CosmeticId = moisturizer?.Id ?? Guid.Empty,
+            StepNumber = 2
+          });
+          steps.Add(new RoutineStep
+          {
+            Id = Guid.NewGuid(),
+            RoutineId = routine.Id,
+            CosmeticId = retinoid?.Id ?? Guid.Empty,
+            StepNumber = 3
+          });
+        }
+      }
       return steps;
     }
   }

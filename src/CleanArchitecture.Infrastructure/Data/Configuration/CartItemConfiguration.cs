@@ -4,8 +4,8 @@ namespace CleanArchitecture.Infrastructure.Data.Configuration;
 
 public class CartItemConfiguration : IEntityTypeConfiguration<CartItem>
 {
-    public void Configure(EntityTypeBuilder<CartItem> builder)
-    {
-       
-    }
+  public void Configure(EntityTypeBuilder<CartItem> builder)
+  {
+    builder.HasKey(cartItem => new { cartItem.CartId, cartItem.CosmeticId });
+  }
 }

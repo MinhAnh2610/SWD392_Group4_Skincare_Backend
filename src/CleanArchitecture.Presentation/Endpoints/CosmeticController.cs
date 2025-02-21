@@ -1,4 +1,4 @@
-﻿using CleanArchitecture.Application.DTOs.Cosmetic;
+﻿using CleanArchitecture.Application.DTOs.CosmeticDto;
 using CleanArchitecture.Domain.Entities;
 
 namespace CleanArchitecture.Presentation.Endpoints;
@@ -21,7 +21,7 @@ public class CosmeticController : ICarterModule
       return Results.StatusCode(StatusCodes.Status500InternalServerError);
     })
     .WithName("GetCosmetics")
-    .Produces<ApiResponse<CompanyInformation>>(StatusCodes.Status200OK)
+    .Produces<ApiResponse<List<CosmeticResponse>>>(StatusCodes.Status200OK)
     .ProducesProblem(StatusCodes.Status500InternalServerError)
     .WithSummary("GetCosmetics")
     .WithDescription("Get Cosmetics");

@@ -1,4 +1,4 @@
-﻿namespace CleanArchitecture.Application.DTOs.User;
+﻿namespace CleanArchitecture.Application.DTOs.UserDto;
 
 public record UpdateProfileRequest(
   string? UserName,

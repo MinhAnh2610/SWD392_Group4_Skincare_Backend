@@ -2,6 +2,7 @@
 using CleanArchitecture.Application.DTOs.Order;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace CleanArchitecture.Presentation.Endpoints
 {
@@ -65,6 +66,24 @@ namespace CleanArchitecture.Presentation.Endpoints
       .Produces<ApiResponse<List<OrderResponse>>>(StatusCodes.Status200OK)
       .ProducesProblem(StatusCodes.Status500InternalServerError)
       .RequireAuthorization();
+
+      group.MapPost("/orders", async (CheckOutRequest request, IOrderService orderService) =>
+      {
+        var result = await orderService.CheckOut(request);
+        if (result.IsSuccess)
+        {
+          return Results.Created($"/orders/{result.Data!.Id}", ApiResponse<OrderResponse>.SuccessResponse(
+                 result.Data!,
+                 "Order created successfully."
+                 ));
+        }
+        return Results.StatusCode(result.Status);
+      })
+      .WithName("Check out")
+      .Produces<ApiResponse<List<OrderResponse>>>(StatusCodes.Status200OK)
+      .ProducesProblem(StatusCodes.Status500InternalServerError)
+      .RequireAuthorization();
     }
+
   }
 }

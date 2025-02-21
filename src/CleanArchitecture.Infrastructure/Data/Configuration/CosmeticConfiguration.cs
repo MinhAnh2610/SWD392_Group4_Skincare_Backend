@@ -40,7 +40,7 @@ namespace CleanArchitecture.Infrastructure.Data.Configuration
 
       builder.HasMany(cosmetic => cosmetic.Feedbacks)
         .WithOne(orderItem => orderItem.Cosmetic);
-      
+
       builder.HasMany(cosmetic => cosmetic.RefundItems)
         .WithOne(orderItem => orderItem.Cosmetic);
     }

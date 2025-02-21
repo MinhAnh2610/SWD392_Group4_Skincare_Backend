@@ -4,8 +4,12 @@ namespace CleanArchitecture.Infrastructure.Data.Configuration;
 
 public class QuestionTypeConfiguration : IEntityTypeConfiguration<QuestionType>
 {
-    public void Configure(EntityTypeBuilder<QuestionType> builder)
-    {
-        builder.HasKey(questionType => questionType.Id);
-    }
+  public void Configure(EntityTypeBuilder<QuestionType> builder)
+  {
+    builder.HasKey(questionType => questionType.Id);
+
+    builder.HasMany(questionType => questionType.QuestionOptions)
+      .WithOne(questionOption => questionOption.QuestionType)
+      .HasForeignKey(questionOption => questionOption.QuestionTypeId);
+  }
 }
