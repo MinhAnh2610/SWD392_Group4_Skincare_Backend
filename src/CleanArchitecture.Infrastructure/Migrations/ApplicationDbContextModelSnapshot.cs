@@ -717,6 +717,9 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("text");
 
+                    b.Property<Guid>("QuestionTypeId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("QuizId")
                         .HasColumnType("uuid");
 
@@ -727,6 +730,8 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("QuestionTypeId");
 
                     b.HasIndex("QuizId");
 
@@ -760,14 +765,12 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Property<Guid>("QuestionId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("QuestionTypeId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("Score")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
                     b.HasIndex("QuestionId");
-
-                    b.HasIndex("QuestionTypeId");
 
                     b.ToTable("QuestionOptions");
                 });
@@ -1635,11 +1638,19 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Question", b =>
                 {
+                    b.HasOne("CleanArchitecture.Domain.Entities.QuestionType", "QuestionType")
+                        .WithMany("Questions")
+                        .HasForeignKey("QuestionTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("CleanArchitecture.Domain.Entities.Quiz", "Quiz")
                         .WithMany("Questions")
                         .HasForeignKey("QuizId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("QuestionType");
 
                     b.Navigation("Quiz");
                 });
@@ -1652,15 +1663,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CleanArchitecture.Domain.Entities.QuestionType", "QuestionType")
-                        .WithMany("QuestionOptions")
-                        .HasForeignKey("QuestionTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Question");
-
-                    b.Navigation("QuestionType");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Refund", b =>
@@ -1917,7 +1920,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.QuestionType", b =>
                 {
-                    b.Navigation("QuestionOptions");
+                    b.Navigation("Questions");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Quiz", b =>

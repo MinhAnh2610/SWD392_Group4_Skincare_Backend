@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CleanArchitecture.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class test : Migration
+    public partial class Quiz_Update : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -31,6 +31,14 @@ namespace CleanArchitecture.Infrastructure.Migrations
                 name: "FK_Orders_Coupons_CouponId",
                 table: "Orders");
 
+            migrationBuilder.DropForeignKey(
+                name: "FK_QuestionOptions_QuestionTypes_QuestionTypeId",
+                table: "QuestionOptions");
+
+            migrationBuilder.DropIndex(
+                name: "IX_QuestionOptions_QuestionTypeId",
+                table: "QuestionOptions");
+
             migrationBuilder.DropIndex(
                 name: "IX_Payments_OrderId",
                 table: "Payments");
@@ -48,12 +56,30 @@ namespace CleanArchitecture.Infrastructure.Migrations
                 table: "CartItems");
 
             migrationBuilder.DropColumn(
+                name: "QuestionTypeId",
+                table: "QuestionOptions");
+
+            migrationBuilder.DropColumn(
                 name: "BatchId",
                 table: "Cosmetics");
 
             migrationBuilder.DropColumn(
                 name: "CustomerId",
                 table: "CartItems");
+
+            migrationBuilder.AddColumn<Guid>(
+                name: "QuestionTypeId",
+                table: "Questions",
+                type: "uuid",
+                nullable: false,
+                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
+
+            migrationBuilder.AddColumn<int>(
+                name: "Score",
+                table: "QuestionOptions",
+                type: "integer",
+                nullable: false,
+                defaultValue: 0);
 
             migrationBuilder.AlterColumn<Guid>(
                 name: "CouponId",
@@ -84,6 +110,11 @@ namespace CleanArchitecture.Infrastructure.Migrations
                 name: "PK_CartItems",
                 table: "CartItems",
                 columns: new[] { "CartId", "CosmeticId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Questions_QuestionTypeId",
+                table: "Questions",
+                column: "QuestionTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payments_OrderId",
@@ -118,6 +149,14 @@ namespace CleanArchitecture.Infrastructure.Migrations
                 column: "CouponId",
                 principalTable: "Coupons",
                 principalColumn: "Id");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Questions_QuestionTypes_QuestionTypeId",
+                table: "Questions",
+                column: "QuestionTypeId",
+                principalTable: "QuestionTypes",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
         }
 
         /// <inheritdoc />
@@ -135,6 +174,14 @@ namespace CleanArchitecture.Infrastructure.Migrations
                 name: "FK_Orders_Coupons_CouponId",
                 table: "Orders");
 
+            migrationBuilder.DropForeignKey(
+                name: "FK_Questions_QuestionTypes_QuestionTypeId",
+                table: "Questions");
+
+            migrationBuilder.DropIndex(
+                name: "IX_Questions_QuestionTypeId",
+                table: "Questions");
+
             migrationBuilder.DropIndex(
                 name: "IX_Payments_OrderId",
                 table: "Payments");
@@ -148,8 +195,23 @@ namespace CleanArchitecture.Infrastructure.Migrations
                 table: "CartItems");
 
             migrationBuilder.DropColumn(
+                name: "QuestionTypeId",
+                table: "Questions");
+
+            migrationBuilder.DropColumn(
+                name: "Score",
+                table: "QuestionOptions");
+
+            migrationBuilder.DropColumn(
                 name: "CustomerId",
                 table: "Carts");
+
+            migrationBuilder.AddColumn<Guid>(
+                name: "QuestionTypeId",
+                table: "QuestionOptions",
+                type: "uuid",
+                nullable: false,
+                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
 
             migrationBuilder.AlterColumn<Guid>(
                 name: "CouponId",
@@ -186,6 +248,11 @@ namespace CleanArchitecture.Infrastructure.Migrations
                 name: "PK_CartItems",
                 table: "CartItems",
                 columns: new[] { "CustomerId", "CosmeticId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_QuestionOptions_QuestionTypeId",
+                table: "QuestionOptions",
+                column: "QuestionTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payments_OrderId",
@@ -237,6 +304,14 @@ namespace CleanArchitecture.Infrastructure.Migrations
                 table: "Orders",
                 column: "CouponId",
                 principalTable: "Coupons",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_QuestionOptions_QuestionTypes_QuestionTypeId",
+                table: "QuestionOptions",
+                column: "QuestionTypeId",
+                principalTable: "QuestionTypes",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
         }
