@@ -8,10 +8,18 @@ public class FeedbackRepository : GenericRepository<Feedback>, IFeedbackReposito
   {
   }
 
+  public override async Task<List<Feedback>> GetAllAsync()
+  {
+    return await _context.Feedbacks
+      .Include(f => f.Cosmetic)
+      .Include(f => f.Customer)
+      .ToListAsync();
+  }
+
   public async Task<List<Feedback>> GetFeedbacksByCustomerIdAsync(Guid customerId)
   {
     return await _context.Set<Feedback>()
-        .Where(f => f.CustomerId == customerId)
-        .ToListAsync();
+      .Where(f => f.CustomerId == customerId)
+      .ToListAsync();
   }
 }

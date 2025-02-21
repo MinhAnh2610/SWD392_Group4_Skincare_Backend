@@ -1,4 +1,4 @@
-﻿using CleanArchitecture.Application.DTOs.Cosmetic;
+﻿using CleanArchitecture.Application.DTOs.CosmeticDto;
 
 namespace CleanArchitecture.Application.ServiceContracts;
 

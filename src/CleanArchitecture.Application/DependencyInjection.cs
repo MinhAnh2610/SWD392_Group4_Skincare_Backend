@@ -1,14 +1,12 @@
 ﻿using CleanArchitecture.Application.DTOs.Auth;
 using CleanArchitecture.Application.DTOs.CouponDTO;
-using CleanArchitecture.Application.DTOs.Role;
-using CleanArchitecture.Application.DTOs.User;
-using CleanArchitecture.Application.ServiceContracts;
+using CleanArchitecture.Application.DTOs.RoleDto;
+using CleanArchitecture.Application.DTOs.UserDto;
 using CleanArchitecture.Application.Services;
 using CleanArchitecture.Application.Validators;
 using CleanArchitecture.Application.Validators.Auth;
 using CleanArchitecture.Application.Validators.Role;
 using CleanArchitecture.Application.Validators.User;
-using CleanArchitecture.Domain.RepositoryContracts;
 using IdentityServer4.Validation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,18 +50,24 @@ public static class DependencyInjection
 
     // Add services
     services.AddScoped<IAuthService, AuthService>();
+    services.AddScoped<IBlogService, BlogService>();
+    services.AddScoped<IBrandService, BrandService>();
+    services.AddScoped<ICartService, CartService>();
+    services.AddScoped<ICategoryService, CategoryService>();
     services.AddScoped<ICosmeticService, CosmeticService>();
+    services.AddScoped<ICosmeticImageService, CosmeticImageService>();
+    services.AddScoped<ICosmeticTypeService, CosmeticTypeService>();
+    services.AddScoped<ICouponService, CouponService>();
+    services.AddScoped<IFeedbackService, FeedbackService>();
+    services.AddScoped<IOrderService, OrderService>();
     services.AddScoped<IPaymentService, PaymentService>();
     services.AddScoped<IRefundService, RefundService>();
     services.AddScoped<IRefundItemService, RefundItemService>();
-    //services.AddScoped<IProfileService, ProfileService>();
+    services.AddScoped<ISubCategoryService, SubCategoryService>();
+    services.AddScoped<ISkinTypeService, SkinTypeService>();
+    services.AddScoped<ITestimonialService, TestimonialService>();
     services.AddScoped<IUserService, UserService>();
     services.AddScoped<IRoleService, RoleService>();
-    services.AddScoped<ICartService, CartService>();
-    services.AddScoped<ICouponService, CouponService>();
-
-    services.AddScoped<IOrderService, OrderService>();
-    services.AddScoped<IFeedbackService, FeedbackService>();
     services.AddScoped<IRoutineService, RoutineService>();
     return services;
   }

@@ -2,20 +2,23 @@
 
 namespace CleanArchitecture.Infrastructure.Data.Configuration
 {
-    public class SkinTypeConfiguration : IEntityTypeConfiguration<SkinType>
+  public class SkinTypeConfiguration : IEntityTypeConfiguration<SkinType>
+  {
+    public void Configure(EntityTypeBuilder<SkinType> builder)
     {
-        public void Configure(EntityTypeBuilder<SkinType> builder)
-        {
-            builder.HasKey(skinType => skinType.Id);
+      builder.HasKey(skinType => skinType.Id);
 
-            builder.HasMany(skinType => skinType.Customers)
-                .WithOne(customer => customer.SkinType);
+      builder.HasMany(skinType => skinType.Customers)
+          .WithOne(customer => customer.SkinType)
+          .HasForeignKey(customer => customer.SkinTypeId);
 
-            builder.HasMany(skinType => skinType.Cosmetics)
-                .WithOne(cosmetic => cosmetic.SkinType);
+      builder.HasMany(skinType => skinType.Cosmetics)
+          .WithOne(cosmetic => cosmetic.SkinType)
+          .HasForeignKey(cosmetic => cosmetic.SkinTypeId);
 
-            builder.HasMany(skinType => skinType.Routines)
-                .WithOne(routine => routine.SkinType);
-        }
+      builder.HasMany(skinType => skinType.Routines)
+          .WithOne(routine => routine.SkinType)
+          .HasForeignKey(routine => routine.SkinTypeId);
     }
+  }
 }

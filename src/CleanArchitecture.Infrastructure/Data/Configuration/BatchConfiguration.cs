@@ -2,13 +2,14 @@
 
 namespace CleanArchitecture.Infrastructure.Data.Configuration
 {
-    public class BatchConfiguration : IEntityTypeConfiguration<Batch>
+  public class BatchConfiguration : IEntityTypeConfiguration<Batch>
+  {
+    public void Configure(EntityTypeBuilder<Batch> builder)
     {
-        public void Configure(EntityTypeBuilder<Batch> builder)
-        {
-            builder.HasKey(batch => batch.Id);
-            builder.HasOne(batch => batch.Cosmetic)
-                .WithMany(product => product.Batches);
-        }
+      builder.HasKey(batch => batch.Id);
+
+      builder.HasOne(batch => batch.Cosmetic)
+          .WithMany(product => product.Batches);
     }
+  }
 }

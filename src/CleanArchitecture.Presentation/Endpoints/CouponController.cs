@@ -1,6 +1,5 @@
-﻿
-using CleanArchitecture.Application.DTOs.Cart;
-using CleanArchitecture.Application.DTOs.CouponDTO;
+﻿using CleanArchitecture.Application.DTOs.CouponDTO;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CleanArchitecture.Presentation.Endpoints
 {
@@ -10,7 +9,7 @@ namespace CleanArchitecture.Presentation.Endpoints
     {
       var group = app.MapGroup("api/coupon").WithTags("Coupon Management");
       #region Apply Coupon API
-      group.MapGet("/apply-coupon", async (ICouponService couponService, ApplyCouponRequest applyCouponRequest) =>
+      group.MapGet("/apply-coupon", async (ICouponService couponService, [FromBody] ApplyCouponRequest applyCouponRequest) =>
       {
         var result = await couponService.ApplyCoupon(applyCouponRequest);
         if (result.IsSuccess)
@@ -24,7 +23,7 @@ namespace CleanArchitecture.Presentation.Endpoints
         };
       })
       .WithName("ApplyCoupon")
-      .Produces<ApiResponse<List<CartResponse>>>(StatusCodes.Status200OK)
+      .Produces<ApiResponse<List<CouponResponse>>>(StatusCodes.Status200OK)
       .ProducesProblem(StatusCodes.Status401Unauthorized)
       .ProducesProblem(StatusCodes.Status500InternalServerError)
       .WithSummary("ApplyCoupon")

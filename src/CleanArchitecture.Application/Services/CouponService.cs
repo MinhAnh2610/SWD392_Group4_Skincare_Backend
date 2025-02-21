@@ -1,27 +1,18 @@
 ﻿using CleanArchitecture.Application.DTOs.CouponDTO;
-using CleanArchitecture.Domain.RepositoryContracts;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CleanArchitecture.Application.Services
 {
   public class CouponService : ICouponService
   {
-    private readonly ICouponRepository _couponRepository;
-
-    private readonly IOrderRepository _orderRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     private readonly IValidator<ApplyCouponRequest> _couponValidator;
 
-    public CouponService(ICouponRepository couponRepository, IValidator<ApplyCouponRequest> couponValidator, IOrderRepository orderRepository)
+    public CouponService(IUnitOfWork unitOfWork, IValidator<ApplyCouponRequest> couponValidator)
     {
-      _couponRepository = couponRepository;
+      _unitOfWork = unitOfWork;
       _couponValidator = couponValidator;
-      _orderRepository = orderRepository;
     }
 
     public async Task<Result<CouponResponse>> ApplyCoupon(ApplyCouponRequest applyCouponRequest)
@@ -36,7 +27,7 @@ namespace CleanArchitecture.Application.Services
         return Result<CouponResponse>.Failure(errors, StatusCodes.Status400BadRequest);
       }
 
-      var coupon = await _couponRepository.GetByIdAsync(applyCouponRequest.code);
+      var coupon = await _unitOfWork.Coupons.GetByIdAsync(applyCouponRequest.code);
       if (coupon == null)
       {
         return Result<CouponResponse>.Failure(
@@ -45,7 +36,7 @@ namespace CleanArchitecture.Application.Services
                );
       }
       
-      var order = await _orderRepository.GetByIdAsync(applyCouponRequest.order);
+      var order = await _unitOfWork.Orders.GetByIdAsync(applyCouponRequest.order);
 
       if (order == null)
       {
@@ -80,7 +71,7 @@ namespace CleanArchitecture.Application.Services
       }
 
       order.Coupon = coupon;
-      await _orderRepository.UpdateAsync(order);
+      await _unitOfWork.Orders.UpdateAsync(order);
       return Result<CouponResponse>.Success(new CouponResponse
       {
         Id = coupon.Id,
