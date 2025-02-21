@@ -132,6 +132,7 @@ public static class DependencyInjection
       });
     }
 
+
     app.UseExceptionHandler(options => { });
     app.UseMiddleware<CustomErrorHandler>();
 
