@@ -1,4 +1,5 @@
 using CleanArchitecture.Application;
+using CleanArchitecture.Application.Mapper;
 using CleanArchitecture.Infrastructure;
 using CleanArchitecture.Infrastructure.Data.Extensions;
 using CleanArchitecture.Presentation;

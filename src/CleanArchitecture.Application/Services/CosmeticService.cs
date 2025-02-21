@@ -19,13 +19,11 @@ namespace CleanArchitecture.Application.Services
   public class CosmeticService : ICosmeticService
   {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
 
     public CosmeticService(
-    IUnitOfWork unitOfWork, IMapper mapper)
+    IUnitOfWork unitOfWork)
     {
       _unitOfWork = unitOfWork;
-      _mapper = mapper;
     }
     public async Task<Result<CosmeticResponse>> CreateCosmetic(CreateCosmetic cosmetic)
     {
@@ -181,7 +179,7 @@ namespace CleanArchitecture.Application.Services
       // Apply filters if they exist
       var filteredResults = query.Where(c =>
           // Name filter (case-insensitive contains)
-          (string.IsNullOrEmpty(filter.Name) || c.Name.ToLower().Contains(filter.Name.ToLower())) &&
+          (string.IsNullOrEmpty(filter.Name) || c.Name.Contains(filter.Name, StringComparison.OrdinalIgnoreCase)) &&
           // Type filter
           (!filter.TypeId.HasValue || c.CosmeticTypeId == filter.TypeId) &&
           // Brand filter
@@ -190,7 +188,7 @@ namespace CleanArchitecture.Application.Services
           (!filter.SkinTypeId.HasValue || c.SkinTypeId == filter.SkinTypeId)
       ).ToList();
 
-      if (!filteredResults.Any())
+      if (filteredResults?.Any() != true)
       {
         return Result<List<CosmeticResponse>>.Failure(
             [CosmeticErrors.CosmeticNotFound],

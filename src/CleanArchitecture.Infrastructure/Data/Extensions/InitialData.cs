@@ -1584,10 +1584,10 @@ internal class InitialData
 
       foreach (var routine in routines)
       {
-        var cleanser = cosmetics.FirstOrDefault(c => c.Name.ToLower().Contains("cleanser") && c.SkinTypeId == routine.SkinTypeId);
-        var moisturizer = cosmetics.FirstOrDefault(c => c.Name.ToLower().Contains("moisturizer") && c.SkinTypeId == routine.SkinTypeId);
-        var sunscreen = cosmetics.FirstOrDefault(c => c.Name.ToLower().Contains("sunscreen") && c.SkinTypeId == routine.SkinTypeId);
-        var retinoid = cosmetics.FirstOrDefault(c => c.Name.ToLower().Contains("retinoid") && c.SkinTypeId == routine.SkinTypeId);
+        var cleanser = cosmetics.FirstOrDefault(c => c.Name.Contains("cleanser", StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
+        var moisturizer = cosmetics.FirstOrDefault(c => c.Name.Contains("moisturizer", StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
+        var sunscreen = cosmetics.FirstOrDefault(c => c.Name.Contains("sunscreen", StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
+        var retinoid = cosmetics.FirstOrDefault(c => c.Name.Contains("retinoid", StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
         if (routine.Period.Equals("Morning", StringComparison.OrdinalIgnoreCase))
         {
           // Morning Routine Steps
