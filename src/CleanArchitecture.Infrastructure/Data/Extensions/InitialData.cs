@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-
-namespace CleanArchitecture.Infrastructure.Data.Extensions;
+﻿namespace CleanArchitecture.Infrastructure.Data.Extensions;
 
 internal class InitialData
 {
@@ -785,233 +783,6 @@ internal class InitialData
     }
   }
 
-  public static IEnumerable<Batch> Batches
-  {
-    get
-    {
-      var cosmetics = Cosmetics.ToList();
-      var batches = new List<Batch>();
-
-      foreach (var cosmetic in cosmetics)
-      {
-        batches.Add(new Batch
-        {
-          Id = Guid.NewGuid(),
-          CosmeticId = cosmetic.Id,
-          Quantity = 200,
-          ManufactureDate = new DateOnly(2025, 3, 15),
-          ExportedDate = new DateOnly(2025, 4, 1),
-          ExpirationDate = new DateOnly(2027, 3, 15),
-        });
-      }
-      return batches;
-    }
-  }
-
-  public static IEnumerable<Blog> Blogs
-  {
-    get
-    {
-      var staffs = Users.ToList();
-      return new List<Blog>
-      {
-        new Blog
-        {
-          Id = new Guid("CB64A508-526E-4156-A512-1D1BF7A5A032"),
-          StaffId = staffs[3].Id,
-          Title = "The Future of AI",
-          Content = "AI is transforming industries...",
-          BlogTags = new List<BlogTag>() // BlogTags will be assigned later
-        },
-        new Blog
-        {
-          Id = new Guid("C9DED966-A2F7-4328-B899-8201508D5476"),
-          StaffId = staffs[3].Id,
-          Title = "Starting a Business in 2024",
-          Content = "Starting a business has never been easier...",
-          BlogTags = new List<BlogTag>()
-        }
-      };
-    }
-  }
-
-  public static IEnumerable<BlogTag> BlogTags
-  {
-    get
-    {
-      var blogs = Blogs.ToList();
-      var tags = Tags.ToList();
-
-      return new List<BlogTag>
-      {
-        new BlogTag { BlogId = blogs[0].Id, TagId = tags[0].Id }, // AI & Tech
-        new BlogTag { BlogId = blogs[1].Id, TagId = tags[1].Id }  // Business  
-      };
-    }
-  }
-
-  public static IEnumerable<Brand> Brands => new List<Brand>
-  {
-    new Brand { Id = new Guid("9286DAB7-CCA8-4C04-9D2D-FF1072A1746A"), Name = "L'Oreal", Description = "Global beauty brand", WebsiteUrl = "https://www.loreal.com", LogoUrl = "https://example.com/loreal-logo.png" },
-    new Brand { Id = new Guid("A6ACE76F-5DA7-4EEB-A909-49B0390F34A2"), Name = "Clinique", Description = "Fragrance-free skincare products", WebsiteUrl = "https://www.clinique.com", LogoUrl = "https://example.com/clinique-logo.png" },
-    new Brand { Id = new Guid("735B21D1-AB56-45BD-8404-7722112AE8E2"), Name = "Neutrogena", Description = "Dermatologist-recommended skincare", WebsiteUrl = "https://www.neutrogena.com", LogoUrl = "https://example.com/neutrogena-logo.png" },
-    new Brand { Id = new Guid("B4D858D8-28D6-476A-9BDF-B9265DA3E160"), Name = "CeraVe", Description = "Skincare with essential ceramides", WebsiteUrl = "https://www.cerave.com", LogoUrl = "https://example.com/cerave-logo.png" },
-    new Brand { Id = new Guid("0F7ABD8F-0905-4EDE-A573-C46B6EF86267"), Name = "The Ordinary", Description = "Clinical formulations with integrity", WebsiteUrl = "https://www.theordinary.com", LogoUrl = "https://example.com/theordinary-logo.png" }
-  };
-
-  public static IEnumerable<Cart> Carts
-  {
-    get
-    {
-      var customers = Users.ToList();
-      return new List<Cart>
-      {
-        new Cart
-        {
-          Id = new Guid("A5D8471E-7C24-48D9-8233-CD598E6DD1C3"),
-          CustomerId = customers[5].Id,
-          TotalPrice = 89.97m
-        }
-      };
-    }
-  }
-
-  public static IEnumerable<CartItem> CartItems
-  {
-    get
-    {
-      var carts = Carts.ToList();
-      var cosmetics = Cosmetics.ToList();
-      return new List<CartItem>
-      {
-        new CartItem
-        {
-          CartId = carts[0].Id,
-          CosmeticId = cosmetics[0].Id,
-          Quantity = 2
-        },
-        new CartItem
-        {
-          CartId = carts[0].Id,
-          CosmeticId = cosmetics[1].Id,
-          Quantity = 1
-        }
-      };
-    }
-  }
-
-  public static IEnumerable<Category> Categories => new List<Category>
-  {
-    new Category
-    {
-      Id = new Guid("0419D5D4-1C6A-4F2D-ACFA-D3E5687C5A73"),
-      Name = "Radiance",
-      Description = "Enhance your natural glow and brighten your complexion."
-    },
-    new Category
-    {
-      Id = new Guid("0CDF8B34-6D34-4669-9757-10C68A69ECAA"),
-      Name = "Rejuvenation",
-      Description = "Age-defying and skin renewal solutions."
-    },
-    new Category
-    {
-      Id = new Guid("222AFB3A-879D-4FB1-AEB4-BCD4EECE09C4"),
-      Name = "Purity",
-      Description = "Deep cleansing and detoxifying products."
-    },
-    new Category
-    {
-      Id = new Guid("ECBE8150-1FF8-4DE8-B13F-44E007E2487D"),
-      Name = "Hydration",
-      Description = "Products to lock in moisture and nourish your skin."
-    },
-    new Category
-    {
-      Id = new Guid("E187FB64-B583-4BF6-A9F7-34C8DCE1CDCF"),
-      Name = "Balance",
-      Description = "Formulations to maintain skin pH and soothe irritation."
-    },
-    new Category
-    {
-      Id = new Guid("16C105C4-D38D-46A1-98CA-48852724DA8F"),
-      Name = "Protection",
-      Description = "Guard your skin against environmental stressors."
-    },
-    new Category
-    {
-      Id = new Guid("67D4B89F-17EE-4458-9678-6454E89547DD"),
-      Name = "Specialized Care",
-      Description = "Targeted solutions for specific skin concerns."
-    },
-    new Category
-    {
-      Id = new Guid("D5E75588-1D27-4FF4-8DDA-6220DF581268"),
-      Name = "Masking",
-      Description = "Intensive treatments delivered via masks."
-    }
-  };
-
-  public static IEnumerable<CosmeticType> CosmeticTypes => new List<CosmeticType>
-  {
-    new CosmeticType
-    {
-      Id = new Guid("AC635372-0D15-44F7-BF5F-7496C4F16051"),
-      Name = "Cleansers",
-      Description = "Products that clean the skin."
-    },
-    new CosmeticType
-    {
-      Id = new Guid("119B5F44-626F-4831-8978-388A8B2AD23C"),
-      Name = "Exfoliators",
-      Description = "Products to remove dead skin cells."
-    },
-    new CosmeticType
-    {
-      Id = new Guid("A0F0DF4B-07C2-4984-A914-184479DB31B0"),
-      Name = "Toners",
-      Description = "Products to balance and refresh the skin."
-    },
-    new CosmeticType
-    {
-      Id = new Guid("22D4240D-9674-4E6C-B0B7-72F84CA010B8"),
-      Name = "Serums",
-      Description = "Concentrated treatments for skin."
-    },
-    new CosmeticType
-    {
-      Id = new Guid("4CCDED92-BB02-4B8E-9119-95F59628C5D2"),
-      Name = "Moisturizers",
-      Description = "Products to hydrate and nourish the skin."
-    },
-    new CosmeticType
-    {
-      Id = new Guid("79406AF7-46EE-49B4-9D4C-6812A2C396A0"),
-      Name = "Eye Creams",
-      Description = "Specialized creams for the eye area."
-    },
-    new CosmeticType
-    {
-      Id = new Guid("79BD1C90-FAF6-4A08-9893-DBA2552FEE68"),
-      Name = "Sunscreens",
-      Description = "Products that protect the skin from UV rays."
-    },
-    new CosmeticType
-    {
-      Id = new Guid("C6C92631-D452-4C16-A065-3FA93CE750D8"),
-      Name = "Lip Care Products",
-      Description = "Products to care for and enhance the lips."
-    },
-    new CosmeticType
-    {
-      Id = new Guid("C4FDAAE7-B369-4842-B31B-37EAA3072534"),
-      Name = "Face Masks",
-      Description = "Treatments that refresh and rejuvenate the skin."
-    }
-  };
-
-
-
   public static IEnumerable<CosmeticImage> CosmeticImages
   {
     get
@@ -1035,32 +806,32 @@ internal class InitialData
     }
   }
 
-  //public static IEnumerable<CosmeticSubCategory> CosmeticSubCategories
-  //{
-  //  get
-  //  {
-  //    var cosmetics = Cosmetics.ToList();
-  //    var subCategories = SubCategories.ToList();
-  //    return new List<CosmeticSubCategory>
-  //    {
-  //      new CosmeticSubCategory
-  //      {
-  //        CosmeticId = cosmetics[0].Id,
-  //        SubCategoryId = subCategories[0].Id
-  //      },
-  //      new CosmeticSubCategory
-  //      {
-  //        CosmeticId = cosmetics[0].Id,
-  //        SubCategoryId = subCategories[2].Id
-  //      },
-  //      new CosmeticSubCategory
-  //      {
-  //        CosmeticId = cosmetics[1].Id,
-  //        SubCategoryId = subCategories[1].Id
-  //      }
-  //    };
-  //  }
-  //}
+  public static IEnumerable<CosmeticSubCategory> CosmeticSubCategories
+  {
+    get
+    {
+      var cosmetics = Cosmetics.ToList();
+      var subCategories = SubCategories.ToList();
+      return new List<CosmeticSubCategory>
+      {
+        new CosmeticSubCategory
+        {
+          CosmeticId = cosmetics[0].Id,
+          SubCategoryId = subCategories[0].Id
+        },
+        new CosmeticSubCategory
+        {
+          CosmeticId = cosmetics[0].Id,
+          SubCategoryId = subCategories[2].Id
+        },
+        new CosmeticSubCategory
+        {
+          CosmeticId = cosmetics[1].Id,
+          SubCategoryId = subCategories[1].Id
+        }
+      };
+    }
+  }
 
   public static IEnumerable<CompanyInformation> CompanyInfos => new List<CompanyInformation>
   {
@@ -1589,7 +1360,7 @@ internal class InitialData
       var routines = Routines.ToList();
       var cosmetics = Cosmetics.ToList();
       var steps = new List<RoutineStep>();
-     
+
       var guids = new List<Guid>()
       {
         new Guid("EBE1E2D8-892F-42CA-B1C3-9AB1D37D5DD6"),
@@ -1892,173 +1663,173 @@ internal class InitialData
     new SkinType { Id = new Guid("F585889E-076E-434A-A47F-AC952736712C"), Name = "DRNT", Description = "Dry, Resistant, Non-Pigmented, Tight", IsDry = true, IsSensitive = false, IsUneven = false, IsWrinkle = false }
   };
 
-  //public static IEnumerable<SubCategory> SubCategories
-  //{
-  //  get
-  //  {
-  //    var categories = new List<Category>(Categories);
+  public static IEnumerable<SubCategory> SubCategories
+  {
+    get
+    {
+      var categories = new List<Category>(Categories);
 
-  //    return new List<SubCategory>
-  //    {
-  //      // Radiance (Category 1)
-  //      new SubCategory
-  //      {
-  //        Id = new Guid("FA5585BA-D79A-4738-973A-2A46BAAFEF02"),
-  //        CategoryId = categories[0].Id,
-  //        Name = "Glow Boosters",
-  //        Description = "Enhance natural radiance and luminosity."
-  //      },
-  //      new SubCategory
-  //      {
-  //        Id = new Guid("924F9CB9-DA41-4B51-A9E6-3F43B15BF4A6"),
-  //        CategoryId = categories[0].Id,
-  //        Name = "Brightening Formulas",
-  //        Description = "Products formulated to brighten and even out skin tone."
-  //      },
-  //      new SubCategory
-  //      {
-  //        Id = new Guid("9B4F16A4-3163-4744-9399-E9381819283A"),
-  //        CategoryId = categories[0].Id,
-  //        Name = "Illuminators",
-  //        Description = "Subtle enhancers for a lit-from-within glow."
-  //      },
-        
-  //      // Rejuvenation (Category 2)
-  //      new SubCategory
-  //      {
-  //        Id = new Guid("A8EF488E-56C6-46AC-889B-4A0FFBD680AC"),
-  //        CategoryId = categories[1].Id,
-  //        Name = "Age-Defying Treatments",
-  //        Description = "Reduce the signs of aging and smooth wrinkles."
-  //      },
-  //      new SubCategory
-  //      {
-  //        Id = new Guid("9A924542-D844-43C2-88CB-5641D00A22DD"),
-  //        CategoryId = categories[1].Id,
-  //        Name = "Firming Solutions",
-  //        Description = "Products that help to tighten and firm the skin."
-  //      },
-  //      new SubCategory
-  //      {
-  //        Id = new Guid("277169B9-E26C-4EE1-9CBC-B4E326E82EE0"),
-  //        CategoryId = categories[1].Id,
-  //        Name = "Renewal Complex",
-  //        Description = "Promote cell turnover and skin renewal."
-  //      },
-        
-  //      // Purity (Category 3)
-  //      new SubCategory
-  //      {
-  //        Id = new Guid("C7C096CE-8959-494D-8913-4139CA48B160"),
-  //        CategoryId = categories[2].Id,
-  //        Name = "Deep Cleansing",
-  //        Description = "Thorough cleansers to purify the skin."
-  //      },
-  //      new SubCategory
-  //      {
-  //        Id = new Guid("FA60A320-490A-4CCF-8BA8-1386DF682A61"),
-  //        CategoryId = categories[2].Id,
-  //        Name = "Detox & Clarify",
-  //        Description = "Remove impurities and unclog pores."
-  //      },
-  //      new SubCategory
-  //      {
-  //        Id = new Guid("17E228DD-F780-4CCE-8884-DFE530FD5A00"),
-  //        CategoryId = categories[2].Id,
-  //        Name = "Pore Refiners",
-  //        Description = "Minimize pores and smooth skin texture."
-  //      },
-        
-  //      // Hydration (Category 4)
-  //      new SubCategory
-  //      {
-  //        Id = new Guid("7FB4A783-8587-4A18-A0DA-94D40682EEFC"),
-  //        CategoryId = categories[3].Id,
-  //        Name = "Moisture Locks",
-  //        Description = "Seal in hydration for long-lasting moisture."
-  //      },
-  //      new SubCategory
-  //      {
-  //        Id = new Guid("F86FA2D9-B3C1-48DF-828E-4BD6CDD76319"),
-  //        CategoryId = categories[3].Id,
-  //        Name = "Hydrating Essentials",
-  //        Description = "Fundamental products for daily hydration."
-  //      },
+      return new List<SubCategory>
+      {
+        // Radiance (Category 1)
+        new SubCategory
+        {
+          Id = new Guid("FA5585BA-D79A-4738-973A-2A46BAAFEF02"),
+          CategoryId = categories[0].Id,
+          Name = "Glow Boosters",
+          Description = "Enhance natural radiance and luminosity."
+        },
+        new SubCategory
+        {
+          Id = new Guid("924F9CB9-DA41-4B51-A9E6-3F43B15BF4A6"),
+          CategoryId = categories[0].Id,
+          Name = "Brightening Formulas",
+          Description = "Products formulated to brighten and even out skin tone."
+        },
+        new SubCategory
+        {
+          Id = new Guid("9B4F16A4-3163-4744-9399-E9381819283A"),
+          CategoryId = categories[0].Id,
+          Name = "Illuminators",
+          Description = "Subtle enhancers for a lit-from-within glow."
+        },
 
-  //      new SubCategory
-  //      {
-  //        Id = new Guid("C6A71C5D-A067-4BB6-8D9C-3CA3F180ADFD"),
-  //        CategoryId = categories[3].Id,
-  //        Name = "Nourishing Creams",
-  //        Description = "Rich creams that deeply nourish the skin."
-  //      },
-        
-  //      // Balance (Category 5)
-  //      new SubCategory
-  //      {
-  //        Id = new Guid("71895946-0B7C-40F9-97E0-9195D7BDC5E2"),
-  //        CategoryId = categories[4].Id,
-  //        Name = "pH Balancing",
-  //        Description = "Products to maintain the skin's natural pH."
-  //      },
-  //      new SubCategory
-  //      {
-  //        Id = new Guid("9AD8FBB8-DB09-4842-95B3-590F3728ED42"),
-  //        CategoryId = categories[4].Id,
-  //        Name = "Soothing Solutions",
-  //        Description = "Calm and reduce irritation for balanced skin."
-  //      },
-        
-  //      // Protection (Category 6)
-  //      new SubCategory
-  //      {
-  //        Id = new Guid("C4A28A94-14DA-452D-96EB-1B01D4892C84"),
-  //        CategoryId = categories[5].Id,
-  //        Name = "Environmental Shields",
-  //        Description = "Defend skin against pollution and external stressors."
-  //      },
-  //      new SubCategory
-  //      {
-  //        Id = new Guid("39783437-38B8-480A-B9A5-4814E9920C36"),
-  //        CategoryId = categories[5].Id,
-  //        Name = "SPF Essentials",
-  //        Description = "Sunscreens and UV protective formulations."
-  //      },
-        
-  //      // Specialized Care (Category 7)
-  //      new SubCategory
-  //      {
-  //        Id = new Guid("7B314245-8C44-4E8D-B763-155291ED57C8"),
-  //        CategoryId = categories[6].Id,
-  //        Name = "Targeted Remedies",
-  //        Description = "Specific solutions for defined skin issues."
-  //      },
-  //      new SubCategory
-  //      {
-  //        Id = new Guid("646E7856-BF86-46FB-A71A-799FDAC30F82"),
-  //        CategoryId = categories[6].Id,
-  //        Name = "Delicate Area Care",
-  //        Description = "Gentle products for sensitive areas like eyes and lips."
-  //      },
-        
-  //      // Masking (Category 8)
-  //      new SubCategory
-  //      {
-  //        Id = new Guid("93894942-ADB7-4D19-ABBF-1AA6620B5BCB"),
-  //        CategoryId = categories[7].Id,
-  //        Name = "Sheet Masks",
-  //        Description = "Single-use masks for an instant boost."
-  //      },
-  //      new SubCategory
-  //      {
-  //        Id = new Guid("DADC109E-FA2E-4BE0-A5E2-29FC46F54826"),
-  //        CategoryId = categories[7].Id,
-  //        Name = "Overnight Masks",
-  //        Description = "Leave-on treatments for intensive overnight care."
-  //      }
-  //    };
-  //  }
-  //}
+        // Rejuvenation (Category 2)
+        new SubCategory
+        {
+          Id = new Guid("A8EF488E-56C6-46AC-889B-4A0FFBD680AC"),
+          CategoryId = categories[1].Id,
+          Name = "Age-Defying Treatments",
+          Description = "Reduce the signs of aging and smooth wrinkles."
+        },
+        new SubCategory
+        {
+          Id = new Guid("9A924542-D844-43C2-88CB-5641D00A22DD"),
+          CategoryId = categories[1].Id,
+          Name = "Firming Solutions",
+          Description = "Products that help to tighten and firm the skin."
+        },
+        new SubCategory
+        {
+          Id = new Guid("277169B9-E26C-4EE1-9CBC-B4E326E82EE0"),
+          CategoryId = categories[1].Id,
+          Name = "Renewal Complex",
+          Description = "Promote cell turnover and skin renewal."
+        },
+
+        // Purity (Category 3)
+        new SubCategory
+        {
+          Id = new Guid("C7C096CE-8959-494D-8913-4139CA48B160"),
+          CategoryId = categories[2].Id,
+          Name = "Deep Cleansing",
+          Description = "Thorough cleansers to purify the skin."
+        },
+        new SubCategory
+        {
+          Id = new Guid("FA60A320-490A-4CCF-8BA8-1386DF682A61"),
+          CategoryId = categories[2].Id,
+          Name = "Detox & Clarify",
+          Description = "Remove impurities and unclog pores."
+        },
+        new SubCategory
+        {
+          Id = new Guid("17E228DD-F780-4CCE-8884-DFE530FD5A00"),
+          CategoryId = categories[2].Id,
+          Name = "Pore Refiners",
+          Description = "Minimize pores and smooth skin texture."
+        },
+
+        // Hydration (Category 4)
+        new SubCategory
+        {
+          Id = new Guid("7FB4A783-8587-4A18-A0DA-94D40682EEFC"),
+          CategoryId = categories[3].Id,
+          Name = "Moisture Locks",
+          Description = "Seal in hydration for long-lasting moisture."
+        },
+        new SubCategory
+        {
+          Id = new Guid("F86FA2D9-B3C1-48DF-828E-4BD6CDD76319"),
+          CategoryId = categories[3].Id,
+          Name = "Hydrating Essentials",
+          Description = "Fundamental products for daily hydration."
+        },
+
+        new SubCategory
+        {
+          Id = new Guid("C6A71C5D-A067-4BB6-8D9C-3CA3F180ADFD"),
+          CategoryId = categories[3].Id,
+          Name = "Nourishing Creams",
+          Description = "Rich creams that deeply nourish the skin."
+        },
+
+        // Balance (Category 5)
+        new SubCategory
+        {
+          Id = new Guid("71895946-0B7C-40F9-97E0-9195D7BDC5E2"),
+          CategoryId = categories[4].Id,
+          Name = "pH Balancing",
+          Description = "Products to maintain the skin's natural pH."
+        },
+        new SubCategory
+        {
+          Id = new Guid("9AD8FBB8-DB09-4842-95B3-590F3728ED42"),
+          CategoryId = categories[4].Id,
+          Name = "Soothing Solutions",
+          Description = "Calm and reduce irritation for balanced skin."
+        },
+
+        // Protection (Category 6)
+        new SubCategory
+        {
+          Id = new Guid("C4A28A94-14DA-452D-96EB-1B01D4892C84"),
+          CategoryId = categories[5].Id,
+          Name = "Environmental Shields",
+          Description = "Defend skin against pollution and external stressors."
+        },
+        new SubCategory
+        {
+          Id = new Guid("39783437-38B8-480A-B9A5-4814E9920C36"),
+          CategoryId = categories[5].Id,
+          Name = "SPF Essentials",
+          Description = "Sunscreens and UV protective formulations."
+        },
+
+        // Specialized Care (Category 7)
+        new SubCategory
+        {
+          Id = new Guid("7B314245-8C44-4E8D-B763-155291ED57C8"),
+          CategoryId = categories[6].Id,
+          Name = "Targeted Remedies",
+          Description = "Specific solutions for defined skin issues."
+        },
+        new SubCategory
+        {
+          Id = new Guid("646E7856-BF86-46FB-A71A-799FDAC30F82"),
+          CategoryId = categories[6].Id,
+          Name = "Delicate Area Care",
+          Description = "Gentle products for sensitive areas like eyes and lips."
+        },
+
+        // Masking (Category 8)
+        new SubCategory
+        {
+          Id = new Guid("93894942-ADB7-4D19-ABBF-1AA6620B5BCB"),
+          CategoryId = categories[7].Id,
+          Name = "Sheet Masks",
+          Description = "Single-use masks for an instant boost."
+        },
+        new SubCategory
+        {
+          Id = new Guid("DADC109E-FA2E-4BE0-A5E2-29FC46F54826"),
+          CategoryId = categories[7].Id,
+          Name = "Overnight Masks",
+          Description = "Leave-on treatments for intensive overnight care."
+        }
+      };
+    }
+  }
 
   public static IEnumerable<Tag> Tags => new List<Tag>
         {
