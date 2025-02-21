@@ -1,7 +1,9 @@
 ﻿using CleanArchitecture.Application.DTOs.QuizDto;
 using CleanArchitecture.Application.DTOs.RoutineDTO;
 using CleanArchitecture.Application.DTOs.SkinTypeDto;
+using IdentityModel.Client;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CleanArchitecture.Presentation.Endpoints;
 
@@ -36,13 +38,23 @@ public class QuizController : ICarterModule
 
     #region Submit Quiz API
     group.MapPost("{id}/submit", async (
-      IQuizService service, 
+      IQuizService quizService,
+      IQuizResultService quizResultService,
+      IHttpContextAccessor httpContextAccessor,
       [FromRoute] Guid id,
       [FromBody] QuizSubmitRequest request) =>
     {
-      var result = await service.ProcessQuizAsync(id, request);
+      var result = await quizService.ProcessQuizAsync(id, request);
+      var user = httpContextAccessor.HttpContext?.User;
+
       if (result.IsSuccess)
       {
+        if (user!.Identity!.IsAuthenticated)
+        {
+          var userId = user.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+          await quizResultService.SaveQuizResultAsync(Guid.Parse(userId), id, request, result.Data!.First());
+        }
+
         return Results.Ok(ApiResponse<List<RoutineResponse>>.SuccessResponse(result.Data!, "Submitted Quiz Successfully."));
       }
 

@@ -25,6 +25,8 @@ public interface IUnitOfWork : IDisposable
   IQuestionRepository Questions { get; }
   IQuestionTypeRepository QuestionTypes { get; }
   IQuizRepository Quizs { get; }
+  IQuizResultRepository QuizResults { get; }
+  IQuizAnswerRepository QuizAnswers { get; }
   IRefundRepository Refunds { get; }
   IRefundItemRepository RefundItems { get; }
   IRoutineRepository Routines { get; }
