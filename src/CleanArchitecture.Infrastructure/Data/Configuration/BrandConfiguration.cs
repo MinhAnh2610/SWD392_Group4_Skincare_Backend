@@ -9,7 +9,8 @@ namespace CleanArchitecture.Infrastructure.Data.Configuration
       builder.HasKey(brand => brand.Id);
 
       builder.HasMany(brand => brand.Cosmetics)
-          .WithOne(cosmetic => cosmetic.Brand);
+          .WithOne(cosmetic => cosmetic.Brand)
+          .HasForeignKey(cosmetic => cosmetic.BrandId);
     }
   }
 }
