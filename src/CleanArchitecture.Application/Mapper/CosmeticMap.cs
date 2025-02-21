@@ -14,5 +14,7 @@ public class CosmeticMappingConfig : IRegister
         .Map(dest => dest.CosmeticSubcategories, src => src.CosmeticSubcategories) // Map nested CosmeticSubcategories
         .Map(dest => dest.CosmeticImages, src => src.CosmeticImages) // Map nested CosmeticImages
         .Map(dest => dest.Feedbacks, src => src.Feedbacks); // Map nested Feedbacks
+    config.NewConfig<Cosmetic, CosmeticResponse>();
+    config.NewConfig<UpdateCosmetic, CosmeticResponse>();
   }
 }
