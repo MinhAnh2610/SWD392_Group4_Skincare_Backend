@@ -13,6 +13,7 @@ builder.Services
   .AddApiServices(builder.Configuration);
 var config = new TypeAdapterConfig();
 config.Apply(new CosmeticMappingConfig());
+config.Apply(new CategoryMappingConfig());
 builder.Services.AddSingleton(config);
 builder.Services.AddMapster();
 

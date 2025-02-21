@@ -232,6 +232,7 @@ public static class DatabaseExtensions
     if (!await context.Categories.AnyAsync())
     {
       await context.Categories.AddRangeAsync(InitialData.Categories);
+      await context.SaveChangesAsync();
     }
   }
 
