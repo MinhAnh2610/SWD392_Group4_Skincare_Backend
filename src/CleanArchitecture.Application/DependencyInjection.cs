@@ -69,6 +69,7 @@ public static class DependencyInjection
     services.AddScoped<IUserService, UserService>();
     services.AddScoped<IRoleService, RoleService>();
     services.AddScoped<IRoutineService, RoutineService>();
+    services.AddScoped<ITimeZoneService, TimeZoneService>();
     return services;
   }
 }
