@@ -50,6 +50,7 @@ public static class DependencyInjection
 
     // Add services
     services.AddScoped<IAuthService, AuthService>();
+    services.AddScoped<IBatchService, BatchService>();
     services.AddScoped<IBlogService, BlogService>();
     services.AddScoped<IBrandService, BrandService>();
     services.AddScoped<ICartService, CartService>();
