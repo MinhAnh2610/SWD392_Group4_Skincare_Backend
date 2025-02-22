@@ -150,7 +150,42 @@ namespace CleanArchitecture.Application.Services
         );
       }
     }
+    // New Delete Order Method
+    public async Task<Result<string>> DeleteOrderAsync(Guid orderId)
+    {
+      try
+      {
+        var order = await _unitOfWork.Orders.GetByIdAsync(orderId);
+        if (order == null)
+        {
+          return Result<string>.Failure(
+              new List<Error> { new Error("Order.Delete", "Order not found") },
+              StatusCodes.Status404NotFound
+          );
+        }
 
+        // Remove the order from the repository.
+        var isRemoved = await _unitOfWork.Orders.RemoveAsync(order);
+        if (isRemoved)
+        {
+          return Result<string>.Success("Order deleted successfully", StatusCodes.Status200OK);
+        }
+        else
+        {
+          return Result<string>.Failure(
+              new List<Error> { new Error("Order.Delete", "Failed to delete order") },
+              StatusCodes.Status500InternalServerError
+          );
+        }
+      }
+      catch (Exception ex)
+      {
+        return Result<string>.Failure(
+            new List<Error> { new Error("Order.Delete", ex.Message) },
+            StatusCodes.Status500InternalServerError
+        );
+      }
+    }
     private static OrderResponse MapToOrderResponse(Order order)
     {
       return new OrderResponse

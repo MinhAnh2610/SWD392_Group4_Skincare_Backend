@@ -83,6 +83,24 @@ namespace CleanArchitecture.Presentation.Endpoints
       .Produces<ApiResponse<List<OrderResponse>>>(StatusCodes.Status200OK)
       .ProducesProblem(StatusCodes.Status500InternalServerError)
       .RequireAuthorization();
+
+      group.MapDelete("/{orderId}", async (Guid orderId, IOrderService orderService) =>
+      {
+        var result = await orderService.DeleteOrderAsync(orderId);
+        if (result.IsSuccess)
+        {
+          return Results.Ok(ApiResponse<string>.SuccessResponse(result.Data!, "Order deleted successfully."));
+        }
+        return Results.StatusCode(result.Status);
+      })
+   .WithName("DeleteOrder")
+   .Produces<ApiResponse<string>>(StatusCodes.Status200OK)
+   .ProducesProblem(StatusCodes.Status404NotFound)
+   .ProducesProblem(StatusCodes.Status500InternalServerError)
+   .WithSummary("Delete Order")
+   .WithDescription("Deletes an order by its identifier.")
+   .RequireAuthorization();
+
     }
 
   }
