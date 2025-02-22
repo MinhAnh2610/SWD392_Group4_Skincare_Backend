@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.Text;
 
 namespace CleanArchitecture.Application.Common;
 
@@ -34,24 +35,26 @@ public class Result<T>
 
   public IResult Match(string message)
   {
-    var successResponse = ApiResponse<T>.SuccessResponse(Data, message);
-    var failedResponse = ApiResponse<T>.FailureResponse(Errors, message);
+    var response = IsSuccess
+      ? ApiResponse<T>.SuccessResponse(Data, message)
+      : ApiResponse<T>.FailureResponse(Errors, message);
     if (Errors.Count > 0)
     {
-      message = string.Empty;
+      StringBuilder stringBuilder = new StringBuilder();
       foreach (var error in Errors)
       {
-        message = message + $"{error.Description}\n";
+        stringBuilder.AppendLine(error.Description);
       }
+      message = stringBuilder.ToString();
     }
 
     return Status switch
     {
-      StatusCodes.Status200OK => Results.Ok(successResponse),
-      StatusCodes.Status400BadRequest => Results.BadRequest(failedResponse),
+      StatusCodes.Status200OK => Results.Ok(response),
+      StatusCodes.Status400BadRequest => Results.BadRequest(response),
       StatusCodes.Status401Unauthorized => Results.Unauthorized(),
-      StatusCodes.Status409Conflict => Results.Conflict(failedResponse),
-      StatusCodes.Status404NotFound => Results.NotFound(failedResponse),
+      StatusCodes.Status409Conflict => Results.Conflict(response),
+      StatusCodes.Status404NotFound => Results.NotFound(response),
       _ => Results.StatusCode(StatusCodes.Status500InternalServerError)
     };
   }
