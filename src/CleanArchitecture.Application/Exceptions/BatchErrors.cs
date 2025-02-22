@@ -10,5 +10,7 @@ namespace CleanArchitecture.Application.Exceptions
   {
     public static readonly Error BatchNotFound = new Error("Batch.NotFound", "There is no batch with that id");
     public static readonly Error BatchAlreadyExist = new Error("Batch.AlreadyExist", "There is already a batch with that id");
+    public static readonly Error WrongDateRange = new Error("Batch.WrongDateRange", "Date Range is invalid");
+    public static readonly Error WrongSearchType = new Error("Batch.WrongSearchType", "SearchType invald");
   }
 }
