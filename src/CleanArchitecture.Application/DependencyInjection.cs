@@ -62,6 +62,7 @@ public static class DependencyInjection
     services.AddScoped<IOrderService, OrderService>();
     services.AddScoped<IPaymentService, PaymentService>();
     services.AddScoped<IQuizService, QuizService>();
+    services.AddScoped<IQuizResultService, QuizResultService>();
     services.AddScoped<IRefundService, RefundService>();
     services.AddScoped<IRefundItemService, RefundItemService>();
     services.AddScoped<ISubCategoryService, SubCategoryService>();
@@ -70,6 +71,7 @@ public static class DependencyInjection
     services.AddScoped<IUserService, UserService>();
     services.AddScoped<IRoleService, RoleService>();
     services.AddScoped<IRoutineService, RoutineService>();
+    services.AddScoped<ITimeZoneService, TimeZoneService>();
     return services;
   }
 }

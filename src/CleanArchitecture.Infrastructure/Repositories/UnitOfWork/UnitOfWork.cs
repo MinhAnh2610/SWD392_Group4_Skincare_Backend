@@ -30,6 +30,8 @@ public class UnitOfWork : IUnitOfWork
   public IQuestionRepository Questions { get; }
   public IQuestionTypeRepository QuestionTypes { get; }
   public IQuizRepository Quizs { get; }
+  public IQuizResultRepository QuizResults { get; }
+  public IQuizAnswerRepository QuizAnswers { get; }
   public IRefundRepository Refunds { get; }
   public IRefundItemRepository RefundItems { get; }
   public IRoutineRepository Routines { get; }
@@ -65,6 +67,8 @@ public class UnitOfWork : IUnitOfWork
     Questions = new QuestionRepository(_context);
     QuestionTypes = new QuestionTypeRepository(_context);
     Quizs = new QuizRepository(_context);
+    QuizResults = new QuizResultRepository(_context);
+    QuizAnswers = new QuizAnswerRepository(_context);
     Refunds = new RefundRepository(_context);
     RefundItems = new RefundItemRepository(_context);
     Routines = new RoutineRepository(_context);
