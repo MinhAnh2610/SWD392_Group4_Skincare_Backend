@@ -2,16 +2,18 @@
 using CleanArchitecture.Domain.Entities;
 using CleanArchitecture.Application.DTOs;
 using CleanArchitecture.Application.DTOs.Category;
-
-public class CategoryMappingConfig : IRegister
+namespace CleanArchitecture.Application.Mapper
 {
-  public void Register(TypeAdapterConfig config)
+  public class CategoryMappingConfig : IRegister
   {
-    // Map Category → CategoryResponse
-    config.NewConfig<Category, CategoryResponse>()
-    .Map(dest => dest.Subcategories, src => src.SubCategories);
+    public void Register(TypeAdapterConfig config)
+    {
+      // Map Category → CategoryResponse
+      config.NewConfig<Category, CategoryResponse>()
+      .Map(dest => dest.Subcategories, src => src.SubCategories);
 
-    // Map CategoryRequest → Category (for creating/updating)
-    config.NewConfig<UpdateCategory, CategoryResponse>();
+      // Map CategoryRequest → Category (for creating/updating)
+      config.NewConfig<UpdateCategory, CategoryResponse>();
+    }
   }
 }

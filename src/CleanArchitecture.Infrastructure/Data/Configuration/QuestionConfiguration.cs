@@ -15,5 +15,9 @@ public class QuestionConfiguration : IEntityTypeConfiguration<Question>
     builder.HasMany(question => question.QuestionOptions)
       .WithOne(questionOption => questionOption.Question)
       .HasForeignKey(questionOption => questionOption.QuestionId);
+
+    builder.HasOne(question => question.QuestionType)
+        .WithMany(questionType => questionType.Questions)
+        .HasForeignKey(question => question.QuestionTypeId);
   }
 }

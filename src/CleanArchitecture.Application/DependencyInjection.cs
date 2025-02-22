@@ -61,6 +61,7 @@ public static class DependencyInjection
     services.AddScoped<IFeedbackService, FeedbackService>();
     services.AddScoped<IOrderService, OrderService>();
     services.AddScoped<IPaymentService, PaymentService>();
+    services.AddScoped<IQuizService, QuizService>();
     services.AddScoped<IRefundService, RefundService>();
     services.AddScoped<IRefundItemService, RefundItemService>();
     services.AddScoped<ISubCategoryService, SubCategoryService>();

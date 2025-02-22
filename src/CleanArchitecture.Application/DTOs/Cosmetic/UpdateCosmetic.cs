@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,12 +9,11 @@ namespace CleanArchitecture.Application.DTOs.Cosmetic
 {
   public class UpdateCosmetic
   {
-    public Guid Id { get; set; }
-    public Guid BrandId { get; set; }
-    public Guid SkinTypeId { get; set; }
-    public Guid CosmeticTypeId { get; set; }
+    [Required]
     public decimal Price { get; set; }
+    [Required]
     public string MainUsage { get; set; } = default!;
+    [Required]
     public string Instructions { get; set; } = default!;
   }
 }

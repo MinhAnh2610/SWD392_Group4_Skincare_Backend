@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -18,27 +19,32 @@ namespace CleanArchitecture.Application.Services
   public class CosmeticService : ICosmeticService
   {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
 
     public CosmeticService(
-    IUnitOfWork unitOfWork, IMapper mapper)
+    IUnitOfWork unitOfWork)
     {
       _unitOfWork = unitOfWork;
-      _mapper = mapper;
     }
-    public async Task<Result<CreateCosmetic>> CreateCosmetic(Cosmetic cosmetic)
+    public async Task<Result<CosmeticResponse>> CreateCosmetic(CreateCosmetic cosmetic)
     {
-      var existcosmetic = _unitOfWork.Cosmetics.GetById(cosmetic.Id);
-      if (existcosmetic != null)
-      {
-        return Result<CreateCosmetic>.Failure([CosmeticErrors.CosmeticAlreadyExist], StatusCodes.Status400BadRequest);
-      }
-      else
-      {
-        await _unitOfWork.Cosmetics.CreateAsync(cosmetic);
-        var output = cosmetic.Adapt<CreateCosmetic>();
-        return Result<CreateCosmetic>.Success(output, StatusCodes.Status201Created);
-      }
+        var orgcosmetic = cosmetic.Adapt<Cosmetic>();
+      orgcosmetic.BrandId = cosmetic.BrandId;
+      orgcosmetic.SkinTypeId = cosmetic.SkinTypeId;
+      orgcosmetic.CosmeticTypeId = cosmetic.CosmeticTypeId;
+
+      // Attach existing related entities to avoid re-adding them
+      orgcosmetic.Brand = new Brand { Id = cosmetic.BrandId };
+      orgcosmetic.SkinType = new SkinType { Id = cosmetic.SkinTypeId };
+      orgcosmetic.CosmeticType = new CosmeticType { Id = cosmetic.CosmeticTypeId };
+
+      _unitOfWork.Brands.Attach(orgcosmetic.Brand);
+      _unitOfWork.SkinTypes.Attach(orgcosmetic.SkinType);
+      _unitOfWork.CosmeticTypes.Attach(orgcosmetic.CosmeticType);
+
+      //What to bind Cossubcate and feedbacks ?
+      await _unitOfWork.Cosmetics.CreateAsync(orgcosmetic);
+        var output = orgcosmetic.Adapt<CosmeticResponse>();
+        return Result<CosmeticResponse>.Success(output, StatusCodes.Status201Created);
     }
 
     public async Task<Result<List<CosmeticResponse>>> GetAllCosmetics()
@@ -124,26 +130,28 @@ namespace CleanArchitecture.Application.Services
       }
     }
 
-    public async Task<Result<CosmeticResponse>> UpdateCosmetic(UpdateCosmetic cosmetic)
+    public async Task<Result<CosmeticResponse>> UpdateCosmetic(UpdateCosmetic cosmetic,Guid id)
     {
-      var existcosmetic = _unitOfWork.Cosmetics.GetById(cosmetic.Id);
+      var existcosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(id);
       if (existcosmetic == null)
       {
         return Result<CosmeticResponse>.Failure([CosmeticErrors.CosmeticNotFound], StatusCodes.Status404NotFound);
       }
-      else
-      {
-        existcosmetic.Price = cosmetic.Price;
-        existcosmetic.MainUsage = cosmetic.MainUsage;
-        existcosmetic.Instructions = cosmetic.Instructions;
-        await _unitOfWork.Cosmetics.UpdateAsync(existcosmetic);
-        var output = existcosmetic.Adapt<CosmeticResponse>();
-        return Result<CosmeticResponse>.Success(output, StatusCodes.Status200OK);
-      }
+
+      // Only update if the new value is NOT null
+      existcosmetic.Price = cosmetic.Price != default ? cosmetic.Price : existcosmetic.Price;
+      existcosmetic.MainUsage = !string.IsNullOrWhiteSpace(cosmetic.MainUsage) ? cosmetic.MainUsage : existcosmetic.MainUsage;
+      existcosmetic.Instructions = !string.IsNullOrWhiteSpace(cosmetic.Instructions) ? cosmetic.Instructions : existcosmetic.Instructions;
+      existcosmetic.LastModified = DateTime.Now;
+
+      await _unitOfWork.Cosmetics.UpdateAsync(existcosmetic);
+      var output = existcosmetic.Adapt<CosmeticResponse>();
+
+      return Result<CosmeticResponse>.Success(output, StatusCodes.Status200OK);
     }
     public async Task<Result<CosmeticResponse>> DeleteCosmetic(Guid id)
     {
-      var existcosmetic = _unitOfWork.Cosmetics.GetById(id);
+      var existcosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(id);
       if (existcosmetic == null)
       {
         return Result<CosmeticResponse>.Failure([CosmeticErrors.CosmeticNotFound], StatusCodes.Status404NotFound);
@@ -171,7 +179,7 @@ namespace CleanArchitecture.Application.Services
       // Apply filters if they exist
       var filteredResults = query.Where(c =>
           // Name filter (case-insensitive contains)
-          (string.IsNullOrEmpty(filter.Name) || c.Name.ToLower().Contains(filter.Name.ToLower())) &&
+          (string.IsNullOrEmpty(filter.Name) || c.Name.Contains(filter.Name, StringComparison.OrdinalIgnoreCase)) &&
           // Type filter
           (!filter.TypeId.HasValue || c.CosmeticTypeId == filter.TypeId) &&
           // Brand filter
@@ -180,7 +188,7 @@ namespace CleanArchitecture.Application.Services
           (!filter.SkinTypeId.HasValue || c.SkinTypeId == filter.SkinTypeId)
       ).ToList();
 
-      if (!filteredResults.Any())
+      if (filteredResults?.Any() != true)
       {
         return Result<List<CosmeticResponse>>.Failure(
             [CosmeticErrors.CosmeticNotFound],
