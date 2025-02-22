@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Domain.RepositoryContracts.Base;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace CleanArchitecture.Infrastructure.Repositories.Base;
 
@@ -18,9 +19,21 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
 
   public virtual async Task<List<T>> GetAllAsync()
   {
-    return await _context.Set<T>().ToListAsync();
-  }
+    // Get the entity type metadata
+    var entityType = _context.Model.FindEntityType(typeof(T));
 
+    // Start building the query
+    var query = _context.Set<T>().AsQueryable();
+
+    // Include all navigation properties (first-level relationships)
+    foreach (var navigation in entityType.GetNavigations())
+    {
+      query = query.Include(navigation.Name);
+    }
+
+    // Execute the query with all includes
+    return await query.ToListAsync();
+  }
   public virtual void Create(T entity)
   {
     _context.Add(entity);
@@ -111,13 +124,29 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     return entity!;
   }
 
-  public virtual async Task<T> GetByIdAsync(Guid code)
+  public virtual async Task<T> GetByIdAsync(Guid id)
   {
-    var entity = await _context.Set<T>().FindAsync(code);
+    // Get the entity type metadata
+    var entityType = _context.Model.FindEntityType(typeof(T));
+
+    // Start building the query
+    var query = _context.Set<T>().AsQueryable();
+
+    // Include all first-level navigation properties
+    foreach (var navigation in entityType.GetNavigations())
+    {
+      query = query.Include(navigation.Name);
+    }
+
+    // Find the entity by ID with all includes
+    var entity = await query.FirstOrDefaultAsync(e => EF.Property<Guid>(e, "Id") == id);
+
     if (entity != null)
     {
+      // Detach the entity to avoid tracking (optional)
       _context.Entry(entity).State = EntityState.Detached;
     }
+
     return entity!;
   }
   public virtual void Attach (T entity) 
@@ -127,5 +156,80 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
       throw new ArgumentNullException(nameof(entity));
        }
     _context.Attach(entity);
+  }
+  public virtual async Task<List<T>> GetAllAsyncWithDepth(int level)
+  {
+    if (level < 1) level = 1;
+
+    var entityType = _context.Model.FindEntityType(typeof(T));
+    var query = _context.Set<T>().AsQueryable();
+    var includePaths = new List<string>();
+
+    void CollectPaths(IEntityType currentEntityType, int currentDepth, string currentPath)
+    {
+      foreach (var navigation in currentEntityType.GetNavigations())
+      {
+        var path = string.IsNullOrEmpty(currentPath)
+            ? navigation.Name
+            : $"{currentPath}.{navigation.Name}";
+
+        includePaths.Add(path);
+
+        if (currentDepth < level)
+        {
+          CollectPaths(navigation.TargetEntityType, currentDepth + 1, path);
+        }
+      }
+    }
+
+    CollectPaths(entityType, 1, "");
+
+    foreach (var path in includePaths)
+    {
+      query = query.Include(path);
+    }
+
+    return await query.ToListAsync();
+  }
+  public virtual async Task<T> GetByIdAsyncWithDepth(Guid id, int level)
+  {
+    if (level < 1) level = 1;
+
+    var entityType = _context.Model.FindEntityType(typeof(T));
+    var query = _context.Set<T>().AsQueryable();
+    var includePaths = new List<string>();
+
+    void CollectPaths(IEntityType currentEntityType, int currentDepth, string currentPath)
+    {
+      foreach (var navigation in currentEntityType.GetNavigations())
+      {
+        var path = string.IsNullOrEmpty(currentPath)
+            ? navigation.Name
+            : $"{currentPath}.{navigation.Name}";
+
+        includePaths.Add(path);
+
+        if (currentDepth < level)
+        {
+          CollectPaths(navigation.TargetEntityType, currentDepth + 1, path);
+        }
+      }
+    }
+
+    CollectPaths(entityType, 1, "");
+
+    foreach (var path in includePaths)
+    {
+      query = query.Include(path);
+    }
+
+    var entity = await query.FirstOrDefaultAsync(e => EF.Property<Guid>(e, "Id") == id);
+
+    if (entity != null)
+    {
+      _context.Entry(entity).State = EntityState.Detached;
+    }
+
+    return entity!;
   }
 }

@@ -4,5 +4,7 @@ namespace CleanArchitecture.Domain.RepositoryContracts;
 
 public interface IBatchRepository : IGenericRepository<Batch>
 {
-  Task<List<Batch>> GetListByAnyId(Expression<Func<Batch, bool>> predicate);
+  Task<List<Batch>> GetListByAnyId(
+      Expression<Func<Batch, bool>> predicate,
+      int level);
 }

@@ -9,6 +9,7 @@ namespace CleanArchitecture.Application.DTOs.BatchDto
 {
   public class BatchResponse
   {
+    public Guid Id { get; set; }
     public Guid CosmeticId { get; set; }
     public CosmeticResponse Cosmetic { get; set; } = default!;
     public int Quantity { get; set; }

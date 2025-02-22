@@ -40,7 +40,7 @@ namespace CleanArchitecture.Application.Services
 
     public async Task<Result<BatchResponse>> DeleteBatch(Guid id)
     {
-      var existbatch = await _unitOfWork.Batches.GetByIdAsync(id);
+      var existbatch = await _unitOfWork.Batches.GetByIdAsyncWithDepth(id,2);
       if (existbatch == null)
       {
         return Result<BatchResponse>.Failure([BatchErrors.BatchNotFound], StatusCodes.Status404NotFound);
@@ -55,7 +55,7 @@ namespace CleanArchitecture.Application.Services
 
     public async Task<Result<List<BatchResponse>>> GetAllBatches()
     {
-      var batches = await _unitOfWork.Batches.GetAllAsync();
+      var batches = await _unitOfWork.Batches.GetAllAsyncWithDepth(2);
       if (batches != null)
       {
         var batchesResponse = batches.Adapt<List<BatchResponse>>();
@@ -70,7 +70,7 @@ namespace CleanArchitecture.Application.Services
 
     public async Task<Result<BatchResponse>> GetBatchById(Guid id)
     {
-      var batch = await _unitOfWork.Batches.GetByIdAsync(id);
+      var batch = await _unitOfWork.Batches.GetByIdAsyncWithDepth(id,2);
       if (batch != null)
       {
         var batchesResponse = batch.Adapt<BatchResponse>();
@@ -84,7 +84,7 @@ namespace CleanArchitecture.Application.Services
 
     public async Task<Result<List<BatchResponse>>> GetBatchesByCosmeticId(Guid cosId)
     {
-      var batch = await _unitOfWork.Batches.GetListByAnyId(e => e.CosmeticId == cosId);
+      var batch = await _unitOfWork.Batches.GetListByAnyId(e => e.CosmeticId == cosId,2);
       if (batch != null)
       {
         var batchesResponse = batch.Adapt<List<BatchResponse>>();
@@ -98,7 +98,7 @@ namespace CleanArchitecture.Application.Services
 
     public async Task<Result<BatchResponse>> UpdateBatch(BatchUpdateRequest batch, Guid id)
     {
-      var existbatch = await _unitOfWork.Batches.GetByIdAsync(id);
+      var existbatch = await _unitOfWork.Batches.GetByIdAsyncWithDepth(id,2);
       if (existbatch == null)
       {
         return Result<BatchResponse>.Failure([BatchErrors.BatchNotFound], StatusCodes.Status404NotFound);
@@ -133,7 +133,7 @@ namespace CleanArchitecture.Application.Services
         predicate = predicate.Or(b => b.ExpirationDate >= startDate && b.ExpirationDate <= endDate);
       }
 
-      var batches =await _unitOfWork.Batches.GetListByAnyId(predicate);
+      var batches =await _unitOfWork.Batches.GetListByAnyId(predicate,2);
       var batchesResponse = batches.Adapt<List<BatchResponse>>();
       return Result<List<BatchResponse>>.Success(batchesResponse, StatusCodes.Status200OK);
 
