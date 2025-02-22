@@ -1,7 +1,8 @@
 ﻿using CleanArchitecture.Application.DTOs.QuizDto;
+using CleanArchitecture.Application.DTOs.QuizResultDto;
 using CleanArchitecture.Application.DTOs.RoutineDTO;
-using CleanArchitecture.Application.DTOs.SkinTypeDto;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace CleanArchitecture.Presentation.Endpoints;
 
@@ -36,13 +37,23 @@ public class QuizController : ICarterModule
 
     #region Submit Quiz API
     group.MapPost("{id}/submit", async (
-      IQuizService service, 
+      IQuizService quizService,
+      IQuizResultService quizResultService,
+      IHttpContextAccessor httpContextAccessor,
       [FromRoute] Guid id,
       [FromBody] QuizSubmitRequest request) =>
     {
-      var result = await service.ProcessQuizAsync(id, request);
+      var result = await quizService.ProcessQuizAsync(id, request);
+      var user = httpContextAccessor.HttpContext?.User;
+
       if (result.IsSuccess)
       {
+        if (user!.Identity!.IsAuthenticated)
+        {
+          var userId = user.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+          await quizResultService.SaveQuizResultAsync(Guid.Parse(userId), id, request, result.Data!.First());
+        }
+
         return Results.Ok(ApiResponse<List<RoutineResponse>>.SuccessResponse(result.Data!, "Submitted Quiz Successfully."));
       }
 
@@ -58,6 +69,68 @@ public class QuizController : ICarterModule
     .ProducesProblem(StatusCodes.Status500InternalServerError)
     .WithSummary("SubmitQuiz")
     .WithDescription("Submit Skin Type Quiz");
+    #endregion
+
+    #region Get Customer Quiz Results API
+    group.MapGet("/results", async (
+      IQuizResultService service,
+      IHttpContextAccessor httpContextAccessor) =>
+    {
+      var user = httpContextAccessor.HttpContext?.User;
+      var userId = "";
+      if (user!.Identity!.IsAuthenticated)
+      {
+        userId = user.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+      }
+
+      var result = await service.GetUserQuizResultsAsync(Guid.Parse(userId));
+
+      if (result.IsSuccess)
+      {
+        return Results.Ok(ApiResponse<List<QuizResultResponse>>.SuccessResponse(result.Data!, "Retrieved Quiz Results Successfully."));
+      }
+
+      return result.Status switch
+      {
+        StatusCodes.Status404NotFound => Results.NotFound(ApiResponse<List<QuizResultResponse>>.FailureResponse(result.Errors, "Resource Not Found")),
+        _ => Results.StatusCode(StatusCodes.Status500InternalServerError),
+      };
+    })
+    .WithName("GetCustomerQuizResults")
+    .Produces<ApiResponse<List<QuizResultResponse>>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status404NotFound)
+    .ProducesProblem(StatusCodes.Status500InternalServerError)
+    .WithSummary("GetCustomerQuizResults")
+    .WithDescription("Get Customer Quiz Results")
+    .RequireAuthorization();
+    #endregion
+
+    #region Get All Customer's Quiz Results API
+    group.MapGet("/customer/results", async (
+      IQuizResultService service,
+      IHttpContextAccessor httpContextAccessor) =>
+    {
+      var result = await service.GetAllCustomerQuizResultsAsync();
+
+      if (result.IsSuccess)
+      {
+        return Results.Ok(ApiResponse<List<QuizResultResponse>>.SuccessResponse(result.Data!, "Retrieved Quiz Results Successfully."));
+      }
+
+      return result.Status switch
+      {
+        _ => Results.StatusCode(StatusCodes.Status500InternalServerError),
+      };
+    })
+    .WithName("GetAllCustomerQuizResults")
+    .Produces<ApiResponse<List<QuizResultResponse>>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status500InternalServerError)
+    .WithSummary("GetAllCustomerQuizResults")
+    .WithDescription("Get All Customer's Quiz Results")
+    .RequireAuthorization(new AuthorizeAttribute
+    {
+      Roles = "Staff, Manager"
+    });
     #endregion
   }
 }
