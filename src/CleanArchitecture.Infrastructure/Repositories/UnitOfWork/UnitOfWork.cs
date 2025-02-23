@@ -98,7 +98,7 @@ public class UnitOfWork : IUnitOfWork
     }
     catch (Exception ex)
     {
-      _logger.LogError($"Database saved failed at {_timeZoneService.ConvertToLocalTime(DateTime.Now)}\n" +
+      _logger.LogError($"Database saved failed at {DateTime.Now}\n" +
                        $"with error: {ex.Message}");
       return false;
     }

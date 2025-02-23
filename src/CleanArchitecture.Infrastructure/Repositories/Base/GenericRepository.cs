@@ -118,4 +118,9 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
 
     _context.Attach(entity);
   }
+
+  public virtual IQueryable<T> GetQueryable()
+  {
+    return _context.Set<T>().AsQueryable();
+  }
 }
