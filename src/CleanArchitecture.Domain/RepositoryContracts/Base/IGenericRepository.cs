@@ -15,5 +15,6 @@
     void Remove(T entity);
     void Update(T entity);
     void Attach(T entity);  
+    IQueryable<T> GetQueryable();
   }
 }

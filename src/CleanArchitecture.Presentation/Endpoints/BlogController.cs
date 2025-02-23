@@ -10,9 +10,10 @@ public class BlogController : ICarterModule
     var group = app.MapGroup("api/blogs").WithTags("Blogs Management");
 
     #region Get Blogs API
-    group.MapGet("/", async (IBlogService service) =>
+    group.MapGet("/", async (IBlogService service, string? title, string? content, string[]? tags, string? staffUsername, string? sortOrder = "asc", int pageIndex = 1, int pageSize = 10) =>
     {
-      var result = await service.GetAllBlogsAsync();
+      var request = new GetProductRequest(title, content, sortOrder, tags, staffUsername, pageIndex, pageSize);
+      var result = await service.GetBlogsAsync(request);
       return result.Match(Message.SUCCESSFUL_RETRIEVED("Blogs"));
     })
     .WithName("GetBlogs")
@@ -24,7 +25,7 @@ public class BlogController : ICarterModule
 
     #region Create Blog API
 
-    app.MapPost("/", async (IBlogService service, CreateBlogRequest createRequest) =>
+    group.MapPost("/", async (IBlogService service, CreateBlogRequest createRequest) =>
     {
       var result = await service.CreateBlogAsync(createRequest);
       return result.Match(Message.SUCCESSFUL_CREATED("Blog"));
@@ -37,7 +38,7 @@ public class BlogController : ICarterModule
     #endregion
     
     #region Get Blog API
-    app.MapGet("/{id}", async (IBlogService service, [FromRoute] Guid id) =>
+    group.MapGet("/{id}", async (IBlogService service, [FromRoute] Guid id) =>
     {
       var result = await service.GetBlogByIdAsync(id); 
       return result.Match(Message.SUCCESSFUL_RETRIEVED("Blog"));
@@ -50,7 +51,7 @@ public class BlogController : ICarterModule
     #endregion
     
     #region Update Blog API
-    app.MapPut("/{id}", async (IBlogService service, [FromRoute] Guid id, [FromBody] UpdateBlogRequest updateRequest) =>
+    group.MapPut("/{id}", async (IBlogService service, [FromRoute] Guid id, [FromBody] UpdateBlogRequest updateRequest) =>
     {
       var result = await service.UpdateBlogAsync(id, updateRequest);
       return result.Match(Message.SUCCESSFUL_UPDATED("Blog"));
@@ -63,16 +64,16 @@ public class BlogController : ICarterModule
     #endregion
     
     #region Delete Blog API
-    app.MapDelete("/{id}", async (IBlogService service, [FromRoute] Guid id) =>
+    group.MapDelete("/{id}", async (IBlogService service, [FromRoute] Guid id) =>
     {
       var result = await service.DeleteBlogAsync(id);
       return result.Match(Message.SUCCESSFUL_DELETED("Blog"));
     })
-    .WithName("UpdateBlogById")
+    .WithName("DeleteBlogById")
     .Produces<ApiResponse<BlogResponse>>()
     .ProducesProblem(StatusCodes.Status500InternalServerError)
-    .WithSummary("UpdateABlogById")
-    .WithDescription("Update a Blog By Id");
+    .WithSummary("DeleteABlogById")
+    .WithDescription("Delete a Blog By Id");
     #endregion
   }
 }
