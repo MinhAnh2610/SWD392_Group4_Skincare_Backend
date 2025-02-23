@@ -1,11 +1,16 @@
-﻿using CleanArchitecture.Domain.RepositoryContracts;
+﻿using CleanArchitecture.Application.DTOs.Order;
+using CleanArchitecture.Application.ServiceContracts;
+using CleanArchitecture.Domain.RepositoryContracts;
 using CleanArchitecture.Domain.RepositoryContracts.UnitOfWork;
+using Microsoft.Extensions.Logging;
 
 namespace CleanArchitecture.Infrastructure.Repositories.UnitOfWork;
 
 public class UnitOfWork : IUnitOfWork
 {
   private readonly ApplicationDbContext _context;
+  private readonly ILogger<UnitOfWork> _logger;
+  private readonly ITimeZoneService _timeZoneService;
   
   public IBatchRepository Batches { get; }
   public IBlogRepository Blogs { get; }
@@ -41,9 +46,11 @@ public class UnitOfWork : IUnitOfWork
   public ITagRepository Tags { get; }
   public ITestimonialRepository Testimonials { get; }
 
-  public UnitOfWork(ApplicationDbContext context)
+  public UnitOfWork(ApplicationDbContext context, ILogger<UnitOfWork> logger, ITimeZoneService timeZoneService)
   {
     _context = context;
+    _logger = logger;
+    _timeZoneService = timeZoneService;
     Batches = new BatchRepository(_context);
     Blogs = new BlogRepository(_context);
     BlogTags = new BlogTagRepository(_context);
@@ -79,9 +86,22 @@ public class UnitOfWork : IUnitOfWork
     Testimonials = new TestimonialRepository(_context);
   }
 
-  public async Task<int> CompleteAsync()
+  public async Task<bool> CompleteAsync()
   {
-    return await _context.SaveChangesAsync();
+    try
+    {
+      var linesChanged = await _context.SaveChangesAsync();
+      if (linesChanged <= 0)
+        return false;
+
+      return true;
+    }
+    catch (Exception ex)
+    {
+      _logger.LogError($"Database saved failed at {_timeZoneService.ConvertToLocalTime(DateTime.Now)}\n" +
+                       $"with error: {ex.Message}");
+      return false;
+    }
   }
 
   public void Dispose()

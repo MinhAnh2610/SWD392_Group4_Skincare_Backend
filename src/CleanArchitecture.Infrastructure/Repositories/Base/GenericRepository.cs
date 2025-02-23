@@ -23,42 +23,24 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
 
   public virtual void Create(T entity)
   {
-    _context.Add(entity);
-    _context.SaveChanges();
+    _context.Set<T>().Add(entity);
   }
 
-  public virtual async Task<int> CreateAsync(T entity)
+  public virtual async Task CreateAsync(T entity)
   {
-    _context.Add(entity);
-    return await _context.SaveChangesAsync();
+    await _context.Set<T>().AddAsync(entity);
   }
 
   public virtual void Update(T entity)
   {
-    var tracker = _context.Attach(entity);
+    var tracker = _context.Set<T>().Attach(entity);
     tracker.State = EntityState.Modified;
-    _context.SaveChanges();
   }
 
-  public virtual async Task<int> UpdateAsync(T entity)
+  public virtual void Remove(T entity)
   {
-    var tracker = _context.Attach(entity);
-    tracker.State = EntityState.Modified;
-    return await _context.SaveChangesAsync();
-  }
-
-  public virtual bool Remove(T entity)
-  {
-    _context.Remove(entity);
-    _context.SaveChanges();
-    return true;
-  }
-
-  public virtual async Task<bool> RemoveAsync(T entity)
-  {
-    _context.Remove(entity);
-    await _context.SaveChangesAsync();
-    return true;
+    var tracker = _context.Set<T>().Attach(entity);
+    tracker.State = EntityState.Deleted;
   }
 
   public virtual T GetById(int id)
@@ -68,17 +50,19 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
       _context.Entry(entity).State = EntityState.Detached;
     }
+
     return entity!;
   }
 
-  public virtual async Task<T> GetByIdAsync(int id)
+  public virtual async Task<T?> GetByIdAsync(int id)
   {
     var entity = await _context.Set<T>().FindAsync(id);
     if (entity != null)
     {
       _context.Entry(entity).State = EntityState.Detached;
     }
-    return entity!;
+
+    return entity;
   }
 
   public virtual T GetById(string code)
@@ -88,17 +72,19 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
       _context.Entry(entity).State = EntityState.Detached;
     }
-    return entity!;
+
+    return entity;
   }
 
-  public virtual async Task<T> GetByIdAsync(string code)
+  public virtual async Task<T?> GetByIdAsync(string code)
   {
     var entity = await _context.Set<T>().FindAsync(code);
     if (entity != null)
     {
       _context.Entry(entity).State = EntityState.Detached;
     }
-    return entity!;
+
+    return entity;
   }
 
   public virtual T GetById(Guid code)
@@ -108,24 +94,28 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
       _context.Entry(entity).State = EntityState.Detached;
     }
-    return entity!;
+
+    return entity;
   }
 
-  public virtual async Task<T> GetByIdAsync(Guid code)
+  public virtual async Task<T?> GetByIdAsync(Guid code)
   {
     var entity = await _context.Set<T>().FindAsync(code);
     if (entity != null)
     {
       _context.Entry(entity).State = EntityState.Detached;
     }
-    return entity!;
+
+    return entity;
   }
-  public virtual void Attach (T entity) 
+
+  public virtual void Attach(T entity)
   {
-      if (entity == null)
-        {
+    if (entity == null)
+    {
       throw new ArgumentNullException(nameof(entity));
-       }
+    }
+
     _context.Attach(entity);
   }
 }

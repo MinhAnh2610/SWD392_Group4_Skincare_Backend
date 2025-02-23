@@ -17,61 +17,61 @@ namespace Application.Library
     private readonly SortedList<string, string> _requestData = new SortedList<string, string>(new VnPayCompare());
     private readonly SortedList<string, string> _responseData = new SortedList<string, string>(new VnPayCompare());
 
-    public PaymentResponse GetFullResponseData(IQueryCollection collection, string hashSecret)
-    {
-      // Use a new instance to accumulate response data.
-      var vnPay = new VnPayLibrary();
-
-      foreach (var (key, value) in collection)
-      {
-        if (!string.IsNullOrEmpty(key) && key.StartsWith("vnp_"))
-        {
-          vnPay.AddResponseData(key, value);
-        }
-      }
-
-      // Retrieve values from the response.
-      var txnRef = vnPay.GetResponseData("vnp_TxnRef");
-      var vnPayTranId = vnPay.GetResponseData("vnp_TransactionNo");
-      var vnpResponseCode = vnPay.GetResponseData("vnp_ResponseCode");
-      var vnpSecureHash = collection.FirstOrDefault(k => k.Key == "vnp_SecureHash").Value;
-      var orderInfo = vnPay.GetResponseData("vnp_OrderInfo");
-
-      // Optional: Parse the payment date if available.
-      DateTime paymentDate = DateTime.UtcNow;
-      var payDateStr = vnPay.GetResponseData("vnp_PayDate");
-      if (!string.IsNullOrEmpty(payDateStr))
-      {
-        if (DateTime.TryParseExact(payDateStr, "yyyyMMddHHmmss", CultureInfo.InvariantCulture,
-                                   DateTimeStyles.None, out DateTime parsedDate))
-        {
-          paymentDate = parsedDate;
-        }
-      }
-
-      // Validate the secure hash.
-      var checkSignature = vnPay.ValidateSignature(vnpSecureHash, hashSecret);
-      if (!checkSignature)
-      {
-        return new PaymentResponse
-        {
-          Success = false
-        };
-      }
-
-      return new PaymentResponse
-      {
-        Success = true,
-        PaymentMethod = "VnPay",
-        OrderDescription = orderInfo,
-        TransactionOrderId = txnRef,   // This should match the txnRef you stored when creating the payment.
-        PaymentId = vnPayTranId,         // VNPay's transaction id.
-        TransactionId = vnPayTranId,     // You can store the same value here if needed.
-        Token = vnpSecureHash,
-        ResponseCode = vnpResponseCode,
-        PaymentDate = paymentDate
-      };
-    }
+    // public PaymentResponse GetFullResponseData(IQueryCollection collection, string hashSecret)
+    // {
+    //   // Use a new instance to accumulate response data.
+    //   var vnPay = new VnPayLibrary();
+    //
+    //   foreach (var (key, value) in collection)
+    //   {
+    //     if (!string.IsNullOrEmpty(key) && key.StartsWith("vnp_"))
+    //     {
+    //       vnPay.AddResponseData(key, value);
+    //     }
+    //   }
+    //
+    //   // Retrieve values from the response.
+    //   var txnRef = vnPay.GetResponseData("vnp_TxnRef");
+    //   var vnPayTranId = vnPay.GetResponseData("vnp_TransactionNo");
+    //   var vnpResponseCode = vnPay.GetResponseData("vnp_ResponseCode");
+    //   var vnpSecureHash = collection.FirstOrDefault(k => k.Key == "vnp_SecureHash").Value;
+    //   var orderInfo = vnPay.GetResponseData("vnp_OrderInfo");
+    //
+    //   // Optional: Parse the payment date if available.
+    //   DateTime paymentDate = DateTime.UtcNow;
+    //   var payDateStr = vnPay.GetResponseData("vnp_PayDate");
+    //   if (!string.IsNullOrEmpty(payDateStr))
+    //   {
+    //     if (DateTime.TryParseExact(payDateStr, "yyyyMMddHHmmss", CultureInfo.InvariantCulture,
+    //                                DateTimeStyles.None, out DateTime parsedDate))
+    //     {
+    //       paymentDate = parsedDate;
+    //     }
+    //   }
+    //
+    //   // Validate the secure hash.
+    //   var checkSignature = vnPay.ValidateSignature(vnpSecureHash, hashSecret);
+    //   if (!checkSignature)
+    //   {
+    //     return new PaymentResponse
+    //     {
+    //       Success = false
+    //     };
+    //   }
+    //
+    //   return new PaymentResponse
+    //   {
+    //     Success = true,
+    //     PaymentMethod = "VnPay",
+    //     OrderDescription = orderInfo,
+    //     TransactionOrderId = txnRef,   // This should match the txnRef you stored when creating the payment.
+    //     PaymentId = vnPayTranId,         // VNPay's transaction id.
+    //     TransactionId = vnPayTranId,     // You can store the same value here if needed.
+    //     Token = vnpSecureHash,
+    //     ResponseCode = vnpResponseCode,
+    //     PaymentDate = paymentDate
+    //   };
+    // }
 
     public string GetIpAddress(HttpContext context)
     {

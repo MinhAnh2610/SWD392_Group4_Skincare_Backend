@@ -9,10 +9,12 @@ public class BlogService : IBlogService
 {
   private readonly IUnitOfWork _unitOfWork;
   private readonly IErrorFactory _errorFactory;
-  public BlogService(IUnitOfWork unitOfWork, IErrorFactory errorFactory)
+  private readonly IValidator<CreateBlogRequest> _createBlogValidator;
+  public BlogService(IUnitOfWork unitOfWork, IErrorFactory errorFactory, IValidator<CreateBlogRequest> createBlogValidator)
   {
     _unitOfWork = unitOfWork;
     _errorFactory = errorFactory;
+    _createBlogValidator = createBlogValidator;
   }
 
   public async Task<Result<List<BlogResponse>>> GetAllBlogsAsync()
@@ -42,8 +44,67 @@ public class BlogService : IBlogService
     return Result<BlogResponse>.Success(blog.Adapt<BlogResponse>(), StatusCodes.Status200OK);
   }
 
-  public Task<Result<BlogResponse>> CreatePostAsync(CreateBlogRequest request)
+  public async Task<Result<BlogResponse>> CreateBlogAsync(CreateBlogRequest request)
   {
-    throw new NotImplementedException();
+    var validationResult = await _createBlogValidator.ValidateAsync(request);
+    if (!validationResult.IsValid)
+    {
+      var errors =  _errorFactory.CreateValidationError("Blog", validationResult);
+      return Result<BlogResponse>.Failure(errors.errs, errors.statusCode);
+    }
+    var blog = request.Adapt<Blog>();
+    
+    // Use Create instead of CreateAsync to increase performance
+    _unitOfWork.Blogs.Create(blog);
+    var isSaved = await _unitOfWork.CompleteAsync();
+    if (!isSaved)
+    {
+      var error = _errorFactory.CreateDatabaseError("Blog");
+      return Result<BlogResponse>.Failure([error.err], error.statusCode);
+    }
+    
+    return Result<BlogResponse>.Success(blog.Adapt<BlogResponse>(), StatusCodes.Status200OK);
+  }
+
+  public async Task<Result<BlogResponse>> UpdateBlogAsync(Guid id, UpdateBlogRequest request)
+  {
+    var blog = await _unitOfWork.Blogs.GetByIdAsync(id);
+    if (blog is null)
+    {
+      var error = _errorFactory.CreateNotFoundError("Blog");
+      return Result<BlogResponse>.Failure([error.err], error.statusCode);
+    }
+    
+    blog.Title = string.IsNullOrEmpty(request.Title) ? blog.Title : request.Title;
+    blog.Content = string.IsNullOrEmpty(request.Content) ? blog.Content : request.Content;
+    
+    var isSaved = await _unitOfWork.CompleteAsync();
+    if (!isSaved)
+    {
+      var error = _errorFactory.CreateDatabaseError("Blog");
+      return Result<BlogResponse>.Failure([error.err], error.statusCode);
+    }
+    
+    return Result<BlogResponse>.Success(blog.Adapt<BlogResponse>(), StatusCodes.Status200OK);
+  }
+
+  public async Task<Result<BlogResponse>> DeleteBlogAsync(Guid id)
+  {
+    var blog = await _unitOfWork.Blogs.GetByIdAsync(id);
+    if (blog is null)
+    {
+      var error = _errorFactory.CreateNotFoundError("Blog");
+      return Result<BlogResponse>.Failure([error.err], error.statusCode);
+    }
+
+    _unitOfWork.Blogs.Remove(blog);
+    var isSaved = await _unitOfWork.CompleteAsync();
+    if (!isSaved)
+    {
+      var error = _errorFactory.CreateDatabaseError("Blog");
+      return Result<BlogResponse>.Failure([error.err], error.statusCode);
+    }
+    
+    return Result<BlogResponse>.Success(blog.Adapt<BlogResponse>(), StatusCodes.Status200OK);
   }
 }
