@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Application.DTOs.CouponDTO;
+using CleanArchitecture.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 
 namespace CleanArchitecture.Application.Services
@@ -6,13 +7,15 @@ namespace CleanArchitecture.Application.Services
   public class CouponService : ICouponService
   {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IErrorFactory _errorFactory; 
 
     private readonly IValidator<ApplyCouponRequest> _couponValidator;
 
-    public CouponService(IUnitOfWork unitOfWork, IValidator<ApplyCouponRequest> couponValidator)
+    public CouponService(IUnitOfWork unitOfWork, IValidator<ApplyCouponRequest> couponValidator, IErrorFactory errorFactory)
     {
       _unitOfWork = unitOfWork;
       _couponValidator = couponValidator;
+      _errorFactory = errorFactory;
     }
 
     public async Task<Result<CouponResponse>> ApplyCoupon(ApplyCouponRequest applyCouponRequest)
@@ -71,7 +74,13 @@ namespace CleanArchitecture.Application.Services
       }
 
       order.Coupon = coupon;
-      await _unitOfWork.Orders.UpdateAsync(order);
+      _unitOfWork.Orders.Update(order);
+      var isSaved = await _unitOfWork.CompleteAsync();
+      if (!isSaved)
+      {
+        var error = _errorFactory.CreateDatabaseError("Coupon");
+        return Result<CouponResponse>.Failure([error.err], error.statusCode);
+      }
       return Result<CouponResponse>.Success(new CouponResponse
       {
         Id = coupon.Id,

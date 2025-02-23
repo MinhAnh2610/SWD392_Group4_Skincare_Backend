@@ -3,7 +3,7 @@
   public interface IGenericRepository<T> where T : class
   {
     void Create(T entity);
-    Task<int> CreateAsync(T entity);
+    Task CreateAsync(T entity);
     List<T> GetAll();
     Task<List<T>> GetAllAsync();
     T GetById(Guid code);
@@ -12,12 +12,8 @@
     Task<T?> GetByIdAsync(Guid code);
     Task<T?> GetByIdAsync(int id);
     Task<T?> GetByIdAsync(string code);
-    bool Remove(T entity);
-    Task<bool> RemoveAsync(T entity);
+    void Remove(T entity);
     void Update(T entity);
-    Task<int> UpdateAsync(T entity);
-    void Attach(T entity);
-    Task<List<T>> GetAllAsyncWithDepth(int maxDepth);
-    Task<T> GetByIdAsyncWithDepth(Guid id, int level);
+    void Attach(T entity);  
   }
 }
