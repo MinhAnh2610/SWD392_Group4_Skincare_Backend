@@ -13,12 +13,7 @@ public class BlogController : ICarterModule
     group.MapGet("/", async (IBlogService service) =>
     {
       var result = await service.GetAllBlogsAsync();
-      if (result != null)
-      {
-        return Results.Ok(ApiResponse<List<BlogResponse>>.SuccessResponse(result.Data!, "Retrieved Blogs Successfully."));
-      }
-
-      return Results.StatusCode(StatusCodes.Status500InternalServerError);
+      return result.Match(Message.SUCCESSFUL_RETRIEVED("Blogs"));
     })
     .WithName("GetBlogs")
     .Produces<ApiResponse<List<BlogResponse>>>()
