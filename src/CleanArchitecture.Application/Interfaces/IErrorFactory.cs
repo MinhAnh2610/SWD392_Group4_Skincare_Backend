@@ -5,5 +5,6 @@ namespace CleanArchitecture.Application.Interfaces
     (Error err, int statusCode) CreateNotFoundError(string objectName);
     (Error err, int statusCode) CreateValidationError(string objectName);
     (Error err, int statusCode) CreateAlreadyExistsError(string objectName);
+    (Error err, int statusCode) CreateInternalServerError(string objectName);
   }
 }

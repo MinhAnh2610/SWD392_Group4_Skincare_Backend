@@ -1,6 +1,5 @@
 using CleanArchitecture.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
-using System.Net;
 
 namespace CleanArchitecture.Application.Exceptions
 {
@@ -19,6 +18,11 @@ namespace CleanArchitecture.Application.Exceptions
     public (Error err, int statusCode) CreateAlreadyExistsError(string objectName)
     {
       return (new Error($"{objectName}.Duplicate", $"{objectName} already exists."), StatusCodes.Status409Conflict);
+    }
+
+    public (Error err, int statusCode) CreateInternalServerError(string objectName)
+    {
+      return (new Error($"{objectName}.ServerError", $"{objectName} causes errors in the server."), StatusCodes.Status500InternalServerError);
     }
   }
 }
