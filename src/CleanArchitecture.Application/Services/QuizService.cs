@@ -67,13 +67,13 @@ public class QuizService : IQuizService
     });
 
     var result = await _unitOfWork.CompleteAsync();
-    if (result > 0)
+    if (result)
     {
       return Result<bool>.Success(true, StatusCodes.Status200OK);
     }
     else
     {
-      var error = _errorFactory.CreateInternalServerError(nameof(result));
+      var error = _errorFactory.CreateDatabaseError(nameof(result));
       return Result<bool>.Failure([error.err], StatusCodes.Status500InternalServerError);
     }
   }
@@ -225,17 +225,10 @@ public class QuizService : IQuizService
 
     quiz.Questions.Remove(question);
 
-    var result = await _unitOfWork.Questions.RemoveAsync(question);
-    if (result)
-    {
-      await _unitOfWork.CompleteAsync();
-      return Result<bool>.Success(true, StatusCodes.Status200OK);
-    }
-    else
-    {
-      var error = _errorFactory.CreateInternalServerError(nameof(question));
-      return Result<bool>.Failure([error.err], error.statusCode);
-    }
+    _unitOfWork.Questions.Remove(question);
+    await _unitOfWork.CompleteAsync();
+
+    return Result<bool>.Success(true, StatusCodes.Status200OK);
   }
 
   public async Task<Result<bool>> UpdateQuestionAsync(Guid questionId, QuestionUpdateRequest request)
@@ -290,13 +283,13 @@ public class QuizService : IQuizService
 
     //await _unitOfWork.Questions.UpdateAsync(question);
     var result = await _unitOfWork.CompleteAsync();
-    if (result > 0)
+    if (result)
     {
       return Result<bool>.Success(true, StatusCodes.Status200OK);
     }
     else
     {
-      var error = _errorFactory.CreateInternalServerError(nameof(result));
+      var error = _errorFactory.CreateDatabaseError(nameof(result));
       return Result<bool>.Failure([error.err], StatusCodes.Status500InternalServerError);
     }
   }
