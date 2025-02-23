@@ -2,6 +2,7 @@
 using CleanArchitecture.Application.DTOs.CouponDTO;
 using CleanArchitecture.Application.DTOs.RoleDto;
 using CleanArchitecture.Application.DTOs.UserDto;
+using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Application.Services;
 using CleanArchitecture.Application.Validators;
 using CleanArchitecture.Application.Validators.Auth;
@@ -73,6 +74,7 @@ public static class DependencyInjection
     services.AddScoped<IRoleService, RoleService>();
     services.AddScoped<IRoutineService, RoutineService>();
     services.AddScoped<ITimeZoneService, TimeZoneService>();
+    services.AddScoped<IErrorFactory, ErrorFactory>();
     return services;
   }
 }

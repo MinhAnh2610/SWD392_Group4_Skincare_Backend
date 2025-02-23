@@ -1,6 +1,4 @@
 ﻿using Mapster;
-using CleanArchitecture.Domain.Entities;
-using CleanArchitecture.Application.DTOs;
 using CleanArchitecture.Application.DTOs.Category;
 namespace CleanArchitecture.Application.Mapper
 {
