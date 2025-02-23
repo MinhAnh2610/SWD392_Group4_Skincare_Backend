@@ -74,6 +74,7 @@ public static class DependencyInjection
     services.AddScoped<IRoleService, RoleService>();
     services.AddScoped<IRoutineService, RoutineService>();
     services.AddScoped<ITimeZoneService, TimeZoneService>();
+    services.AddScoped<IVnPayIntegrationService, VnPayIntegrationService>();
     services.AddScoped<IErrorFactory, ErrorFactory>();
     return services;
   }
