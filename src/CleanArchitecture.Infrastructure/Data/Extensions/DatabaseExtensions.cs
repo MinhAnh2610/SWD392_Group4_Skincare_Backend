@@ -535,7 +535,7 @@ public static class DatabaseExtensions
         }
       }
 
-      await context.RoutineSteps.AddRangeAsync(steps);
+      await context.RoutineSteps.AddRangeAsync(InitialData.RoutineSteps);
       await context.SaveChangesAsync();
     }
   }
