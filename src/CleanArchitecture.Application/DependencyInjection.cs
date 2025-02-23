@@ -4,6 +4,7 @@ using CleanArchitecture.Application.DTOs.RoleDto;
 using CleanArchitecture.Application.DTOs.UserDto;
 using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Application.Services;
+using CleanArchitecture.Application.Strategies.BlogFilterStrategy;
 using CleanArchitecture.Application.Validators;
 using CleanArchitecture.Application.Validators.Auth;
 using CleanArchitecture.Application.Validators.Blog;
@@ -58,6 +59,17 @@ public static class DependencyInjection
     services.AddScoped<ITimeZoneService, TimeZoneService>();
     services.AddScoped<IVnPayIntegrationService, VnPayIntegrationService>();
     services.AddScoped<IErrorFactory, ErrorFactory>();
+
+    #region Add Strategies
+
+    services.AddTransient<IBlogFilterStrategy, ContentFilterStrategy>();
+    services.AddTransient<IBlogFilterStrategy, TitleFilterStrategy>();
+    services.AddTransient<IBlogFilterStrategy, StaffUsernameFilterStrategy>();
+    services.AddTransient<IBlogFilterStrategy, SortOrderFilterStrategy>();
+
+    #endregion
+    
+    
     return services;
   }
 }
