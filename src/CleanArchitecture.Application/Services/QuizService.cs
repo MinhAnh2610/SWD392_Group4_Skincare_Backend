@@ -4,16 +4,78 @@ using CleanArchitecture.Application.DTOs.QuizDto;
 using CleanArchitecture.Application.DTOs.RoutineDTO;
 using CleanArchitecture.Application.DTOs.RoutineStepDto;
 using CleanArchitecture.Application.DTOs.SkinTypeDto;
+using CleanArchitecture.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 
 namespace CleanArchitecture.Application.Services;
 
 public class QuizService : IQuizService
 {
-  public readonly IUnitOfWork _unitOfWork;
-  public QuizService(IUnitOfWork unitOfWork)
+  private readonly IUnitOfWork _unitOfWork;
+  private readonly IErrorFactory _errorFactory;
+  private readonly IValidator<QuestionAddRequest> _addQuestionToQuizValidator;
+  private readonly IValidator<QuestionUpdateRequest> _updateQuestionValidator;
+  public QuizService(IUnitOfWork unitOfWork, IErrorFactory errorFactory, IValidator<QuestionAddRequest> addQuestionToQuizValidator, IValidator<QuestionUpdateRequest> updateRequestValidator)
   {
     _unitOfWork = unitOfWork;
+    _errorFactory = errorFactory;
+    _addQuestionToQuizValidator = addQuestionToQuizValidator;
+    _updateQuestionValidator = updateRequestValidator;
+  }
+
+  public async Task<Result<bool>> AddQuestionToQuizAsync(Guid quizId, QuestionAddRequest request)
+  {
+    var validationResult = await _addQuestionToQuizValidator.ValidateAsync(request);
+    if (!validationResult.IsValid)
+    {
+      var errors = validationResult.Errors
+          .Select(e => new Error("ValidationError", e.ErrorMessage))
+          .ToList();
+
+      return Result<bool>.Failure(errors, StatusCodes.Status400BadRequest);
+    }
+
+    var quiz = await _unitOfWork.Quizs.GetByIdAsync(quizId);
+
+    if (quiz == null)
+    {
+      var error = _errorFactory.CreateNotFoundError(nameof(quiz));
+      return Result<bool>.Failure([error.err], error.statusCode);
+    }
+
+    var questionTypes = await _unitOfWork.QuestionTypes.GetAllAsync();
+    var questionType = questionTypes.FirstOrDefault(q => q.Name == request.QuestionType);
+
+    if (questionType == null)
+    {
+      var error = _errorFactory.CreateNotFoundError(nameof(questionType));
+      return Result<bool>.Failure([error.err], error.statusCode);
+    }
+
+    quiz.Questions.Add(new Question
+    {
+      Title = request.Title,
+      Description = request.Description,
+      Instruction = request.Instruction,
+      QuestionTypeId = questionType.Id,
+      QuestionType = questionType,
+      QuestionOptions = request.QuestionOptions.Select(qo => new QuestionOption
+      {
+        Content = qo.Content,
+        Score = qo.Score,
+      }).ToList(),
+    });
+
+    var result = await _unitOfWork.CompleteAsync();
+    if (result > 0)
+    {
+      return Result<bool>.Success(true, StatusCodes.Status200OK);
+    }
+    else
+    {
+      var error = _errorFactory.CreateInternalServerError(nameof(result));
+      return Result<bool>.Failure([error.err], StatusCodes.Status500InternalServerError);
+    }
   }
 
   public async Task<Result<QuizResponse>> GetQuizAsync()
@@ -22,10 +84,10 @@ public class QuizService : IQuizService
     var quiz = quizzes.FirstOrDefault();
 
     if (quiz == null)
-      return Result<QuizResponse>.Failure(new List<Error>
-      {
-        new Error("Quiz.NotFound", "Couldn't Load Skin Type Quiz.")
-      }, StatusCodes.Status404NotFound);
+    {
+      var error = _errorFactory.CreateNotFoundError(nameof(quiz));
+      return Result<QuizResponse>.Failure([error.err], error.statusCode);
+    }
 
     return Result<QuizResponse>.Success(new QuizResponse
     {
@@ -57,10 +119,10 @@ public class QuizService : IQuizService
     var quiz = await _unitOfWork.Quizs.GetByIdAsync(id);
 
     if (quiz == null)
-      return Result<List<RoutineResponse>?>.Failure(new List<Error>
-      {
-        new Error("Quiz.NotFound", "Couldn't Found Skin Type Quiz.")
-      }, StatusCodes.Status404NotFound);
+    {
+      var error = _errorFactory.CreateNotFoundError(nameof(quiz));
+      return Result<List<RoutineResponse>?>.Failure([error.err], error.statusCode);
+    }
 
     int oilinessScore = 0;
     int sensitivityScore = 0;
@@ -104,15 +166,18 @@ public class QuizService : IQuizService
     var skinType = await _unitOfWork.SkinTypes.FindSkinTypeBasedOnBaumannAsync(oilinessType + sensitivityType + pigmentationType + agingType);
 
     if (skinType == null)
-      return Result<List<RoutineResponse>?>.Failure(new List<Error>
-      {
-        new Error("SkinType.NotFound", "Couldn't Found Skin Type.")
-      }, StatusCodes.Status404NotFound);
+    {
+      var error = _errorFactory.CreateNotFoundError(nameof(skinType));
+      return Result<List<RoutineResponse>?>.Failure([error.err], error.statusCode);
+    }
 
     var routines = await _unitOfWork.Routines.GetRoutineBySkinTypeAsync(skinType.Id);
 
     if (routines == null)
-      return Result<List<RoutineResponse>?>.Failure(new List<Error> { new Error("Routine.GetRoutines", "Cannot found routines") }, StatusCodes.Status404NotFound);
+    {
+      var error = _errorFactory.CreateNotFoundError(nameof(routines));
+      return Result<List<RoutineResponse>?>.Failure([error.err], error.statusCode);
+    }
 
     return Result<List<RoutineResponse>?>.Success(routines.Select(routine => new RoutineResponse
     {
@@ -138,5 +203,101 @@ public class QuizService : IQuizService
         StepNumber = routineStep.StepNumber,
       }).ToList(),
     }).ToList(), StatusCodes.Status200OK);
+  }
+
+  public async Task<Result<bool>> RemoveQuestionFromQuizAsync(Guid quizId, Guid questionId)
+  {
+    var quiz = await _unitOfWork.Quizs.GetByIdAsync(quizId);
+
+    if (quiz == null)
+    {
+      var error = _errorFactory.CreateNotFoundError(nameof(quiz));
+      return Result<bool>.Failure([error.err], error.statusCode);
+    }
+
+    var question = await _unitOfWork.Questions.GetByIdAsync(questionId);
+
+    if (question == null)
+    {
+      var error = _errorFactory.CreateNotFoundError(nameof(question));
+      return Result<bool>.Failure([error.err], error.statusCode);
+    }
+
+    quiz.Questions.Remove(question);
+
+    var result = await _unitOfWork.Questions.RemoveAsync(question);
+    if (result)
+    {
+      await _unitOfWork.CompleteAsync();
+      return Result<bool>.Success(true, StatusCodes.Status200OK);
+    }
+    else
+    {
+      var error = _errorFactory.CreateInternalServerError(nameof(question));
+      return Result<bool>.Failure([error.err], error.statusCode);
+    }
+  }
+
+  public async Task<Result<bool>> UpdateQuestionAsync(Guid questionId, QuestionUpdateRequest request)
+  {
+    var validationResult = await _updateQuestionValidator.ValidateAsync(request);
+    if (!validationResult.IsValid)
+    {
+      var errors = validationResult.Errors
+          .Select(e => new Error("ValidationError", e.ErrorMessage))
+          .ToList();
+
+      return Result<bool>.Failure(errors, StatusCodes.Status400BadRequest);
+    }
+
+    var question = await _unitOfWork.Questions.GetByIdAsync(questionId);
+
+    if (question == null)
+    {
+      var error = _errorFactory.CreateNotFoundError(nameof(question));
+      return Result<bool>.Failure([error.err], error.statusCode);
+    }
+
+    var questionTypes = await _unitOfWork.QuestionTypes.GetAllAsync();
+    var questionType = questionTypes.FirstOrDefault(q => q.Name == request.QuestionType);
+
+    if (questionType == null)
+    {
+      var error = _errorFactory.CreateNotFoundError(nameof(questionType));
+      return Result<bool>.Failure([error.err], error.statusCode);
+    }
+
+    question.Title = request.Title;
+    question.Description = request.Description;
+    question.Instruction = request.Instruction;
+    question.Section = request.Section;
+    question.QuestionType = questionType;
+
+    // Remove all existing options
+    question.QuestionOptions!.Clear();
+
+    // Add new options
+    foreach (var newOption in request.QuestionOptions)
+    {
+      question.QuestionOptions.Add(new QuestionOption
+      {
+        Id = Guid.NewGuid(),
+        Content = newOption.Content,
+        Score = newOption.Score,
+        QuestionId = question.Id
+      });
+    }
+
+    //await _unitOfWork.Questions.UpdateAsync(question);
+    var result = await _unitOfWork.CompleteAsync();
+    if (result > 0)
+    {
+      return Result<bool>.Success(true, StatusCodes.Status200OK);
+    }
+    else
+    {
+      var error = _errorFactory.CreateInternalServerError(nameof(result));
+      return Result<bool>.Failure([error.err], StatusCodes.Status500InternalServerError);
+    }
   }
 }

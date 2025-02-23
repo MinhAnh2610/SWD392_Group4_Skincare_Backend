@@ -1,7 +1,6 @@
 using CleanArchitecture.Application.Interfaces;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
-using System.Net;
 
 namespace CleanArchitecture.Application.Exceptions
 {
