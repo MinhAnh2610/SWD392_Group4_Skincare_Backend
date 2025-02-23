@@ -36,5 +36,5 @@ public interface IUnitOfWork : IDisposable
   ITagRepository Tags { get; }
   ITestimonialRepository Testimonials { get; }
 
-  Task<int> CompleteAsync();
+  Task<bool> CompleteAsync();
 }
