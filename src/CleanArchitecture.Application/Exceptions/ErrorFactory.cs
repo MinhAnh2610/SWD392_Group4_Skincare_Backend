@@ -1,4 +1,5 @@
 using CleanArchitecture.Application.Interfaces;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 
 namespace CleanArchitecture.Application.Exceptions
@@ -10,19 +11,31 @@ namespace CleanArchitecture.Application.Exceptions
       return (new Error($"{objectName}.NotFound", $"{objectName} not found."), StatusCodes.Status404NotFound);
     }
 
-    public (Error err, int statusCode) CreateValidationError(string objectName)
+    public (List<Error> errs, int statusCode) CreateValidationError(string objectName,
+      ValidationResult validationResult)
     {
-      return (new Error($"{objectName}.Invalid", $"{objectName} is not valid."), StatusCodes.Status400BadRequest);
+      var errs = new List<Error>();
+      foreach (var err in validationResult.Errors)
+      {
+        errs.Add(new Error($"{objectName}.Invalid", err.ErrorMessage));
+      }
+      
+      return (errs, StatusCodes.Status400BadRequest);
     }
+
+  // public (, int statusCode) CreateValidationError(string objectName)
+    // {
+    //   return (new Error($"{objectName}.Invalid", $"{objectName} is not valid."), StatusCodes.Status400BadRequest);
+    // }
 
     public (Error err, int statusCode) CreateAlreadyExistsError(string objectName)
     {
       return (new Error($"{objectName}.Duplicate", $"{objectName} already exists."), StatusCodes.Status409Conflict);
     }
 
-    public (Error err, int statusCode) CreateInternalServerError(string objectName)
+    public (Error err, int statusCode) CreateDatabaseError(string objectName)
     {
-      return (new Error($"{objectName}.ServerError", $"{objectName} causes errors in the server."), StatusCodes.Status500InternalServerError);
+      return new (new Error($"{objectName}.DatabaseFailed", $"Database operation with {objectName} failed."), StatusCodes.Status500InternalServerError); 
     }
   }
 }
