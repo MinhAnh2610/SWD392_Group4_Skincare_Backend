@@ -29,21 +29,10 @@ namespace CleanArchitecture.Presentation.Endpoints
       #endregion
 
       #region Create Payment URL Endpoint
-      group.MapPost("/create-payment", async (IVnPayIntegrationService vnPayIntegrationService, HttpContext context, VnPayPaymentRequestDto request) =>
+      group.MapPost("/create-payment", (IVnPayIntegrationService vnPayIntegrationService, HttpContext context, VnPayPaymentRequestDto request) =>
       {
-        try
-        {
-          // Call the integration service to create the payment URL.
-          var paymentUrl = vnPayIntegrationService.CreatePaymentUrl(request, context);
-          var result = Result<string>.Success(paymentUrl, StatusCodes.Status200OK);
-          return result.Match("Payment URL created successfully.");
-        }
-        catch (System.Exception ex)
-        {
-          var errors = new List<Error> { new Error("Payment.CreatePayment", ex.Message) };
-          var result = Result<string>.Failure(errors, StatusCodes.Status400BadRequest);
-          return result.Match("Error creating payment URL.");
-        }
+        var result = vnPayIntegrationService.CreatePaymentUrl(request, context);
+        return result.Match("Payment URL created successfully.");
       })
       .WithName("CreatePaymentUrl")
       .Produces<ApiResponse<string>>(StatusCodes.Status200OK)
@@ -55,19 +44,8 @@ namespace CleanArchitecture.Presentation.Endpoints
       #region Process VNPay Return Endpoint
       group.MapGet("/vnpay-return", async (IVnPayIntegrationService vnPayIntegrationService, HttpContext context) =>
       {
-        try
-        {
-          // Process the return callback from VNPay.
-          var response = await vnPayIntegrationService.ProcessReturnAsync(context.Request.Query);
-          var result = Result<VnPayPaymentResponseDto>.Success(response, StatusCodes.Status200OK);
-          return result.Match("Payment processed successfully.");
-        }
-        catch (System.Exception ex)
-        {
-          var errors = new List<Error> { new Error("Payment.VnPayReturn", ex.Message) };
-          var result = Result<VnPayPaymentResponseDto>.Failure(errors, StatusCodes.Status400BadRequest);
-          return result.Match("Error processing payment return.");
-        }
+        var result = await vnPayIntegrationService.ProcessReturnAsync(context.Request.Query);
+        return result.Match("Payment processed successfully.");
       })
       .WithName("ProcessVnPayReturn")
       .Produces<ApiResponse<VnPayPaymentResponseDto>>(StatusCodes.Status200OK)
