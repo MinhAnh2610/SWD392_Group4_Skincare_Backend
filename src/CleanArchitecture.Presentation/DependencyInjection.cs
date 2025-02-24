@@ -90,7 +90,7 @@ public static class DependencyInjection
     })
       .AddJwtBearer(options =>
       {
-        options.Authority = "https://localhost:5051";
+        options.Authority = "https://0.0.0.0:5051";
         options.TokenValidationParameters = new TokenValidationParameters
         {
           ValidateAudience = false,
@@ -115,7 +115,7 @@ public static class DependencyInjection
     {
       app.UseSwagger(options =>
       {
-        //https://localhost:5051/scalar/
+        //https://0.0.0.0:5051/scalar/
         options.RouteTemplate = "/openapi/{documentName}.json";
       });
       app.MapScalarApiReference(options =>
