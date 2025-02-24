@@ -72,6 +72,15 @@ public static class DependencyInjection
       .AddUserStore<UserStore<User, Role, ApplicationDbContext, Guid>>()
       .AddRoleStore<RoleStore<Role, ApplicationDbContext, Guid>>();
 
+    services.AddCors(options =>
+    {
+      options.AddPolicy("AllowAll",
+          policy => policy
+              .AllowAnyOrigin()   // ✅ Allow any frontend
+              .AllowAnyMethod()   // ✅ Allow GET, POST, PUT, DELETE, etc.
+              .AllowAnyHeader()); // ✅ Allow any headers
+    });
+
     // Add authentication & authorization
     services.AddAuthentication(options =>
     {
@@ -139,6 +148,7 @@ public static class DependencyInjection
     app.UseHttpsRedirection();
     app.UseRouting();
     app.UseIdentityServer();
+    app.UseCors("AllowAll"); // ✅ Apply CORS globally
     app.UseAuthentication();
     app.UseAuthorization();
 

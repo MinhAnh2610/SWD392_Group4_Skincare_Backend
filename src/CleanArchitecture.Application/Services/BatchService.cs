@@ -1,6 +1,7 @@
 ﻿using Abp.Domain.Repositories;
 using Abp.Linq.Expressions;
 using CleanArchitecture.Application.DTOs.BatchDto;
+using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Domain.Entities;
 using Mapster;
 using Microsoft.AspNetCore.Http;
@@ -15,12 +16,15 @@ namespace CleanArchitecture.Application.Services
   public class BatchService : IBatchService
   {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IErrorFactory _errorFactory;
 
     public BatchService(
-    IUnitOfWork unitOfWork)
+      IUnitOfWork unitOfWork, IErrorFactory errorFactory)
     {
       _unitOfWork = unitOfWork;
+      _errorFactory = errorFactory;
     }
+
     public async Task<Result<BatchResponse>> CreateBatch(BatchCreateRequest batch)
     {
       var orgbatch = batch.Adapt<Batch>();
@@ -31,60 +35,59 @@ namespace CleanArchitecture.Application.Services
       orgbatch.ManufactureDate = batch.ManufactureDate;
       orgbatch.ExpirationDate = batch.ExpirationDate;
 
-      _unitOfWork.Cosmetics.Attach(orgbatch.Cosmetic);
-
-      await _unitOfWork.Batches.CreateAsync(orgbatch);
+      _unitOfWork.Batches.Create(orgbatch);
       var output = orgbatch.Adapt<BatchResponse>();
       return Result<BatchResponse>.Success(output, StatusCodes.Status201Created);
     }
 
     public async Task<Result<BatchResponse>> DeleteBatch(Guid id)
     {
-      var existbatch = await _unitOfWork.Batches.GetByIdAsyncWithDepth(id,2);
+      var existbatch = await _unitOfWork.Batches.GetByIdAsync(id);
       if (existbatch == null)
       {
         return Result<BatchResponse>.Failure([BatchErrors.BatchNotFound], StatusCodes.Status404NotFound);
       }
-      else
+
+      _unitOfWork.Batches.Remove(existbatch);
+      var isSaved = await _unitOfWork.CompleteAsync();
+      if (!isSaved)
       {
-        await _unitOfWork.Batches.RemoveAsync(existbatch);
-        var output = existbatch.Adapt<BatchResponse>();
-        return Result<BatchResponse>.Success(output, StatusCodes.Status200OK);
+        var error = _errorFactory.CreateDatabaseError("Batch");
+        return Result<BatchResponse>.Failure([error.err], error.statusCode);
       }
+
+      var output = existbatch.Adapt<BatchResponse>();
+      return Result<BatchResponse>.Success(output, StatusCodes.Status200OK);
     }
 
     public async Task<Result<List<BatchResponse>>> GetAllBatches()
     {
-      var batches = await _unitOfWork.Batches.GetAllAsyncWithDepth(2);
+      var batches = await _unitOfWork.Batches.GetAllAsync();
       if (batches != null)
       {
         var batchesResponse = batches.Adapt<List<BatchResponse>>();
         return Result<List<BatchResponse>>.Success(batchesResponse, StatusCodes.Status200OK);
       }
-      else
-      {
-        return Result<List<BatchResponse>>.Failure([BatchErrors.BatchNotFound], StatusCodes.Status404NotFound);
-      }
 
+      return Result<List<BatchResponse>>.Failure([BatchErrors.BatchNotFound], StatusCodes.Status404NotFound);
     }
 
     public async Task<Result<BatchResponse>> GetBatchById(Guid id)
     {
-      var batch = await _unitOfWork.Batches.GetByIdAsyncWithDepth(id,2);
-      if (batch != null)
+      var batch = await _unitOfWork.Batches.GetByIdAsync(id);
+
+      if (batch is null)
       {
-        var batchesResponse = batch.Adapt<BatchResponse>();
-        return Result<BatchResponse>.Success(batchesResponse, StatusCodes.Status200OK);
+        var error = _errorFactory.CreateNotFoundError("Batch");
+        return Result<BatchResponse>.Failure([error.err], error.statusCode);
       }
-      else
-      {
-        return Result<BatchResponse>.Failure([BatchErrors.BatchNotFound], StatusCodes.Status404NotFound);
-      }
+      
+      return Result<BatchResponse>.Success(batch.Adapt<BatchResponse>(), StatusCodes.Status200OK);
     }
 
     public async Task<Result<List<BatchResponse>>> GetBatchesByCosmeticId(Guid cosId)
     {
-      var batch = await _unitOfWork.Batches.GetListByAnyId(e => e.CosmeticId == cosId,2);
+      var batch = await _unitOfWork.Batches.GetListByAnyId(e => e.CosmeticId == cosId, 2);
       if (batch != null)
       {
         var batchesResponse = batch.Adapt<List<BatchResponse>>();
@@ -98,7 +101,7 @@ namespace CleanArchitecture.Application.Services
 
     public async Task<Result<BatchResponse>> UpdateBatch(BatchUpdateRequest batch, Guid id)
     {
-      var existbatch = await _unitOfWork.Batches.GetByIdAsyncWithDepth(id,2);
+      var existbatch = await _unitOfWork.Batches.GetByIdAsync(id);
       if (existbatch == null)
       {
         return Result<BatchResponse>.Failure([BatchErrors.BatchNotFound], StatusCodes.Status404NotFound);
@@ -108,13 +111,21 @@ namespace CleanArchitecture.Application.Services
       existbatch.Quantity = batch.Quantity != default ? batch.Quantity : existbatch.Quantity;
       existbatch.ExportedDate = batch.ExportedDate != default ? batch.ExportedDate : existbatch.ExportedDate;
 
-      await _unitOfWork.Batches.UpdateAsync(existbatch);
+      _unitOfWork.Batches.Update(existbatch);
+      var isSaved = await _unitOfWork.CompleteAsync();
+      if (!isSaved)
+      {
+        var error = _errorFactory.CreateDatabaseError("Batch");
+        return Result<BatchResponse>.Failure([error.err], error.statusCode);
+      }
+
       var output = existbatch.Adapt<BatchResponse>();
 
       return Result<BatchResponse>.Success(output, StatusCodes.Status200OK);
     }
-    public async Task<Result<List<BatchResponse>>> GetBatchesByDateRangeAsync(DateOnly startDate,DateOnly endDate,
-    DateSearchType searchTypes)
+
+    public async Task<Result<List<BatchResponse>>> GetBatchesByDateRangeAsync(DateOnly startDate, DateOnly endDate,
+      DateSearchType searchTypes)
     {
       var predicate = PredicateBuilder.New<Batch>(false);
 
@@ -133,11 +144,9 @@ namespace CleanArchitecture.Application.Services
         predicate = predicate.Or(b => b.ExpirationDate >= startDate && b.ExpirationDate <= endDate);
       }
 
-      var batches =await _unitOfWork.Batches.GetListByAnyId(predicate,2);
+      var batches = await _unitOfWork.Batches.GetListByAnyId(predicate, 2);
       var batchesResponse = batches.Adapt<List<BatchResponse>>();
       return Result<List<BatchResponse>>.Success(batchesResponse, StatusCodes.Status200OK);
-
     }
   }
-
 }

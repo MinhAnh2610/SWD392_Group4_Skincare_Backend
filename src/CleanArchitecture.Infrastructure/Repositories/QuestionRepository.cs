@@ -14,4 +14,11 @@ public class QuestionRepository : GenericRepository<Question>, IQuestionReposito
       .Include(q => q.QuestionOptions)
       .ToListAsync();
   }
+
+  public override async Task<Question?> GetByIdAsync(Guid code)
+  {
+    return await _context.Questions
+      .Include(q => q.QuestionOptions)
+      .FirstOrDefaultAsync(q => q.Id == code);
+  }
 }
