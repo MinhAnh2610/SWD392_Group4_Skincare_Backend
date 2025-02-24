@@ -14,10 +14,10 @@ namespace CleanArchitecture.Presentation.Endpoints
 
       group.MapGet("/",
         async (IReportService service, [FromQuery] string? format, [FromQuery] string? type,
-          [FromQuery] DateTime? month, [FromQuery] DateTime? date) =>
+          [FromQuery] DateTime? fromDate, [FromQuery] DateTime? toDate) =>
         {
-          GenerateReportRequest request = new GenerateReportRequest(format, type, month, date);
-          var result = service.GenerateReport(request);
+          GenerateReportRequest request = new(format, type, fromDate, toDate);
+          var result = await service.GenerateReport(request);
           if (result.IsSuccess)
             return Results.File(result.Data, "application/pdf", "report.pdf");
           

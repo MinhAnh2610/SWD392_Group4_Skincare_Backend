@@ -5,5 +5,6 @@ namespace CleanArchitecture.Application.DTOs.ReportDto
     public Guid CosmeticId { get; set; }
     public string? CosmeticName { get; set; }
     public int NumberOfSales { get; set; }
+    public decimal Revenue { get; set; }
   }
 }

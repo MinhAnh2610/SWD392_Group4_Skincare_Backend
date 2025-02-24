@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore.Query.Internal;
+
 namespace CleanArchitecture.Application.DTOs.ReportDto
 {
   public class GenerateReportRequest(

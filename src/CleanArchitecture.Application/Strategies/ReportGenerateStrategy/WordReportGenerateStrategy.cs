@@ -4,7 +4,7 @@ namespace CleanArchitecture.Application.Strategies
 {
   public class WordReportGenerateStrategy : IReportGenerateStrategy
   {
-    public byte[] Generate(GenerateReportRequest request)
+    public byte[] Generate(GenerateReportRequest request, ReportContent reportContent)
     {
       return [];
     }
