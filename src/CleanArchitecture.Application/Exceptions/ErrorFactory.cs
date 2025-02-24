@@ -42,5 +42,10 @@ namespace CleanArchitecture.Application.Exceptions
     {
       return (new Error($"{objectName}.FileCreatedFailed", $"{objectName} file creating operation failed."), StatusCodes.Status500InternalServerError); 
     }
+
+    public (Error err, int statusCode) CreateInvalidDates()
+    {
+      return (new Error("Input.InvalidDates", "The dates inputed are invalid."), StatusCodes.Status400BadRequest);
+    }
   }
 }

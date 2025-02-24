@@ -4,6 +4,6 @@ namespace CleanArchitecture.Application.ServiceContracts
 {
   public interface IReportService
   {
-    Result<byte[]> GenerateReport(GenerateReportRequest request); 
+    Task<Result<byte[]>> GenerateReport(GenerateReportRequest request);
   }
 }
