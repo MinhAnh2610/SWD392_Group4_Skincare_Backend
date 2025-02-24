@@ -1,6 +1,7 @@
 ﻿using CleanArchitecture.Application.DTOs.Auth;
 using CleanArchitecture.Application.DTOs.CouponDTO;
 using CleanArchitecture.Application.DTOs.QuestionDto;
+using CleanArchitecture.Application.DTOs.ReportDto;
 using CleanArchitecture.Application.DTOs.RoleDto;
 using CleanArchitecture.Application.DTOs.UserDto;
 using CleanArchitecture.Application.Interfaces;
@@ -28,6 +29,9 @@ public static class DependencyInjection
   {
 
     QuestPDF.Settings.License = LicenseType.Community;
+    
+    // PdfReportGenerateStrategy strategy = new PdfReportGenerateStrategy();
+    // strategy.Generate(new GenerateReportRequest("pdf", "month", DateTime.Now, DateTime.Today));
     
     services.AddFeatureManagement();
     services.AddHttpContextAccessor();

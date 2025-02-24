@@ -4,6 +4,6 @@ namespace CleanArchitecture.Application.Strategies
 {
   public interface IReportGenerateStrategy
   {
-    byte[] Generate(GenerateReportRequest request);
+    byte[] Generate(GenerateReportRequest request, ReportContent reportContent);
   }
 }

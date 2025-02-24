@@ -9,15 +9,19 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
     builder.HasKey(order => order.Id);
 
     builder.HasOne(order => order.Customer)
-        .WithMany(customer => customer.Orders)
-        .HasForeignKey(order => order.CustomerId);
+      .WithMany(customer => customer.Orders)
+      .HasForeignKey(order => order.CustomerId);
 
     builder.HasOne(order => order.Coupon)
-        .WithMany(coupon => coupon.Orders)
-        .HasForeignKey(order => order.CouponId);
+      .WithMany(coupon => coupon.Orders)
+      .HasForeignKey(order => order.CouponId);
 
     builder.HasMany(order => order.OrderItems)
-        .WithOne(orderItem => orderItem.Order)
-        .HasForeignKey(orderItem => orderItem.OrderId);
+      .WithOne(orderItem => orderItem.Order)
+      .HasForeignKey(orderItem => orderItem.OrderId);
+
+    builder.Property(order => order.OrderDate)
+      .HasColumnType("timestamp")
+      .HasDefaultValueSql("CURRENT_TIMESTAMP");
   }
 }
