@@ -264,7 +264,7 @@ public class QuizService : IQuizService
     question.Description = request.Description;
     question.Instruction = request.Instruction;
     question.Section = request.Section;
-    question.QuestionType = questionType;
+    question.QuestionTypeId = questionType.Id;
 
     // Remove all existing options
     question.QuestionOptions!.Clear();
@@ -281,7 +281,7 @@ public class QuizService : IQuizService
       });
     }
 
-    //await _unitOfWork.Questions.UpdateAsync(question);
+    _unitOfWork.Questions.Update(question);
     var result = await _unitOfWork.CompleteAsync();
     if (result)
     {
