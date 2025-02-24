@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CleanArchitecture.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class changeorderdatetotimestamp : Migration
+    public partial class Update : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
