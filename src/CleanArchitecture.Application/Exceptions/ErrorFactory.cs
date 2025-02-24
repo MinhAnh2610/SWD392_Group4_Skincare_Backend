@@ -37,5 +37,10 @@ namespace CleanArchitecture.Application.Exceptions
     {
       return new (new Error($"{objectName}.DatabaseFailed", $"Database operation with {objectName} failed."), StatusCodes.Status500InternalServerError); 
     }
+
+    public (Error err, int statusCode) CreateFileCreatedFailed(string objectName)
+    {
+      return (new Error($"{objectName}.FileCreatedFailed", $"{objectName} file creating operation failed."), StatusCodes.Status500InternalServerError); 
+    }
   }
 }
