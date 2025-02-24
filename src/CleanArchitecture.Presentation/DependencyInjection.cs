@@ -90,7 +90,7 @@ public static class DependencyInjection
     })
       .AddJwtBearer(options =>
       {
-        options.Authority = "https://0.0.0.0:5051";
+        options.Authority = "https://api.pak160404.click";
         options.TokenValidationParameters = new TokenValidationParameters
         {
           ValidateAudience = false,
