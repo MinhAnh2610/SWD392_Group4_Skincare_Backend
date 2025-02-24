@@ -1,4 +1,4 @@
-﻿using CleanArchitecture.Application.DTOs.Auth;
+using CleanArchitecture.Application.DTOs.Auth;
 using CleanArchitecture.Application.DTOs.CouponDTO;
 using CleanArchitecture.Application.DTOs.QuestionDto;
 using CleanArchitecture.Application.DTOs.ReportDto;
