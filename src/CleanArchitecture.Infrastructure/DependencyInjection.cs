@@ -34,6 +34,7 @@ public static class DependencyInjection
     services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
     {
       options.AddInterceptors(serviceProvider.GetServices<ISaveChangesInterceptor>());
+      options.EnableSensitiveDataLogging();
 
       string? connectionString = Environment.GetEnvironmentVariable("databaseConnectionString");
       if (string.IsNullOrEmpty(connectionString))

@@ -1,6 +1,4 @@
-﻿using CleanArchitecture.Application.DTOs.Payment;
-using Microsoft.AspNetCore.Http;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -8,7 +6,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using CleanArchitecture.Application.DTOs.VnPay;
 
 namespace Application.Library
 {
@@ -16,91 +15,6 @@ namespace Application.Library
   {
     private readonly SortedList<string, string> _requestData = new SortedList<string, string>(new VnPayCompare());
     private readonly SortedList<string, string> _responseData = new SortedList<string, string>(new VnPayCompare());
-
-    public PaymentResponse GetFullResponseData(IQueryCollection collection, string hashSecret)
-    {
-      // Use a new instance to accumulate response data.
-      var vnPay = new VnPayLibrary();
-
-      foreach (var (key, value) in collection)
-      {
-        if (!string.IsNullOrEmpty(key) && key.StartsWith("vnp_"))
-        {
-          vnPay.AddResponseData(key, value);
-        }
-      }
-
-      // Retrieve values from the response.
-      var txnRef = vnPay.GetResponseData("vnp_TxnRef");
-      var vnPayTranId = vnPay.GetResponseData("vnp_TransactionNo");
-      var vnpResponseCode = vnPay.GetResponseData("vnp_ResponseCode");
-      var vnpSecureHash = collection.FirstOrDefault(k => k.Key == "vnp_SecureHash").Value;
-      var orderInfo = vnPay.GetResponseData("vnp_OrderInfo");
-
-      // Optional: Parse the payment date if available.
-      DateTime paymentDate = DateTime.UtcNow;
-      var payDateStr = vnPay.GetResponseData("vnp_PayDate");
-      if (!string.IsNullOrEmpty(payDateStr))
-      {
-        if (DateTime.TryParseExact(payDateStr, "yyyyMMddHHmmss", CultureInfo.InvariantCulture,
-                                   DateTimeStyles.None, out DateTime parsedDate))
-        {
-          paymentDate = parsedDate;
-        }
-      }
-
-      // Validate the secure hash.
-      var checkSignature = vnPay.ValidateSignature(vnpSecureHash, hashSecret);
-      if (!checkSignature)
-      {
-        return new PaymentResponse
-        {
-          Success = false
-        };
-      }
-
-      return new PaymentResponse
-      {
-        Success = true,
-        PaymentMethod = "VnPay",
-        OrderDescription = orderInfo,
-        TransactionOrderId = txnRef,   // This should match the txnRef you stored when creating the payment.
-        PaymentId = vnPayTranId,         // VNPay's transaction id.
-        TransactionId = vnPayTranId,     // You can store the same value here if needed.
-        Token = vnpSecureHash,
-        ResponseCode = vnpResponseCode,
-        PaymentDate = paymentDate
-      };
-    }
-
-    public string GetIpAddress(HttpContext context)
-    {
-      var ipAddress = string.Empty;
-      try
-      {
-        var remoteIpAddress = context.Connection.RemoteIpAddress;
-
-        if (remoteIpAddress != null)
-        {
-          if (remoteIpAddress.AddressFamily == AddressFamily.InterNetworkV6)
-          {
-            remoteIpAddress = Dns.GetHostEntry(remoteIpAddress).AddressList
-                .FirstOrDefault(x => x.AddressFamily == AddressFamily.InterNetwork);
-          }
-
-          if (remoteIpAddress != null)
-            ipAddress = remoteIpAddress.ToString();
-
-          return ipAddress;
-        }
-      }
-      catch (Exception ex)
-      {
-        return ex.Message;
-      }
-
-      return "127.0.0.1";
-    }
 
     public void AddRequestData(string key, string value)
     {
@@ -146,11 +60,32 @@ namespace Application.Library
       return baseUrl;
     }
 
-    public bool ValidateSignature(string inputHash, string secretKey)
+    public string GetIpAddress(HttpContext context)
     {
-      var rspRaw = GetResponseData();
-      var myChecksum = HmacSha512(secretKey, rspRaw);
-      return myChecksum.Equals(inputHash, StringComparison.InvariantCultureIgnoreCase);
+      var ipAddress = string.Empty;
+      try
+      {
+        var remoteIpAddress = context.Connection.RemoteIpAddress;
+
+        if (remoteIpAddress != null)
+        {
+          if (remoteIpAddress.AddressFamily == AddressFamily.InterNetworkV6)
+          {
+            remoteIpAddress = Dns.GetHostEntry(remoteIpAddress).AddressList
+                .FirstOrDefault(x => x.AddressFamily == AddressFamily.InterNetwork);
+          }
+
+          if (remoteIpAddress != null) ipAddress = remoteIpAddress.ToString();
+
+          return ipAddress;
+        }
+      }
+      catch (Exception ex)
+      {
+        return ex.Message;
+      }
+
+      return "127.0.0.1";
     }
 
     private string HmacSha512(string key, string inputData)
@@ -168,6 +103,54 @@ namespace Application.Library
       }
 
       return hash.ToString();
+    }
+
+    public VnPayPaymentResponseDto GetFullResponseData(IQueryCollection collection, string hashSecret)
+    {
+      foreach (var (key, value) in collection)
+      {
+        if (!string.IsNullOrEmpty(key) && key.StartsWith("vnp_"))
+        {
+          AddResponseData(key, value);
+        }
+      }
+
+      // Treat these as strings since we expect a GUID string for TxnRef.
+      var txnRef = GetResponseData("vnp_TxnRef");
+      var transactionNo = GetResponseData("vnp_TransactionNo");
+      var vnpResponseCode = GetResponseData("vnp_ResponseCode");
+      var vnpSecureHash = collection.FirstOrDefault(k => k.Key == "vnp_SecureHash").Value;
+      var orderInfo = GetResponseData("vnp_OrderInfo");
+      var totalAmount = GetResponseData("vnp_Amount");  // The numeric amount multiplied by 100
+
+      var checkSignature = ValidateSignature(vnpSecureHash, hashSecret);
+
+      if (!checkSignature)
+        return new VnPayPaymentResponseDto
+        {
+          Success = false
+        };
+
+      return new VnPayPaymentResponseDto
+      {
+        Success = true,
+        PaymentMethod = "VnPay",
+        OrderDescription = orderInfo,
+        TransactionOrderId = txnRef,
+        PaymentId = transactionNo,
+        TransactionId = transactionNo,
+        TotalAmount = totalAmount,   // Save the total amount as returned by VNPAY
+        Token = vnpSecureHash,
+        ResponseCode = vnpResponseCode
+      };
+    }
+
+
+    private bool ValidateSignature(string inputHash, string secretKey)
+    {
+      var rspRaw = GetResponseData();
+      var myChecksum = HmacSha512(secretKey, rspRaw);
+      return myChecksum.Equals(inputHash, StringComparison.InvariantCultureIgnoreCase);
     }
 
     private string GetResponseData()
@@ -188,7 +171,6 @@ namespace Application.Library
         data.Append(WebUtility.UrlEncode(key) + "=" + WebUtility.UrlEncode(value) + "&");
       }
 
-      // Remove the last '&'
       if (data.Length > 0)
       {
         data.Remove(data.Length - 1, 1);

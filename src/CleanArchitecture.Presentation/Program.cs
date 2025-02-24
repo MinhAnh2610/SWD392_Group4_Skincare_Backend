@@ -15,6 +15,7 @@ builder.Services
 var config = new TypeAdapterConfig();
 config.Apply(new CosmeticMappingConfig());
 config.Apply(new CategoryMappingConfig());
+config.Apply(new BlogMappingConfig());
 builder.Services.AddSingleton(config);
 builder.Services.AddMapster();
 
