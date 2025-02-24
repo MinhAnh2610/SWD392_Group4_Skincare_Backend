@@ -1,5 +1,7 @@
 ﻿using Castle.MicroKernel.Registration;
 using CleanArchitecture.Application.DTOs.Cosmetic;
+using CleanArchitecture.Application.DTOs.SkinTypeDto;
+using CleanArchitecture.Application.DTOs.SubCategoryDto;
 using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Application.ServiceContracts;
 using CleanArchitecture.Domain.Entities;
@@ -58,7 +60,43 @@ namespace CleanArchitecture.Application.Services
       var cosmetic = await _unitOfWork.Cosmetics.GetAllAsync();
       if (cosmetic != null)
       {
-        var cosmeticsReponse = cosmetic.Adapt<List<CosmeticResponse>>();
+        //var cosmeticsReponse = cosmetic.Adapt<List<CosmeticResponse>>();
+
+        var cosmeticsReponse = cosmetic.Select(c => new CosmeticResponse
+        {
+          Id = c.Id,
+          Name = c.Name,
+          BrandId = c.BrandId,
+          CosmeticTypeId = c.CosmeticTypeId,
+          Gender = c.Gender,
+          Ingredients = c.Ingredients,
+          Instructions = c.Instructions,
+          MainUsage = c.MainUsage,
+          Notice = c.Notice,
+          Origin = c.Origin,
+          Price = c.Price,
+          Texture = c.Texture,
+          SkinTypeId = c.SkinTypeId,
+          SkinType = new SkinTypeResponse
+          {
+            Id = c.SkinType.Id,
+            Description = c.SkinType.Description,
+            Name = c.SkinType.Name,
+            IsDry = c.SkinType.IsDry,
+            IsSensitive = c.SkinType.IsSensitive,
+            IsUneven = c.SkinType.IsUneven,
+            IsWrinkle = c.SkinType.IsWrinkle
+          },
+          CosmeticSubcategories = c.CosmeticSubcategories
+            .Select(cs => new SubCategoryResponse
+            {
+              Id = cs.SubCategory.Id,
+              Name = cs.SubCategory.Name,
+              Description = cs.SubCategory.Description,
+              CategoryId = cs.SubCategory.CategoryId,
+            }).ToList()
+        }).ToList();
+
         return Result<List<CosmeticResponse>>.Success(cosmeticsReponse, StatusCodes.Status200OK);
       }
       else

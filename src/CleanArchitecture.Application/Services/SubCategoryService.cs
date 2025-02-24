@@ -19,7 +19,7 @@ public class SubCategoryService : ISubCategoryService
       Id = sc.Id,
       Name = sc.Name,
       Description = sc.Description,
-      CategoryName = sc.Category.Name,
+      CategoryId = sc.CategoryId,
     }).ToList(), StatusCodes.Status200OK);
   }
 }
