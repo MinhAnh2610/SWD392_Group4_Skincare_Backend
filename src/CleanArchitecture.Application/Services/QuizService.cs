@@ -267,21 +267,26 @@ public class QuizService : IQuizService
     question.QuestionType = questionType;
 
     // Remove all existing options
-    question.QuestionOptions!.Clear();
+    foreach (var option in question.QuestionOptions!)
+    {
+      _unitOfWork.QuestionOptions.Remove(option);
+    }
 
     // Add new options
     foreach (var newOption in request.QuestionOptions)
     {
-      question.QuestionOptions.Add(new QuestionOption
+      var option = new QuestionOption
       {
         Id = Guid.NewGuid(),
         Content = newOption.Content,
         Score = newOption.Score,
         QuestionId = question.Id
-      });
+      };
+      question.QuestionOptions.Add(option);
+      _unitOfWork.QuestionOptions.Create(option);
     }
 
-    //await _unitOfWork.Questions.UpdateAsync(question);
+    _unitOfWork.Questions.Update(question);
     var result = await _unitOfWork.CompleteAsync();
     if (result)
     {
