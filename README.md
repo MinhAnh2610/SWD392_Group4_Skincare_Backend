@@ -1,3 +1,5 @@
+[![Build Status](https://jenkins.pak160404.click/buildStatus/icon?job=SWD_SkinCare)](https://jenkins.pak160404.click/job/SWD_SkinCare/)
+[![Lines of Code](https://sonarqube.pak160404.click/api/project_badges/measure?project=SWD_SkinCare&metric=ncloc&token=sqb_bd1957dc5e24f7d013f647a7b727f78bc7bae2c7)](https://sonarqube.pak160404.click/dashboard?id=SWD_SkinCare)
 # Skincare System
 
 Backend for a Skincare System
