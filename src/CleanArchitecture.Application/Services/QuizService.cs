@@ -264,7 +264,7 @@ public class QuizService : IQuizService
     question.Description = request.Description;
     question.Instruction = request.Instruction;
     question.Section = request.Section;
-    question.QuestionType = questionType;
+    question.QuestionTypeId = questionType.Id;
 
     // Remove all existing options
     foreach (var option in question.QuestionOptions!)

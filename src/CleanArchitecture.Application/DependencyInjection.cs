@@ -1,18 +1,9 @@
-﻿using CleanArchitecture.Application.DTOs.Auth;
-using CleanArchitecture.Application.DTOs.CouponDTO;
-using CleanArchitecture.Application.DTOs.QuestionDto;
-using CleanArchitecture.Application.DTOs.RoleDto;
-using CleanArchitecture.Application.DTOs.UserDto;
-using CleanArchitecture.Application.Interfaces;
+﻿using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Application.Services;
 using CleanArchitecture.Application.Strategies;
 using CleanArchitecture.Application.Strategies.BlogFilterStrategy;
 using CleanArchitecture.Application.Validators;
-using CleanArchitecture.Application.Validators.Auth;
-using CleanArchitecture.Application.Validators.Quiz;
 using CleanArchitecture.Application.Validators.Blog;
-using CleanArchitecture.Application.Validators.Role;
-using CleanArchitecture.Application.Validators.User;
 using IdentityServer4.Validation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,13 +25,6 @@ public static class DependencyInjection
 
     // Add all validators
     services.AddValidatorsFromAssemblyContaining<CreateBlogRequestValidator>();
-
-    #region Coupon Validatorss
-
-    services.AddScoped<IValidator<QuestionAddRequest>, QuestionAddRequestValidator>();
-    services.AddScoped<IValidator<QuestionUpdateRequest>, QuestionUpdateRequestValidator>();
-
-    #endregion
 
     // Add identity server 4 validator for owner password
     services.AddTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>();
