@@ -267,18 +267,23 @@ public class QuizService : IQuizService
     question.QuestionTypeId = questionType.Id;
 
     // Remove all existing options
-    question.QuestionOptions!.Clear();
+    foreach (var option in question.QuestionOptions!)
+    {
+      _unitOfWork.QuestionOptions.Remove(option);
+    }
 
     // Add new options
     foreach (var newOption in request.QuestionOptions)
     {
-      question.QuestionOptions.Add(new QuestionOption
+      var option = new QuestionOption
       {
         Id = Guid.NewGuid(),
         Content = newOption.Content,
         Score = newOption.Score,
         QuestionId = question.Id
-      });
+      };
+      question.QuestionOptions.Add(option);
+      _unitOfWork.QuestionOptions.Create(option);
     }
 
     _unitOfWork.Questions.Update(question);
