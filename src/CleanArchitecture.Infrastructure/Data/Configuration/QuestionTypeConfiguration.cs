@@ -8,8 +8,8 @@ public class QuestionTypeConfiguration : IEntityTypeConfiguration<QuestionType>
   {
     builder.HasKey(questionType => questionType.Id);
 
-    builder.HasMany(questionType => questionType.QuestionOptions)
-      .WithOne(questionOption => questionOption.QuestionType)
-      .HasForeignKey(questionOption => questionOption.QuestionTypeId);
+    builder.HasMany(questionType => questionType.Questions)
+      .WithOne(question => question.QuestionType)
+      .HasForeignKey(question => question.QuestionTypeId);
   }
 }

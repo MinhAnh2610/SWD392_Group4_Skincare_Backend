@@ -1,3 +1,9 @@
+[![Build Status](https://jenkins.pak160404.click/buildStatus/icon?job=SWD_SkinCare)](https://jenkins.pak160404.click/job/SWD_SkinCare/)
+[![Lines of Code](https://sonarqube.pak160404.click/api/project_badges/measure?project=SWD_SkinCare&metric=ncloc&token=sqb_bd1957dc5e24f7d013f647a7b727f78bc7bae2c7)](https://sonarqube.pak160404.click/dashboard?id=SWD_SkinCare)
+![Website](https://img.shields.io/website?url=https%3A%2F%2Fweb.pak160404.click%2F)
+![Dynamic JSON Badge](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.pak160404.click%2Fopenapi%2Fv1.json&query=%24.info.title&label=Api)
+
+
 # Skincare System
 
 Backend for a Skincare System
@@ -5,7 +11,7 @@ Backend for a Skincare System
 # Guide to initialize Development Environment using Docker
 ## Prerequisites
 - Docker is installed
-- A `.env` file which configured the local database connection (put it in the root folder of the project). 
+- Create a .env folder, then create a dbcon.env at the root of your project solution ( on the same level of the docker compose)
 ##### dbcon.env
 ```
 databaseConnectionString=Server=skincare.db;Database=skincare;User Id=admin;Password=secret;
@@ -15,7 +21,7 @@ databaseConnectionString=Server=skincare.db;Database=skincare;User Id=admin;Pass
 -  ### Step 0: 
  - Disable the current PostgreSQL service in services.msc.
 - ### Step 1:
- - Run `docker-compose`, this will create two services (Web API and Database).
+ - Run `docker-compose up`, this will create two services (Web API and Database).
 - ### Step 2:
  - Web API should be accessible at http://localhost:8080/swagger/index.html
  
@@ -39,7 +45,7 @@ dotnet ef database update --startup-project ./src/CleanArchitecture.Presentation
 - ### Step 2: 
   - Connect by **Host** with the following settings:
    - Host: localhost
-   - Database: skincare
+   - Database: skincare   
    - Authentication: Database Native
    - Username: admin
    - Password: secret

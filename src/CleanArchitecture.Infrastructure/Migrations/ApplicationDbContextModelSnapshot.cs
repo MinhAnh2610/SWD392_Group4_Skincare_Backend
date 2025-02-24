@@ -162,6 +162,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Cart", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("CreateAt")
@@ -169,6 +170,9 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -184,26 +188,23 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CustomerId");
+
                     b.ToTable("Carts");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.CartItem", b =>
                 {
-                    b.Property<Guid>("CustomerId")
+                    b.Property<Guid>("CartId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("CosmeticId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("CartId")
-                        .HasColumnType("uuid");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
 
-                    b.HasKey("CustomerId", "CosmeticId");
-
-                    b.HasIndex("CartId");
+                    b.HasKey("CartId", "CosmeticId");
 
                     b.HasIndex("CosmeticId");
 
@@ -300,9 +301,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("BatchId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("BrandId")
                         .HasColumnType("uuid");
 
@@ -362,8 +360,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BatchId");
 
                     b.HasIndex("BrandId");
 
@@ -588,7 +584,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("CouponId")
+                    b.Property<Guid?>("CouponId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("CreateAt")
@@ -613,7 +609,9 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("OrderDate")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("ShippingAddress")
                         .IsRequired()
@@ -721,6 +719,9 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("text");
 
+                    b.Property<Guid>("QuestionTypeId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("QuizId")
                         .HasColumnType("uuid");
 
@@ -731,6 +732,8 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("QuestionTypeId");
 
                     b.HasIndex("QuizId");
 
@@ -764,14 +767,12 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Property<Guid>("QuestionId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("QuestionTypeId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("Score")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
                     b.HasIndex("QuestionId");
-
-                    b.HasIndex("QuestionTypeId");
 
                     b.ToTable("QuestionOptions");
                 });
@@ -841,6 +842,87 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Quizzes");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Domain.Entities.QuizAnswer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreateAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("QuizResultId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("SelectedOptions")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("QuizResultId");
+
+                    b.ToTable("QuizAnswers");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Domain.Entities.QuizResult", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreateAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("QuizId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SkinTypeId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("QuizId");
+
+                    b.HasIndex("SkinTypeId");
+
+                    b.ToTable("QuizResults");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Refund", b =>
@@ -1448,7 +1530,8 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderId");
+                    b.HasIndex("OrderId")
+                        .IsUnique();
 
                     b.ToTable("Payments");
                 });
@@ -1497,8 +1580,8 @@ namespace CleanArchitecture.Infrastructure.Migrations
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Cart", b =>
                 {
                     b.HasOne("CleanArchitecture.Domain.Entities.User", "Customer")
-                        .WithOne()
-                        .HasForeignKey("CleanArchitecture.Domain.Entities.Cart", "Id")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1507,9 +1590,11 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.CartItem", b =>
                 {
-                    b.HasOne("CleanArchitecture.Domain.Entities.Cart", null)
+                    b.HasOne("CleanArchitecture.Domain.Entities.Cart", "Cart")
                         .WithMany("CartItems")
-                        .HasForeignKey("CartId");
+                        .HasForeignKey("CartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("CleanArchitecture.Domain.Entities.Cosmetic", "Cosmetic")
                         .WithMany("CartItems")
@@ -1517,23 +1602,13 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CleanArchitecture.Domain.Entities.User", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Cart");
 
                     b.Navigation("Cosmetic");
-
-                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Cosmetic", b =>
                 {
-                    b.HasOne("CleanArchitecture.Domain.Entities.Batch", null)
-                        .WithMany("Cosmetics")
-                        .HasForeignKey("BatchId");
-
                     b.HasOne("CleanArchitecture.Domain.Entities.Brand", "Brand")
                         .WithMany("Cosmetics")
                         .HasForeignKey("BrandId")
@@ -1612,9 +1687,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
                 {
                     b.HasOne("CleanArchitecture.Domain.Entities.Coupon", "Coupon")
                         .WithMany("Orders")
-                        .HasForeignKey("CouponId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CouponId");
 
                     b.HasOne("CleanArchitecture.Domain.Entities.User", "Customer")
                         .WithMany("Orders")
@@ -1648,11 +1721,19 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Question", b =>
                 {
+                    b.HasOne("CleanArchitecture.Domain.Entities.QuestionType", "QuestionType")
+                        .WithMany("Questions")
+                        .HasForeignKey("QuestionTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("CleanArchitecture.Domain.Entities.Quiz", "Quiz")
                         .WithMany("Questions")
                         .HasForeignKey("QuizId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("QuestionType");
 
                     b.Navigation("Quiz");
                 });
@@ -1665,21 +1746,59 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CleanArchitecture.Domain.Entities.QuestionType", "QuestionType")
-                        .WithMany("QuestionOptions")
-                        .HasForeignKey("QuestionTypeId")
+                    b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Domain.Entities.QuizAnswer", b =>
+                {
+                    b.HasOne("CleanArchitecture.Domain.Entities.Question", "Question")
+                        .WithMany()
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CleanArchitecture.Domain.Entities.QuizResult", "QuizResult")
+                        .WithMany("QuizAnswers")
+                        .HasForeignKey("QuizResultId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Question");
 
-                    b.Navigation("QuestionType");
+                    b.Navigation("QuizResult");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Domain.Entities.QuizResult", b =>
+                {
+                    b.HasOne("CleanArchitecture.Domain.Entities.User", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CleanArchitecture.Domain.Entities.Quiz", "Quiz")
+                        .WithMany()
+                        .HasForeignKey("QuizId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CleanArchitecture.Domain.Entities.SkinType", "SkinType")
+                        .WithMany()
+                        .HasForeignKey("SkinTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Quiz");
+
+                    b.Navigation("SkinType");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Refund", b =>
                 {
                     b.HasOne("CleanArchitecture.Domain.Entities.User", "Customer")
-                        .WithMany()
+                        .WithMany("Refunds")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1691,7 +1810,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("CleanArchitecture.Domain.Entities.User", "Staff")
-                        .WithMany("Refunds")
+                        .WithMany()
                         .HasForeignKey("StaffId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1856,17 +1975,12 @@ namespace CleanArchitecture.Infrastructure.Migrations
             modelBuilder.Entity("Payment", b =>
                 {
                     b.HasOne("CleanArchitecture.Domain.Entities.Order", "Order")
-                        .WithMany("Payments")
-                        .HasForeignKey("OrderId")
+                        .WithOne("Payment")
+                        .HasForeignKey("Payment", "OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Order");
-                });
-
-            modelBuilder.Entity("CleanArchitecture.Domain.Entities.Batch", b =>
-                {
-                    b.Navigation("Cosmetics");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Blog", b =>
@@ -1922,7 +2036,8 @@ namespace CleanArchitecture.Infrastructure.Migrations
                 {
                     b.Navigation("OrderItems");
 
-                    b.Navigation("Payments");
+                    b.Navigation("Payment")
+                        .IsRequired();
 
                     b.Navigation("Refunds");
                 });
@@ -1934,12 +2049,17 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.QuestionType", b =>
                 {
-                    b.Navigation("QuestionOptions");
+                    b.Navigation("Questions");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Quiz", b =>
                 {
                     b.Navigation("Questions");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Domain.Entities.QuizResult", b =>
+                {
+                    b.Navigation("QuizAnswers");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Refund", b =>
