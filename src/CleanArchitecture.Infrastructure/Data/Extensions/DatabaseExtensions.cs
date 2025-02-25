@@ -323,7 +323,7 @@ public static class DatabaseExtensions
             }
         };
 
-      await context.CosmeticSubCategories.AddRangeAsync(cosmeticSubCategories);
+      await context.CosmeticSubCategories.AddRangeAsync(InitialData.CosmeticSubCategories);
       await context.SaveChangesAsync();
     }
   }
@@ -721,7 +721,7 @@ public static class DatabaseExtensions
             }
         };
 
-      await context.SubCategories.AddRangeAsync(subCategories);
+      await context.SubCategories.AddRangeAsync(InitialData.SubCategories);
       await context.SaveChangesAsync();
     }
   }
