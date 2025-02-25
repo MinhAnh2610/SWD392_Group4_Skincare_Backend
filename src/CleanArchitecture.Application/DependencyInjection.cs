@@ -71,6 +71,7 @@ public static class DependencyInjection
     #endregion
 
 
+    services.AddScoped<IClaimsService, ClaimsService>();
     return services;
   }
 }
