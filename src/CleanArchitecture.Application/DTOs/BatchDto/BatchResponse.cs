@@ -11,7 +11,6 @@ namespace CleanArchitecture.Application.DTOs.BatchDto
   {
     public Guid Id { get; set; }
     public Guid CosmeticId { get; set; }
-    public CosmeticResponse Cosmetic { get; set; } = default!;
     public int Quantity { get; set; }
     public DateOnly ExportedDate { get; set; }
     public DateOnly ManufactureDate { get; set; }
