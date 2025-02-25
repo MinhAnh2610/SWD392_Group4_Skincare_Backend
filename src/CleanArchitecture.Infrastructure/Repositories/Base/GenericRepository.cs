@@ -101,10 +101,10 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
   public virtual async Task<T?> GetByIdAsync(Guid code)
   {
     var entity = await _context.Set<T>().FindAsync(code);
-    if (entity != null)
-    {
-      _context.Entry(entity).State = EntityState.Detached;
-    }
+    //if (entity != null)
+    //{
+    //  _context.Entry(entity).State = EntityState.Detached;
+    //}
 
     return entity;
   }
