@@ -8,8 +8,8 @@ namespace CleanArchitecture.Application.DTOs.UserDto
 {
   public class CustomerDto
   {
-    public Guid? Id { get; set; } = default!;
-    public string? UserName { get; set; } = default!;
-    public string? Email { get; set; } = default!;
+    public Guid? Id { get; set; }
+    public string? UserName { get; set; }
+    public string? Email { get; set; }
   }
 }
