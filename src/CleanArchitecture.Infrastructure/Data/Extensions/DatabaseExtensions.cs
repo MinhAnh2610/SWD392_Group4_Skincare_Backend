@@ -148,7 +148,7 @@ public static class DatabaseExtensions
             new BlogTag { BlogId = blogs[1].Id, TagId = tags[1].Id }  // Business  
         };
 
-      await context.BlogsTags.AddRangeAsync(blogTags);
+      await context.BlogsTags.AddRangeAsync(InitialData.BlogTags);
       await context.SaveChangesAsync();
     }
   }
