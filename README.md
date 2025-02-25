@@ -5,6 +5,8 @@
 
 
 # Skincare System
+# CI/CD
+https://jenkins.pak160404.click/job/SWD_SkinCare/
 
 Backend for a Skincare System
 
