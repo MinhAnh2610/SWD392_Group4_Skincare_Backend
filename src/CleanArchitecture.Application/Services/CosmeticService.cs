@@ -1,5 +1,7 @@
 ﻿using Castle.MicroKernel.Registration;
 using CleanArchitecture.Application.DTOs.Cosmetic;
+using CleanArchitecture.Application.DTOs.SkinTypeDto;
+using CleanArchitecture.Application.DTOs.SubCategoryDto;
 using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Application.ServiceContracts;
 using CleanArchitecture.Domain.Entities;
@@ -59,6 +61,7 @@ namespace CleanArchitecture.Application.Services
       if (cosmetic != null)
       {
         var cosmeticsReponse = cosmetic.Adapt<List<CosmeticResponse>>();
+
         return Result<List<CosmeticResponse>>.Success(cosmeticsReponse, StatusCodes.Status200OK);
       }
       else

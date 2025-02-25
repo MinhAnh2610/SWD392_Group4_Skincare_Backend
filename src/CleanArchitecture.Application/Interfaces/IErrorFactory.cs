@@ -8,5 +8,7 @@ namespace CleanArchitecture.Application.Interfaces
     (List<Error> errs, int statusCode) CreateValidationError(string objectName, ValidationResult validationResult);
     (Error err, int statusCode) CreateAlreadyExistsError(string objectName);
     (Error err, int statusCode) CreateDatabaseError(string objectName);
+    (Error err, int statusCode) CreateFileCreatedFailed(string objectName);
+    (Error err, int statusCode) CreateInvalidDates();
   }
 }

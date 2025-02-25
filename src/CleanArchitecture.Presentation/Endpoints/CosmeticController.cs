@@ -11,7 +11,7 @@ public class CosmeticController : ICarterModule
     var group = app.MapGroup("api/cosmetic").WithTags("Cosmetics Management");
 
     #region Get Cosmetics API
-    group.MapGet("/get-all", async (ICosmeticService service) =>
+    group.MapGet("/", async (ICosmeticService service) =>
     {
       var result = await service.GetAllCosmetics();
       if (result != null)

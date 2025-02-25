@@ -1,18 +1,14 @@
-﻿using CleanArchitecture.Application.DTOs.Auth;
-using CleanArchitecture.Application.DTOs.CouponDTO;
-using CleanArchitecture.Application.DTOs.RoleDto;
-using CleanArchitecture.Application.DTOs.UserDto;
 using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Application.Services;
+using CleanArchitecture.Application.Strategies;
+using CleanArchitecture.Application.Strategies.BlogFilterStrategy;
 using CleanArchitecture.Application.Validators;
-using CleanArchitecture.Application.Validators.Auth;
 using CleanArchitecture.Application.Validators.Blog;
-using CleanArchitecture.Application.Validators.Role;
-using CleanArchitecture.Application.Validators.User;
 using IdentityServer4.Validation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.FeatureManagement;
+using QuestPDF.Infrastructure;
 
 namespace CleanArchitecture.Application;
 
@@ -22,6 +18,8 @@ public static class DependencyInjection
     (this IServiceCollection services, IConfiguration configuration)
   {
 
+    QuestPDF.Settings.License = LicenseType.Community;
+    
     services.AddFeatureManagement();
     services.AddHttpContextAccessor();
 
@@ -58,6 +56,21 @@ public static class DependencyInjection
     services.AddScoped<ITimeZoneService, TimeZoneService>();
     services.AddScoped<IVnPayIntegrationService, VnPayIntegrationService>();
     services.AddScoped<IErrorFactory, ErrorFactory>();
+    services.AddScoped<IReportService, ReportService>();
+
+    #region Add Strategies
+
+    services.AddSingleton<IBlogFilterStrategy, ContentFilterStrategy>();
+    services.AddSingleton<IBlogFilterStrategy, TitleFilterStrategy>();
+    services.AddSingleton<IBlogFilterStrategy, StaffUsernameFilterStrategy>();
+    services.AddSingleton<IBlogFilterStrategy, SortOrderFilterStrategy>();
+
+    services.AddSingleton<IReportGenerateStrategy, PdfReportGenerateStrategy>();
+    services.AddSingleton<IReportGenerateStrategy, WordReportGenerateStrategy>();
+
+    #endregion
+
+
     services.AddScoped<IClaimsService, ClaimsService>();
     return services;
   }

@@ -1,6 +1,7 @@
 ﻿using Mapster;
 using CleanArchitecture.Domain.Entities;
 using CleanArchitecture.Application.DTOs.Cosmetic;
+using CleanArchitecture.Application.DTOs.SubCategoryDto;
 namespace CleanArchitecture.Application.Mapper
 {
   public class CosmeticMappingConfig : IRegister

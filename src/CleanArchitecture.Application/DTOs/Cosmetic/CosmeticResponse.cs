@@ -1,7 +1,12 @@
-﻿using CleanArchitecture.Application.DTOs.BrandDto;
+﻿using CleanArchitecture.Application.DTOs.BatchDto;
+using CleanArchitecture.Application.DTOs.BrandDto;
+using CleanArchitecture.Application.DTOs.CartItem;
 using CleanArchitecture.Application.DTOs.CosmeticImageDto;
+using CleanArchitecture.Application.DTOs.CosmeticSubcategory;
 using CleanArchitecture.Application.DTOs.CosmeticTypeDto;
 using CleanArchitecture.Application.DTOs.FeedbackDto;
+using CleanArchitecture.Application.DTOs.RefundItem;
+using CleanArchitecture.Application.DTOs.RoutineStepDto;
 using CleanArchitecture.Application.DTOs.SkinTypeDto;
 using CleanArchitecture.Application.DTOs.SubCategoryDto;
 using System;
@@ -34,8 +39,14 @@ namespace CleanArchitecture.Application.DTOs.Cosmetic
     public string Texture { get; set; } = default!;
     public string Origin { get; set; } = default!;
     public string Instructions { get; set; } = default!;
-    public List<SubCategoryResponse>? CosmeticSubcategories { get; set; }
-    public List<CosmeticImageResponse>? CosmeticImages { get; set; }
+    public List<CosmeticSubcategoryResponse>? CosmeticSubcategories { get; set; }
+    public List<CosmeticImageResponse>?CosmeticImages { get; set; }
+  //  public List<CartItemResponse>? CartItems { get; set; }
+    public List<OrderItem>? OrderItems { get; set; }
+    public List<BatchResponse>? Batches { get; set; }
+    public List<RoutineStepResponse>? RoutineSteps { get; set; }
     public List<FeedbackResponse>? Feedbacks { get; set; }
+    public List<RefundItemResponse>? RefundItems { get; set; }
+
   }
 }

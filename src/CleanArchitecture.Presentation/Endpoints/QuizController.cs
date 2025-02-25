@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Application.DTOs.QuizDto;
+﻿using CleanArchitecture.Application.DTOs.QuestionDto;
+using CleanArchitecture.Application.DTOs.QuizDto;
 using CleanArchitecture.Application.DTOs.QuizResultDto;
 using CleanArchitecture.Application.DTOs.RoutineDTO;
 using Microsoft.AspNetCore.Mvc;
@@ -127,6 +128,93 @@ public class QuizController : ICarterModule
     .ProducesProblem(StatusCodes.Status500InternalServerError)
     .WithSummary("GetAllCustomerQuizResults")
     .WithDescription("Get All Customer's Quiz Results")
+    .RequireAuthorization(new AuthorizeAttribute
+    {
+      Roles = "Staff, Manager"
+    });
+    #endregion
+
+    #region Add Question To Quiz API
+    group.MapPost("/{quizId}/add-question", async (
+      IQuizService service, [FromBody] QuestionAddRequest request, [FromRoute] Guid quizId) =>
+    {
+      var result = await service.AddQuestionToQuizAsync(quizId, request);
+
+      if (result.IsSuccess)
+      {
+        return Results.Ok(ApiResponse<bool>.SuccessResponse(result.Data!, "Add Question To Quiz Successfully."));
+      }
+        
+      return result.Status switch
+      {
+        StatusCodes.Status404NotFound => Results.NotFound(ApiResponse<bool>.FailureResponse(result.Errors, "Resource Not Found")),
+        _ => Results.StatusCode(StatusCodes.Status500InternalServerError),
+      };
+    })
+    .WithName("AddQuestionToQuiz")
+    .Produces<ApiResponse<bool>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status404NotFound)
+    .ProducesProblem(StatusCodes.Status500InternalServerError)
+    .WithSummary("AddQuestionToQuiz")
+    .WithDescription("Add Question To Quiz")
+    .RequireAuthorization(new AuthorizeAttribute
+    {
+      Roles = "Staff, Manager"
+    });
+    #endregion
+
+    #region Remove Question From Quiz API
+    group.MapDelete("/{quizId}/remove-question/{questionId}", async (
+      IQuizService service, [FromRoute] Guid quizId, [FromRoute] Guid questionId) =>
+    {
+      var result = await service.RemoveQuestionFromQuizAsync(quizId, questionId);
+
+      if (result.IsSuccess)
+      {
+        return Results.Ok(ApiResponse<bool>.SuccessResponse(result.Data!, "Remove Question To Quiz Successfully."));
+      }
+
+      return result.Status switch
+      {
+        StatusCodes.Status404NotFound => Results.NotFound(ApiResponse<bool>.FailureResponse(result.Errors, "Resource Not Found")),
+        _ => Results.StatusCode(StatusCodes.Status500InternalServerError),
+      };
+    })
+    .WithName("RemoveQuestionFromQuiz")
+    .Produces<ApiResponse<bool>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status404NotFound)
+    .ProducesProblem(StatusCodes.Status500InternalServerError)
+    .WithSummary("RemoveQuestionFromQuiz")
+    .WithDescription("Remove Question From Quiz")
+    .RequireAuthorization(new AuthorizeAttribute
+    {
+      Roles = "Staff, Manager"
+    });
+    #endregion
+
+    #region Update Question API
+    group.MapPut("/{update-question}/{questionId}", async (
+      IQuizService service, [FromBody] QuestionUpdateRequest request, [FromRoute] Guid questionId) =>
+    {
+      var result = await service.UpdateQuestionAsync(questionId, request);
+
+      if (result.IsSuccess)
+      {
+        return Results.Ok(ApiResponse<bool>.SuccessResponse(result.Data!, "Update Question Successfully."));
+      }
+
+      return result.Status switch
+      {
+        StatusCodes.Status404NotFound => Results.NotFound(ApiResponse<bool>.FailureResponse(result.Errors, "Resource Not Found")),
+        _ => Results.StatusCode(StatusCodes.Status500InternalServerError),
+      };
+    })
+    .WithName("UpdateQuestion")
+    .Produces<ApiResponse<bool>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status404NotFound)
+    .ProducesProblem(StatusCodes.Status500InternalServerError)
+    .WithSummary("UpdateQuestion")
+    .WithDescription("Update Question")
     .RequireAuthorization(new AuthorizeAttribute
     {
       Roles = "Staff, Manager"

@@ -12,6 +12,7 @@ public class SubCategoryRepository : GenericRepository<SubCategory>, ISubCategor
   {
     return await _context.SubCategories
       .Include(sc => sc.CosmeticSubcategories)
+      .Include(sc => sc.Category)
       .ToListAsync();
   }
 }

@@ -1,7 +1,6 @@
 using CleanArchitecture.Application.Interfaces;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
-using System.Net;
 
 namespace CleanArchitecture.Application.Exceptions
 {
@@ -37,6 +36,16 @@ namespace CleanArchitecture.Application.Exceptions
     public (Error err, int statusCode) CreateDatabaseError(string objectName)
     {
       return new (new Error($"{objectName}.DatabaseFailed", $"Database operation with {objectName} failed."), StatusCodes.Status500InternalServerError); 
+    }
+
+    public (Error err, int statusCode) CreateFileCreatedFailed(string objectName)
+    {
+      return (new Error($"{objectName}.FileCreatedFailed", $"{objectName} file creating operation failed."), StatusCodes.Status500InternalServerError); 
+    }
+
+    public (Error err, int statusCode) CreateInvalidDates()
+    {
+      return (new Error("Input.InvalidDates", "The dates inputed are invalid."), StatusCodes.Status400BadRequest);
     }
   }
 }

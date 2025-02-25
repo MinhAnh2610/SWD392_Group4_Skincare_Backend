@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Application.DTOs.BatchDto;
+using CleanArchitecture.Application.Exceptions;
 using CleanArchitecture.Application.Services;
 using CleanArchitecture.Domain.Entities;
 using Microsoft.AspNetCore.Builder;
@@ -117,7 +118,17 @@ public class BatchController : ICarterModule
         [FromQuery] DateOnly endDate,
         [FromQuery] string searchTypes = "Exported,Manufacture,Expiration") =>
     {
-      var parsedTypes = Enum.Parse<DateSearchType>(searchTypes);
+          if (startDate > endDate)
+            {
+                return Results.BadRequest(ApiResponse<List<BatchResponse>>.FailureResponse([BatchErrors.WrongDateRange],
+        "Start date cannot be after end date"));
+            }
+      
+          if (!Enum.TryParse<DateSearchType>(searchTypes, out var parsedTypes))
+            {
+              return Results.BadRequest(ApiResponse<List<BatchResponse>>.FailureResponse([BatchErrors.WrongSearchType],
+        "Invalid search types provided"));
+           }
       var result = await service.GetBatchesByDateRangeAsync(startDate, endDate, parsedTypes);
       return result.IsSuccess
           ? Results.Ok(ApiResponse<List<BatchResponse>>.SuccessResponse(result.Data!, "Batches found"))

@@ -34,11 +34,12 @@ public static class DependencyInjection
     services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
     {
       options.AddInterceptors(serviceProvider.GetServices<ISaveChangesInterceptor>());
+      options.EnableSensitiveDataLogging();
 
       string? connectionString = Environment.GetEnvironmentVariable("databaseConnectionString");
       if (string.IsNullOrEmpty(connectionString))
         connectionString = configuration.GetConnectionString("DevDatabase");
-       //options.UseInMemoryDatabase("database");
+        //options.UseInMemoryDatabase("database");
       options.UseNpgsql(connectionString);
     });
 
