@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CleanArchitecture.Application.DTOs.CartItem;
+using CleanArchitecture.Application.DTOs.UserDto;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,12 +10,13 @@ namespace CleanArchitecture.Application.DTOs.Cart
 {
   public class CartResponse
   {
-      public Guid Id { get; set; }
-      public decimal TotalPrice { get; set; }
+    public Guid Id { get; set; }
+    public decimal TotalPrice { get; set; }
 
-      public CleanArchitecture.Domain.Entities.User Customer { get; set; } = default!;
+    // Customer info without circular references
+    public CustomerDto Customer { get; set; } = default!;
 
-      public List<CleanArchitecture.Domain.Entities.CartItem>? Items { get; set; } = new List<CleanArchitecture.Domain.Entities.CartItem>();
-
+    // Use specialized DTO for cart items to avoid circular references
+    public List<CartItemDto> Items { get; set; } = new List<CartItemDto>();
   }
 }
