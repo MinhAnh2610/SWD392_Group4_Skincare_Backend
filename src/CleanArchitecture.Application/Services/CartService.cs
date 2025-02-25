@@ -9,10 +9,12 @@ namespace CleanArchitecture.Application.Services
   public class CartService : ICartService
   {
     private readonly IUnitOfWork _unitOfWork;
-
-    public CartService(IUnitOfWork unitOfWork)
+    private readonly IClaimsService _claimsService;
+    public CartService(IUnitOfWork unitOfWork, IClaimsService claimsService)
     {
       _unitOfWork = unitOfWork;
+      _claimsService = claimsService;
+
     }
     public async Task<Result<List<CartResponse>>> AddCartItemAsync(AddProductRequest addProductRequest)
     {
@@ -168,6 +170,57 @@ namespace CleanArchitecture.Application.Services
         return Result<CartResponse>.Failure(
         new List<Error> { new Error("Cart.AddCartItem", "Cart not found") },
         StatusCodes.Status404NotFound
+        );
+      }
+    }
+
+    // CartService.cs - implementation of the new method
+    public async Task<Result<CartResponse>> GetCartByUserIdAsync()
+    {
+      try
+      {
+        var userId = _claimsService.CurrentUserId;
+        if (userId == Guid.Empty)
+        {
+          return Result<CartResponse>.Failure(
+              new List<Error> { new Error("Cart.GetByUserId", "User not authenticated") },
+              StatusCodes.Status401Unauthorized
+          );
+        }
+
+        var carts = await _unitOfWork.Carts.GetAllAsync();
+        var cart = carts.FirstOrDefault(c => c.CustomerId == userId);
+
+        if (cart == null)
+        {
+          // User doesn't have a cart yet, create one
+          cart = new Cart
+          {
+            Id = Guid.NewGuid(),
+            CustomerId = userId,
+            TotalPrice = 0,
+            CartItems = new List<CartItem>()
+          };
+
+          await _unitOfWork.Carts.CreateAsync(cart);
+          await _unitOfWork.CompleteAsync();
+        }
+
+        var response = new CartResponse
+        {
+          Id = cart.Id,
+          TotalPrice = cart.TotalPrice,
+          Customer = cart.Customer,
+          Items = cart.CartItems
+        };
+
+        return Result<CartResponse>.Success(response, StatusCodes.Status200OK);
+      }
+      catch (Exception ex)
+      {
+        return Result<CartResponse>.Failure(
+            new List<Error> { new Error("Cart.GetByUserId", ex.Message) },
+            StatusCodes.Status500InternalServerError
         );
       }
     }

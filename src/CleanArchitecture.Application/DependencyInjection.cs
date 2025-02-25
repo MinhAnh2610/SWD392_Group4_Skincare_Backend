@@ -58,6 +58,7 @@ public static class DependencyInjection
     services.AddScoped<ITimeZoneService, TimeZoneService>();
     services.AddScoped<IVnPayIntegrationService, VnPayIntegrationService>();
     services.AddScoped<IErrorFactory, ErrorFactory>();
+    services.AddScoped<IClaimsService, ClaimsService>();
     return services;
   }
 }
