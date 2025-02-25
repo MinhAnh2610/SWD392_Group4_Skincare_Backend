@@ -14,14 +14,6 @@ public class CosmeticRepository : GenericRepository<Cosmetic>, ICosmeticReposito
   {
 
   }
-  public override async Task<List<Cosmetic>> GetAllAsync()
-  {
-    return await _context.Cosmetics
-      .Include(c => c.SkinType)
-      .Include(c => c.CosmeticSubcategories)
-        .ThenInclude(cs => cs.SubCategory)
-      .ToListAsync();
-  }
 
   public async Task<List<Cosmetic>> GetListByAnyId(Expression<Func<Cosmetic, bool>> predicate)
   {
