@@ -663,7 +663,8 @@ internal class InitialData
           Texture = "Gel",
           Origin = "USA",
           Instructions = "Apply to wet skin, massage gently, then rinse.",
-          Size = (ushort)rand.Next(10,1000)
+          Size = (ushort)rand.Next(10,1000),
+          VolumeUnit = (VolumeUnit)0
         });
 
         // Moisturizer for this skin type
@@ -682,7 +683,8 @@ internal class InitialData
           Texture = "Cream",
           Origin = "France",
           Instructions = "Apply to face after cleansing.",
-          Size = (ushort)rand.Next(10, 1000)
+          Size = (ushort)rand.Next(10, 1000),
+          VolumeUnit = (VolumeUnit)0
         });
 
         // Sunscreen for this skin type
@@ -701,7 +703,8 @@ internal class InitialData
           Texture = "Lotion",
           Origin = "USA",
           Instructions = "Apply generously 15 minutes before sun exposure.",
-          Size = (ushort)rand.Next(10, 1000)
+          Size = (ushort)rand.Next(10, 1000),
+          VolumeUnit = (VolumeUnit)0
         });
 
         // Retinoid (using the Serums type) for this skin type
@@ -720,7 +723,8 @@ internal class InitialData
           Texture = "Cream",
           Origin = "Italy",
           Instructions = "Apply a pea-sized amount to cleansed skin at night.",
-          Size = (ushort)rand.Next(10, 1000)
+          Size = (ushort)rand.Next(10, 1000),
+          VolumeUnit = (VolumeUnit)0
         });
       }
 
@@ -741,7 +745,8 @@ internal class InitialData
           Texture = "Cream",
           Origin = "France",
           Instructions = "Apply on a cleansed face in the morning and at night.",
-          Size = (ushort)rand.Next(10, 1000)
+          Size = (ushort)rand.Next(10, 1000),
+          VolumeUnit = (VolumeUnit)0
         },
         new Cosmetic
         {
@@ -758,7 +763,8 @@ internal class InitialData
           Texture = "Gel",
           Origin = "USA",
           Instructions = "Massage onto wet skin and rinse thoroughly.",
-          Size = (ushort)rand.Next(10, 1000)
+          Size = (ushort)rand.Next(10, 1000),
+          VolumeUnit = (VolumeUnit)0
         },
         new Cosmetic
         {
@@ -775,7 +781,8 @@ internal class InitialData
           Texture = "Light Gel",
           Origin = "France",
           Instructions = "Apply 2-3 drops on cleansed skin, morning and night.",
-          Size = (ushort)rand.Next(10, 1000)
+          Size = (ushort)rand.Next(10, 1000),
+          VolumeUnit = (VolumeUnit)0
         },
         new Cosmetic
         {
@@ -792,7 +799,8 @@ internal class InitialData
           Texture = "Cream",
           Origin = "Germany",
           Instructions = "Apply evenly to face and neck after cleansing.",
-          Size = (ushort)rand.Next(10, 1000)
+          Size = (ushort)rand.Next(10, 1000),
+          VolumeUnit = (VolumeUnit)0
         },
         new Cosmetic
         {
@@ -809,7 +817,8 @@ internal class InitialData
           Texture = "Liquid",
           Origin = "USA",
           Instructions = "Apply with a cotton pad after cleansing.",
-          Size = (ushort)rand.Next(10, 1000)
+          Size = (ushort)rand.Next(10, 1000),
+          VolumeUnit = (VolumeUnit)0
         },
         new Cosmetic
         {
@@ -826,7 +835,8 @@ internal class InitialData
           Texture = "Scrub",
           Origin = "USA",
           Instructions = "Gently massage on damp skin and rinse off.",
-          Size = (ushort)rand.Next(10, 1000)
+          Size = (ushort)rand.Next(10, 1000),
+          VolumeUnit = (VolumeUnit)1
         },
         new Cosmetic
         {
@@ -843,7 +853,8 @@ internal class InitialData
           Texture = "Rich Cream",
           Origin = "Italy",
           Instructions = "Apply evenly to clean skin before bed.",
-          Size = (ushort)rand.Next(10, 1000)
+          Size = (ushort)rand.Next(10, 1000),
+          VolumeUnit = (VolumeUnit) 0
         },
         new Cosmetic
         {
@@ -860,7 +871,8 @@ internal class InitialData
           Texture = "Gel-Cream",
           Origin = "France",
           Instructions = "Gently tap around the eye area using your ring finger.",
-          Size = (ushort)rand.Next(10, 1000)
+          Size = (ushort)rand.Next(10, 1000),
+          VolumeUnit = (VolumeUnit) 0
         },
         new Cosmetic
         {
@@ -877,7 +889,8 @@ internal class InitialData
           Texture = "Lotion",
           Origin = "USA",
           Instructions = "Apply generously 15 minutes before sun exposure.",
-          Size = (ushort)rand.Next(10, 1000)
+          Size = (ushort)rand.Next(10, 1000),
+          VolumeUnit = (VolumeUnit) 0
         },
         new Cosmetic
         {
@@ -894,7 +907,8 @@ internal class InitialData
           Texture = "Balm",
           Origin = "USA",
           Instructions = "Apply to lips as needed throughout the day.",
-          Size = (ushort)rand.Next(10, 1000)
+          Size = (ushort)rand.Next(10, 1000),
+          VolumeUnit = (VolumeUnit) 2
         },
         new Cosmetic
         {
@@ -911,7 +925,8 @@ internal class InitialData
           Texture = "Sheet Mask",
           Origin = "South Korea",
           Instructions = "Apply for 15-20 minutes, then remove and pat remaining essence.",
-          Size = (ushort)rand.Next(10, 1000)
+          Size = (ushort)rand.Next(10, 1000),
+          VolumeUnit = (VolumeUnit) 2
         },
         new Cosmetic
         {
@@ -928,7 +943,8 @@ internal class InitialData
           Texture = "Cream",
           Origin = "USA",
           Instructions = "Apply a pea-sized amount to cleansed skin at night.",
-          Size = (ushort)rand.Next(10, 1000)
+          Size = (ushort)rand.Next(10, 1000),
+          VolumeUnit = (VolumeUnit) 0
         }
       });
       return cosmetics;

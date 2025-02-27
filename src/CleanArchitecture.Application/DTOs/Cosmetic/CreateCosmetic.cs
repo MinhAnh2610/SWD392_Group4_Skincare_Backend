@@ -34,5 +34,7 @@ namespace CleanArchitecture.Application.DTOs.Cosmetic
     [Range(0, ushort.MaxValue)]
     [Required]
     public ushort Size { get; init; }
+    [Required]
+    public VolumeUnit VolumeUnit { get; set; }
   }
 }
