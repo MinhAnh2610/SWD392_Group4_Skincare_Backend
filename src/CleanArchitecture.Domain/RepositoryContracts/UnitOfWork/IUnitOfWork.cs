@@ -35,6 +35,7 @@ public interface IUnitOfWork : IDisposable
   ISubCategoryRepository SubCategories { get; }
   ITagRepository Tags { get; }
   ITestimonialRepository Testimonials { get; }
+  IUserRepository Users { get; }
 
   Task<bool> CompleteAsync();
 }

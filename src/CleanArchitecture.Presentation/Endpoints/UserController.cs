@@ -32,6 +32,29 @@ public class UserController : ICarterModule
     .RequireAuthorization();
     #endregion
 
+    #region Get All Users API
+    group.MapGet("/", async (IUserService userService) =>
+    {
+      var result = await userService.GetAllUsers();
+      if (result.IsSuccess)
+      {
+        return Results.Ok(ApiResponse<List<UserProfileResponse>>.SuccessResponse(result.Data!, "Retrieve All User's Profile Successfully."));
+      }
+
+      return result.Status switch
+      {
+        _ => Results.StatusCode(StatusCodes.Status500InternalServerError)
+      };
+    })
+    .WithName("GetAllUsers")
+    .Produces<ApiResponse<List<UserProfileResponse>>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status401Unauthorized)
+    .ProducesProblem(StatusCodes.Status500InternalServerError)
+    .WithSummary("GetAllUsers")
+    .WithDescription("Get All Users")
+    .RequireAuthorization();
+    #endregion
+
     #region Update User Profile API
     group.MapPut("/profile", async (IUserService userService, UpdateProfileRequest request) =>
     {
