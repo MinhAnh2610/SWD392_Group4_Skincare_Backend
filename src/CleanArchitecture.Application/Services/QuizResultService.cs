@@ -1,5 +1,4 @@
-﻿using Castle.Core.Resource;
-using CleanArchitecture.Application.DTOs.QuizAnswerDto;
+﻿using CleanArchitecture.Application.DTOs.QuizAnswerDto;
 using CleanArchitecture.Application.DTOs.QuizDto;
 using CleanArchitecture.Application.DTOs.QuizResultDto;
 using CleanArchitecture.Application.DTOs.RoutineDTO;

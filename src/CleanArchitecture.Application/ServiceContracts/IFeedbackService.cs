@@ -6,4 +6,5 @@ public interface IFeedbackService
 {
   Task<Result<List<FeedbackResponse>>> GetAllFeedbacksAsync();
   Task<Result<List<FeedbackResponse>>> GetFeedbacksByCustomerIdAsync(Guid customerId);
+  Task<Result<FeedbackResponse>> CreateFeedbackAsync(FeedbackRequest request, Guid customerId, string username);
 }

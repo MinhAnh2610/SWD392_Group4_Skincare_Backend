@@ -1,5 +1,4 @@
-﻿using CleanArchitecture.Application.DTOs.Order;
-using CleanArchitecture.Application.ServiceContracts;
+﻿using CleanArchitecture.Application.ServiceContracts;
 using CleanArchitecture.Domain.RepositoryContracts;
 using CleanArchitecture.Domain.RepositoryContracts.UnitOfWork;
 using Microsoft.Extensions.Logging;
@@ -45,6 +44,7 @@ public class UnitOfWork : IUnitOfWork
   public ISubCategoryRepository SubCategories { get; }
   public ITagRepository Tags { get; }
   public ITestimonialRepository Testimonials { get; }
+  public IUserRepository Users { get; }
 
   public UnitOfWork(ApplicationDbContext context, ILogger<UnitOfWork> logger, ITimeZoneService timeZoneService)
   {
@@ -84,6 +84,7 @@ public class UnitOfWork : IUnitOfWork
     SubCategories = new SubCategoryRepository(_context);
     Tags = new TagRepository(_context);
     Testimonials = new TestimonialRepository(_context);
+    Users = new UserRepository(_context);
   }
 
   public async Task<bool> CompleteAsync()
