@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Application.DTOs.BlogDto;
+using CleanArchitecture.Application.DTOs.TagDto;
 using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Application.Strategies.BlogFilterStrategy;
 using Mapster;
@@ -36,7 +37,13 @@ public class BlogService : IBlogService
       ShortenContent = b.Content.Length > 100
         ? b.Content.Substring(0, 100) + "..."
         : b.Content,
-      BlogTags = b.BlogTags.ToList(),
+      Content = b.Content,
+      Tags = b.BlogTags.Select(bt => new TagResponse
+      {
+        Id = bt.TagId,
+        Name = bt.Tag.Name,
+        Description = bt.Tag.Description
+      }).ToList(),
     }).ToList(), StatusCodes.Status200OK);
   }
 
@@ -61,7 +68,13 @@ public class BlogService : IBlogService
       ShortenContent = b.Content.Length > 100
         ? b.Content.Substring(0, 100) + "..."
         : b.Content,
-      BlogTags = b.BlogTags.ToList(),
+      Content = b.Content,
+      Tags = b.BlogTags.Select(bt => new TagResponse
+      {
+        Id = bt.TagId,
+        Name = bt.Tag.Name,
+        Description = bt.Tag.Description
+      }).ToList(),
     });
 
     var blogs = await PaginatedList<BlogResponse>.CreateAsync(blogResponseQuery, request.PageIndex, request.PageSize);
