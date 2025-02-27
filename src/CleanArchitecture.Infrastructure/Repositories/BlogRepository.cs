@@ -10,6 +10,6 @@ public class BlogRepository : GenericRepository<Blog>, IBlogRepository
 
   public override IQueryable<Blog> GetQueryable()
   {
-    return base.GetQueryable().Include(b => b.Staff);
+    return base.GetQueryable().Include(b => b.Staff).Include(b => b.BlogTags);
   }
 }
