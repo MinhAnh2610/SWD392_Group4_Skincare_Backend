@@ -39,7 +39,6 @@ namespace CleanArchitecture.Application.DTOs.Cosmetic
     public string Texture { get; set; } = default!;
     public string Origin { get; set; } = default!;
     public string Instructions { get; set; } = default!;
-    public ushort Size { get; set; } = default!;
     public List<CosmeticSubcategoryResponse>? CosmeticSubcategories { get; set; }
     public List<CosmeticImageResponse>?CosmeticImages { get; set; }
   //  public List<CartItemResponse>? CartItems { get; set; }
