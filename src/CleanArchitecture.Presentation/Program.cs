@@ -4,6 +4,7 @@ using CleanArchitecture.Infrastructure;
 using CleanArchitecture.Infrastructure.Data.Extensions;
 using CleanArchitecture.Presentation;
 using Mapster;
+using MapsterMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,11 +14,10 @@ builder.Services
   .AddInfrastructureServices(builder.Configuration)
   .AddApiServices(builder.Configuration);
 var config = new TypeAdapterConfig();
-config.Apply(new CosmeticMappingConfig());
-config.Apply(new CategoryMappingConfig());
-config.Apply(new BlogMappingConfig());
+config.Scan(typeof(CosmeticMappingConfig).Assembly);
 builder.Services.AddSingleton(config);
 builder.Services.AddMapster();
+builder.Services.AddScoped<IMapper, ServiceMapper>();
 
 
 var app = builder.Build();
