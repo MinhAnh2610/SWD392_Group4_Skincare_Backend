@@ -1,4 +1,6 @@
-﻿namespace CleanArchitecture.Domain.Entities;
+﻿using System.ComponentModel;
+
+namespace CleanArchitecture.Domain.Entities;
 
 public class Cosmetic : Entity<Guid>
 {
@@ -18,6 +20,7 @@ public class Cosmetic : Entity<Guid>
   public string Origin { get; set; } = default!;
   public string Instructions { get; set; } = default!;
   public ushort Size { get; set; }
+  public VolumeUnit VolumeUnit { get; set; }
   public List<CosmeticSubCategory> CosmeticSubcategories { get; set; } = new List<CosmeticSubCategory>();
   public List<CosmeticImage> CosmeticImages { get; set; } = new List<CosmeticImage>();
   public List<CartItem> CartItems { get; set; } = new List<CartItem>();
@@ -26,4 +29,21 @@ public class Cosmetic : Entity<Guid>
   public List<RoutineStep> RoutineSteps { get; set; } = new List<RoutineStep>();
   public List<Feedback> Feedbacks { get; set; } = new List<Feedback>();
   public List<RefundItem> RefundItems { get; set; } = new List<RefundItem>();
+
+}
+public enum VolumeUnit
+{
+  // Use DescriptionAttribute for display variations
+  /// <summary>
+  ///  ml
+  /// </summary>
+  ml,
+  /// <summary>
+  ///  gram
+  /// </summary>
+  g,
+  /// <summary>
+  ///  peices
+  /// </summary>
+  pieces
 }
