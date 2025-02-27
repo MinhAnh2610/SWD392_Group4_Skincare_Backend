@@ -31,5 +31,8 @@ namespace CleanArchitecture.Application.DTOs.Cosmetic
     public string Origin { get; init; } = default!;
     [Required]
     public string Instructions { get; init; } = default!;
+    [Range(0, ushort.MaxValue)]
+    [Required]
+    public ushort Size { get; init; }
   }
 }
