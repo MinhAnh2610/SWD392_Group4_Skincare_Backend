@@ -208,16 +208,80 @@ internal class InitialData
         {
           Id = new Guid("CB64A508-526E-4156-A512-1D1BF7A5A032"),
           StaffId = staffs[3].Id,
-          Title = "The Future of AI",
-          Content = "AI is transforming industries...",
-          BlogTags = new List<BlogTag>() // BlogTags will be assigned later
+          Title = "Skincare Education: Master the Basics",
+          Content = "Discover essential skincare tips, tutorials, and best practices to keep your skin healthy and radiant. Our experts share insights on proper cleansing, moisturizing, and sun protection to help you build a solid skincare foundation.",
+          BlogTags = new List<BlogTag>()
         },
         new Blog
         {
           Id = new Guid("C9DED966-A2F7-4328-B899-8201508D5476"),
           StaffId = staffs[3].Id,
-          Title = "Starting a Business in 2024",
-          Content = "Starting a business has never been easier...",
+          Title = "Routine Building & Ingredient Guide for Every Skin Concern",
+          Content = "Building your perfect skincare routine is easier than ever. Learn how to select the right ingredients for your unique skin concerns and get expert advice on customizing a regimen to combat dryness, oiliness, and signs of aging.",
+          BlogTags = new List<BlogTag>()
+        },
+        new Blog
+        {
+          Id = new Guid("BAADC4E3-EE7A-44BB-9942-33B3C63B8DA4"),
+          StaffId = staffs[3].Id,
+          Title = "Deep Dive into Active Ingredients: Vitamin C & Retinol",
+          Content = "Explore the benefits and science behind active ingredients like Vitamin C and Retinol. This post details how these potent ingredients can transform your skincare routine and improve overall skin health.",
+          BlogTags = new List<BlogTag>()
+        },
+        new Blog
+        {
+          Id = new Guid("7E15DA89-51F2-4F64-9603-84065B2757C0"),
+          StaffId = staffs[3].Id,
+          Title = "How to Build a Customized Skincare Routine",
+          Content = "Every skin is unique. Learn a step-by-step approach to creating a personalized skincare routine that meets your skin’s specific needs, including product recommendations and application techniques.",
+          BlogTags = new List<BlogTag>()
+        },
+        new Blog
+        {
+          Id = new Guid("384D9D37-F554-4EA1-8443-6C4054F3DFB8"),
+          StaffId = staffs[3].Id,
+          Title = "Managing Acne and Other Skin Concerns",
+          Content = "From acne to hyperpigmentation, this post offers actionable strategies and product tips to address common skin concerns. Learn how to choose the right treatments to restore balance and clarity.",
+          BlogTags = new List<BlogTag>()
+        },
+        new Blog
+        {
+          Id = new Guid("F0632A67-8571-4E6A-A6F0-E22704D1FC42"),
+          StaffId = staffs[3].Id,
+          Title = "Expert Advice: Dermatologist Tips for Healthy Skin",
+          Content = "Get professional advice straight from dermatologists. This post covers the latest treatments, daily routines, and lifestyle tips to maintain healthy, glowing skin.",
+          BlogTags = new List<BlogTag>()
+        },
+        new Blog
+        {
+          Id = new Guid("55555555-5555-5555-5555-555555555555"),
+          StaffId = staffs[3].Id,
+          Title = "The Ultimate Guide to Sunscreen Application",
+          Content = "Sunscreen is your best defense against UV damage. Learn how to choose the right SPF, application techniques, and tips for keeping your skin protected throughout the day.",
+          BlogTags = new List<BlogTag>()
+        },
+        new Blog
+        {
+          Id = new Guid("178FB57C-508C-4877-80F3-3607856CF786"),
+          StaffId = staffs[3].Id,
+          Title = "DIY Skincare: Natural Ingredients for a Radiant Glow",
+          Content = "Discover how to incorporate natural, kitchen-based ingredients into your skincare routine. This post shares easy DIY recipes and tips for achieving a healthy, radiant glow.",
+          BlogTags = new List<BlogTag>()
+        },
+        new Blog
+        {
+          Id = new Guid("5E421C87-9AA8-4CC0-A03F-C0F658609241"),
+          StaffId = staffs[3].Id,
+          Title = "Seasonal Skincare: Adjusting Your Routine for Summer",
+          Content = "Summer can be harsh on your skin. Learn how to adapt your skincare routine for hot weather with tips on hydration, sun protection, and lightweight product recommendations.",
+          BlogTags = new List<BlogTag>()
+        },
+        new Blog
+        {
+          Id = new Guid("53292157-7960-4927-9F81-232A0B566F8E"),
+          StaffId = staffs[3].Id,
+          Title = "Nighttime Skincare: Repair and Rejuvenate Your Skin",
+          Content = "Nighttime is the perfect time for skin repair. Discover the best products and practices to help your skin recover from daily stress and rejuvenate while you sleep.",
           BlogTags = new List<BlogTag>()
         }
       };
@@ -233,8 +297,72 @@ internal class InitialData
 
       return new List<BlogTag>
       {
-        new BlogTag { BlogId = blogs[0].Id, TagId = tags[0].Id }, // AI & Tech
-        new BlogTag { BlogId = blogs[1].Id, TagId = tags[1].Id }  // Business  
+        // Blog 1: "Skincare Education: Master the Basics" → Skincare Education
+        new BlogTag
+        {
+          BlogId = blogs[0].Id,
+          TagId = tags.First(t => t.Name == "Skincare Education").Id,
+        },
+        // Blog 2: "Routine Building & Ingredient Guide for Every Skin Concern" → Routine Building
+        new BlogTag
+        {
+          BlogId = blogs[1].Id,
+          TagId = tags.First(t => t.Name == "Routine Building").Id,
+        },
+        // Blog 2: "Routine Building & Ingredient Guide for Every Skin Concern" → Ingredient Guide
+        new BlogTag
+        {
+          BlogId = blogs[1].Id,
+          TagId = tags.First(t => t.Name == "Ingredient Guide").Id,
+        },
+        // Blog 3: "Deep Dive into Active Ingredients: Vitamin C & Retinol" → Ingredient Guide
+        new BlogTag
+        {
+          BlogId = blogs[2].Id,
+          TagId = tags.First(t => t.Name == "Ingredient Guide").Id,
+        },
+        // Blog 4: "How to Build a Customized Skincare Routine" → Routine Building
+        new BlogTag
+        {
+          BlogId = blogs[3].Id,
+          TagId = tags.First(t => t.Name == "Routine Building").Id,
+        },
+        // Blog 5: "Managing Acne and Other Skin Concerns" → Skin Concerns
+        new BlogTag
+        {
+          BlogId = blogs[4].Id,
+          TagId = tags.First(t => t.Name == "Skin Concerns").Id,
+        },
+        // Blog 6: "Expert Advice: Dermatologist Tips for Healthy Skin" → Expert Advice
+        new BlogTag
+        {
+          BlogId = blogs[5].Id,
+          TagId = tags.First(t => t.Name == "Expert Advice").Id,
+        },
+        // Blog 7: "The Ultimate Guide to Sunscreen Application" → Skincare Education
+        new BlogTag
+        {
+          BlogId = blogs[6].Id,
+          TagId = tags.First(t => t.Name == "Skincare Education").Id,
+        },
+        // Blog 8: "DIY Skincare: Natural Ingredients for a Radiant Glow" → Ingredient Guide
+        new BlogTag
+        {
+          BlogId = blogs[7].Id,
+          TagId = tags.First(t => t.Name == "Ingredient Guide").Id,
+        },
+        // Blog 9: "Seasonal Skincare: Adjusting Your Routine for Summer" → Routine Building
+        new BlogTag
+        {
+          BlogId = blogs[8].Id,
+          TagId = tags.First(t => t.Name == "Routine Building").Id,
+        },
+        // Blog 10: "Nighttime Skincare: Repair and Rejuvenate Your Skin" → Skincare Education
+        new BlogTag
+        {
+          BlogId = blogs[9].Id,
+          TagId = tags.First(t => t.Name == "Skincare Education").Id,
+        }
       };
     }
   }
@@ -506,17 +634,25 @@ internal class InitialData
         new Guid("EE853A4D-F553-483B-885F-97F4D404BDCE")  // Retinoid
       };
 
+      var rand = new Random();
+
       var cosmetics = new List<Cosmetic>();
       int guidIndex = 0;
       // We'll use Brand[0] for cleanser and moisturizer, and Brand[1] for sunscreen and retinoid.
       foreach (var skin in skinTypes)
       {
+        // Randomize brand index for each product type
+        int cleanserBrandIndex = rand.Next(brands.Count);
+        int moisturizerBrandIndex = rand.Next(brands.Count);
+        int sunscreenBrandIndex = rand.Next(brands.Count);
+        int retinoidBrandIndex = rand.Next(brands.Count);
+
         // Cleanser for this skin type
         cosmetics.Add(new Cosmetic
         {
           Id = guids[guidIndex++],
           Name = $"{skin.Name} Cleanser",
-          BrandId = brands[0].Id,
+          BrandId = brands[cleanserBrandIndex].Id,
           SkinTypeId = skin.Id,
           CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Cleansers").Id,
           Price = 15.99m,
@@ -534,7 +670,7 @@ internal class InitialData
         {
           Id = guids[guidIndex++],
           Name = $"{skin.Name} Moisturizer",
-          BrandId = brands[0].Id,
+          BrandId = brands[moisturizerBrandIndex].Id,
           SkinTypeId = skin.Id,
           CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Moisturizers").Id,
           Price = 25.99m,
@@ -552,7 +688,7 @@ internal class InitialData
         {
           Id = guids[guidIndex++],
           Name = $"{skin.Name} Sunscreen",
-          BrandId = brands[1].Id,
+          BrandId = brands[sunscreenBrandIndex].Id,
           SkinTypeId = skin.Id,
           CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Sunscreens").Id,
           Price = 19.99m,
@@ -570,7 +706,7 @@ internal class InitialData
         {
           Id = guids[guidIndex++],
           Name = $"{skin.Name} Anti-Aging Retinoid",
-          BrandId = brands[1].Id,
+          BrandId = brands[retinoidBrandIndex].Id,
           SkinTypeId = skin.Id,
           CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Serums").Id,
           Price = 39.99m,
@@ -606,7 +742,7 @@ internal class InitialData
         {
           Id = new Guid("70DEC3C1-B8FB-4BCB-AA27-B04B49E5D626"),
           Name = "Gentle Facial Cleanser",
-          BrandId = brands[1].Id,
+          BrandId = brands[2].Id,
           SkinTypeId = skinTypes[1].Id,
           CosmeticTypeId = cosmeticTypes[1].Id,
           Price = 19.99m,
@@ -622,7 +758,7 @@ internal class InitialData
         {
           Id = new Guid("1D3E5EC9-6FEC-450E-8283-D44D349EDBBF"),
           Name = "Revitalizing Serum",
-          BrandId = brands[1].Id,
+          BrandId = brands[3].Id,
           SkinTypeId = skinTypes[1].Id,
           CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Serums").Id,
           Price = 34.99m,
@@ -638,7 +774,7 @@ internal class InitialData
         {
           Id = new Guid("3A7DFA4B-E4C7-430D-9B0B-AC2E341602C4"),
           Name = "Hydrating Moisturizer",
-          BrandId = brands[0].Id,
+          BrandId = brands[4].Id,
           SkinTypeId = skinTypes[2].Id,
           CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Moisturizers").Id,
           Price = 29.99m,
@@ -702,7 +838,7 @@ internal class InitialData
         {
           Id = new Guid("AF48F533-2AF5-4A28-BEFD-24CB3F851218"),
           Name = "Brightening Eye Cream",
-          BrandId = brands[0].Id,
+          BrandId = brands[4].Id,
           SkinTypeId = skinTypes[0].Id,
           CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Eye Creams").Id,
           Price = 27.99m,
@@ -766,7 +902,7 @@ internal class InitialData
         {
           Id = new Guid("8B4343AB-99C1-49C4-92A8-18D44556CDFA"),
           Name = "Anti-Aging Retinoid",
-          BrandId = brands[2].Id,
+          BrandId = brands[3].Id,
           SkinTypeId = skinTypes[3].Id,
           CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Serums").Id,
           Price = 39.99m,
@@ -810,26 +946,136 @@ internal class InitialData
   {
     get
     {
+      // Assume these static properties return your seeded data.
       var cosmetics = Cosmetics.ToList();
       var subCategories = SubCategories.ToList();
-      return new List<CosmeticSubCategory>
+
+      var mappings = new List<CosmeticSubCategory>();
+
+      foreach (var cosmetic in cosmetics)
       {
-        new CosmeticSubCategory
+        string cosmeticName = cosmetic.Name.ToLower();
+
+        // Map cleansers to "Deep Cleansing" under Purity.
+        if (cosmeticName.Contains("cleanser"))
         {
-          CosmeticId = cosmetics[0].Id,
-          SubCategoryId = subCategories[0].Id
-        },
-        new CosmeticSubCategory
-        {
-          CosmeticId = cosmetics[0].Id,
-          SubCategoryId = subCategories[2].Id
-        },
-        new CosmeticSubCategory
-        {
-          CosmeticId = cosmetics[1].Id,
-          SubCategoryId = subCategories[1].Id
+          var sub = subCategories.FirstOrDefault(s => s.Name == "Deep Cleansing");
+          if (sub != null)
+          {
+            mappings.Add(new CosmeticSubCategory
+            {
+              CosmeticId = cosmetic.Id,
+              SubCategoryId = sub.Id,
+            });
+          }
         }
-      };
+        // Map moisturizers and face creams to "Nourishing Creams" under Hydration.
+        else if (cosmeticName.Contains("moisturizer") || cosmeticName.Contains("face cream"))
+        {
+          var sub = subCategories.FirstOrDefault(s => s.Name == "Nourishing Creams");
+          if (sub != null)
+          {
+            mappings.Add(new CosmeticSubCategory
+            {
+              CosmeticId = cosmetic.Id,
+              SubCategoryId = sub.Id,
+            });
+          }
+        }
+        // Map sunscreens to "SPF Essentials" under Protection.
+        else if (cosmeticName.Contains("sunscreen"))
+        {
+          var sub = subCategories.FirstOrDefault(s => s.Name == "SPF Essentials");
+          if (sub != null)
+          {
+            mappings.Add(new CosmeticSubCategory
+            {
+              CosmeticId = cosmetic.Id,
+              SubCategoryId = sub.Id,
+            });
+          }
+        }
+        // Map retinoids to "Age-Defying Treatments" under Rejuvenation.
+        else if (cosmeticName.Contains("retinoid"))
+        {
+          var sub = subCategories.FirstOrDefault(s => s.Name == "Age-Defying Treatments");
+          if (sub != null)
+          {
+            mappings.Add(new CosmeticSubCategory
+            {
+              CosmeticId = cosmetic.Id,
+              SubCategoryId = sub.Id,
+            });
+          }
+        }
+        // Map toners to "Soothing Solutions" under Balance.
+        else if (cosmeticName.Contains("toner"))
+        {
+          var sub = subCategories.FirstOrDefault(s => s.Name == "Soothing Solutions");
+          if (sub != null)
+          {
+            mappings.Add(new CosmeticSubCategory
+            {
+              CosmeticId = cosmetic.Id,
+              SubCategoryId = sub.Id,
+            });
+          }
+        }
+        // Map scrubs to "Detox & Clarify" under Purity.
+        else if (cosmeticName.Contains("scrub"))
+        {
+          var sub = subCategories.FirstOrDefault(s => s.Name == "Detox & Clarify");
+          if (sub != null)
+          {
+            mappings.Add(new CosmeticSubCategory
+            {
+              CosmeticId = cosmetic.Id,
+              SubCategoryId = sub.Id,
+            });
+          }
+        }
+        // Map eye creams to "Illuminators" under Radiance.
+        else if (cosmeticName.Contains("eye cream"))
+        {
+          var sub = subCategories.FirstOrDefault(s => s.Name == "Illuminators");
+          if (sub != null)
+          {
+            mappings.Add(new CosmeticSubCategory
+            {
+              CosmeticId = cosmetic.Id,
+              SubCategoryId = sub.Id,
+            });
+          }
+        }
+        // Map lip balms to "Delicate Area Care" under Specialized Care.
+        else if (cosmeticName.Contains("lip balm"))
+        {
+          var sub = subCategories.FirstOrDefault(s => s.Name == "Delicate Area Care");
+          if (sub != null)
+          {
+            mappings.Add(new CosmeticSubCategory
+            {
+              CosmeticId = cosmetic.Id,
+              SubCategoryId = sub.Id,
+            });
+          }
+        }
+        // Map face masks to "Sheet Masks" under Masking.
+        else if (cosmeticName.Contains("face mask"))
+        {
+          var sub = subCategories.FirstOrDefault(s => s.Name == "Sheet Masks");
+          if (sub != null)
+          {
+            mappings.Add(new CosmeticSubCategory
+            {
+              CosmeticId = cosmetic.Id,
+              SubCategoryId = sub.Id,
+            });
+          }
+        }
+      }
+
+      return mappings;
     }
   }
 
@@ -1344,9 +1590,18 @@ internal class InitialData
           Title = $"{skin.Name} Evening Routine",
           Period = "Evening",
         };
-
+        // Night Routine for this skin type
+        var nightRoutine = new Routine
+        {
+          Id = Guid.NewGuid(),
+          SkinTypeId = skin.Id,
+          Title = $"{skin.Name} Night Routine",
+          Period = "Night",
+        };
+        // Add to the list
         routines.Add(morningRoutine);
         routines.Add(eveningRoutine);
+        routines.Add(nightRoutine);
       }
 
       return routines;
@@ -1832,11 +2087,13 @@ internal class InitialData
   }
 
   public static IEnumerable<Tag> Tags => new List<Tag>
-        {
-            new Tag { Id = new Guid("4C592F29-29A6-49F7-B9FF-1EC76D36826A"), Name = "Technology", Description = "Posts related to technology" },
-            new Tag { Id = new Guid("555B8613-1FC3-465C-8020-2C1E6E8D4668"), Name = "Business", Description = "Posts related to business" },
-            new Tag { Id = new Guid("0DD9E52B-443F-4512-B44C-BC79E90B36CE"), Name = "Health", Description = "Posts related to health and wellness" }
-        };
+  {
+    new Tag { Id = new Guid("4C592F29-29A6-49F7-B9FF-1EC76D36826A"), Name = "Skincare Education", Description = "Posts focused on skincare tips, tutorials, and educational content." },
+    new Tag { Id = new Guid("555B8613-1FC3-465C-8020-2C1E6E8D4668"), Name = "Ingredient Guide", Description = "Posts exploring skincare ingredients, their benefits, and usage." },
+    new Tag { Id = new Guid("0DD9E52B-443F-4512-B44C-BC79E90B36CE"), Name = "Routine Building", Description = "Posts dedicated to building and optimizing skincare routines." },
+    new Tag { Id = new Guid("4ACB26EF-6046-4396-A16A-473756BD2EB0"), Name = "Skin Concerns", Description = "Posts addressing common skin concerns and potential solutions." },
+    new Tag { Id = new Guid("EED76A4E-A40A-4472-841A-A351D01EA588"), Name = "Expert Advice", Description = "Posts offering professional insights and expert advice on skincare." }
+  };
 
   public static IEnumerable<Testimonial> Testimonials => new List<Testimonial>
   {

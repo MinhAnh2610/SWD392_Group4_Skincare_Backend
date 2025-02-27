@@ -100,6 +100,30 @@ namespace CleanArchitecture.Presentation.Endpoints
       .WithDescription("View Cart")
       .RequireAuthorization();
       #endregion
+
+      #region Get User Cart API
+      group.MapGet("/user-cart", async (ICartService cartService) =>
+      {
+        var result = await cartService.GetCartByUserIdAsync();
+        if (result.IsSuccess)
+        {
+          return Results.Ok(ApiResponse<CartResponse>.SuccessResponse(result.Data!, "Retrieved User Cart Successfully."));
+        }
+
+        return result.Status switch
+        {
+          StatusCodes.Status401Unauthorized => Results.Unauthorized(),
+          _ => Results.StatusCode(StatusCodes.Status500InternalServerError)
+        };
+      })
+      .WithName("GetUserCart")
+      .Produces<ApiResponse<CartResponse>>(StatusCodes.Status200OK)
+      .ProducesProblem(StatusCodes.Status401Unauthorized)
+      .ProducesProblem(StatusCodes.Status500InternalServerError)
+      .WithSummary("GetUserCart")
+      .WithDescription("Get Cart for Current User")
+      .RequireAuthorization();
+      #endregion
     }
   }
 }

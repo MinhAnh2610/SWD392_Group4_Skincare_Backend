@@ -13,5 +13,6 @@ namespace CleanArchitecture.Application.ServiceContracts
     Task<Result<List<CartResponse>>> AddCartItemAsync(AddProductRequest addProductRequest);
     Task<Result<CartResponse>> GetByIdAsync(Guid id);
     Task<Result<List<CartResponse>>> DeletebyIdAsync(RemoveProductRequest removeProductRequest);
+    Task<Result<CartResponse>> GetCartByUserIdAsync();
   }
 }

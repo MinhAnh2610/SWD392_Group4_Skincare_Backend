@@ -10,10 +10,10 @@ namespace CleanArchitecture.Presentation.Endpoints
   {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-      var group = app.MapGroup("").WithTags("Order Management");
+      var group = app.MapGroup("api/orders").WithTags("Order Management");
 
       // GET /orders → View All Customer Orders
-      group.MapGet("/orders", async (IOrderService orderService) =>
+      group.MapGet("/get-all-orders", async (IOrderService orderService) =>
       {
         var result = await orderService.GetAllOrdersAsync();
         if (result.IsSuccess)
@@ -31,7 +31,7 @@ namespace CleanArchitecture.Presentation.Endpoints
       .RequireAuthorization();
 
       // PUT /orders/{id}/update → Update Order Status
-      group.MapPut("/orders/{id:guid}/update", async (Guid id, UpdateOrderStatusRequest request, IOrderService orderService) =>
+      group.MapPut("/{id:guid}/update", async (Guid id, UpdateOrderStatusRequest request, IOrderService orderService) =>
       {
         var result = await orderService.UpdateOrderStatusAsync(id, request);
         if (result.IsSuccess)
@@ -67,7 +67,7 @@ namespace CleanArchitecture.Presentation.Endpoints
       .ProducesProblem(StatusCodes.Status500InternalServerError)
       .RequireAuthorization();
 
-      group.MapPost("/orders", async (CheckOutRequest request, IOrderService orderService) =>
+      group.MapPost("/check-out", async (CheckOutRequest request, IOrderService orderService) =>
       {
         var result = await orderService.CheckOut(request);
         if (result.IsSuccess)
@@ -83,6 +83,24 @@ namespace CleanArchitecture.Presentation.Endpoints
       .Produces<ApiResponse<List<OrderResponse>>>(StatusCodes.Status200OK)
       .ProducesProblem(StatusCodes.Status500InternalServerError)
       .RequireAuthorization();
+
+      group.MapDelete("/{orderId}", async (Guid orderId, IOrderService orderService) =>
+      {
+        var result = await orderService.DeleteOrderAsync(orderId);
+        if (result.IsSuccess)
+        {
+          return Results.Ok(ApiResponse<string>.SuccessResponse(result.Data!, "Order deleted successfully."));
+        }
+        return Results.StatusCode(result.Status);
+      })
+   .WithName("DeleteOrder")
+   .Produces<ApiResponse<string>>(StatusCodes.Status200OK)
+   .ProducesProblem(StatusCodes.Status404NotFound)
+   .ProducesProblem(StatusCodes.Status500InternalServerError)
+   .WithSummary("Delete Order")
+   .WithDescription("Deletes an order by its identifier.")
+   .RequireAuthorization();
+
     }
 
   }

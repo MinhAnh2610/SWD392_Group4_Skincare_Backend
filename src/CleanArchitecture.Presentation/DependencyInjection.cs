@@ -72,6 +72,15 @@ public static class DependencyInjection
       .AddUserStore<UserStore<User, Role, ApplicationDbContext, Guid>>()
       .AddRoleStore<RoleStore<Role, ApplicationDbContext, Guid>>();
 
+    services.AddCors(options =>
+    {
+      options.AddPolicy("AllowAll",
+          policy => policy
+              .AllowAnyOrigin()   // ✅ Allow any frontend
+              .AllowAnyMethod()   // ✅ Allow GET, POST, PUT, DELETE, etc.
+              .AllowAnyHeader()); // ✅ Allow any headers
+    });
+
     // Add authentication & authorization
     services.AddAuthentication(options =>
     {
@@ -81,7 +90,7 @@ public static class DependencyInjection
     })
       .AddJwtBearer(options =>
       {
-        options.Authority = "https://localhost:5051";
+        options.Authority = "https://api.pak160404.click";
         options.TokenValidationParameters = new TokenValidationParameters
         {
           ValidateAudience = false,
@@ -106,7 +115,7 @@ public static class DependencyInjection
     {
       app.UseSwagger(options =>
       {
-        //https://localhost:5051/scalar/
+        //https://0.0.0.0:5051/scalar/
         options.RouteTemplate = "/openapi/{documentName}.json";
       });
       app.MapScalarApiReference(options =>
@@ -139,6 +148,7 @@ public static class DependencyInjection
     app.UseHttpsRedirection();
     app.UseRouting();
     app.UseIdentityServer();
+    app.UseCors("AllowAll"); // ✅ Apply CORS globally
     app.UseAuthentication();
     app.UseAuthorization();
 

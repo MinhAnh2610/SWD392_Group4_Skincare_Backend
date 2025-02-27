@@ -1,5 +1,4 @@
-﻿using CleanArchitecture.Infrastructure.Data.Configuration;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System.Reflection;
 
 namespace CleanArchitecture.Infrastructure.Data;
@@ -42,6 +41,8 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>, IApplic
   public DbSet<QuestionOption> QuestionOptions => Set<QuestionOption>();
   public DbSet<QuestionType> QuestionTypes => Set<QuestionType>();
   public DbSet<Quiz> Quizzes => Set<Quiz>();
+  public DbSet<QuizResult> QuizResults => Set<QuizResult>();
+  public DbSet<QuizAnswer> QuizAnswers => Set<QuizAnswer>();
   public DbSet<Refund> Refunds => Set<Refund>();
   public DbSet<RefundItem> RefundItems => Set<RefundItem>();  
   public DbSet<Routine> Routines => Set<Routine>();

@@ -1,3 +1,4 @@
+using Abp.Notifications;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CleanArchitecture.Infrastructure.Data.Configuration;

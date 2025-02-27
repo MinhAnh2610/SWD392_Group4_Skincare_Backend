@@ -609,7 +609,9 @@ namespace CleanArchitecture.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("OrderDate")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("ShippingAddress")
                         .IsRequired()
@@ -840,6 +842,87 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Quizzes");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Domain.Entities.QuizAnswer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreateAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("QuestionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("QuizResultId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("SelectedOptions")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("QuizResultId");
+
+                    b.ToTable("QuizAnswers");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Domain.Entities.QuizResult", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreateAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("QuizId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SkinTypeId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("QuizId");
+
+                    b.HasIndex("SkinTypeId");
+
+                    b.ToTable("QuizResults");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Refund", b =>
@@ -1666,6 +1749,52 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Navigation("Question");
                 });
 
+            modelBuilder.Entity("CleanArchitecture.Domain.Entities.QuizAnswer", b =>
+                {
+                    b.HasOne("CleanArchitecture.Domain.Entities.Question", "Question")
+                        .WithMany()
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CleanArchitecture.Domain.Entities.QuizResult", "QuizResult")
+                        .WithMany("QuizAnswers")
+                        .HasForeignKey("QuizResultId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Question");
+
+                    b.Navigation("QuizResult");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Domain.Entities.QuizResult", b =>
+                {
+                    b.HasOne("CleanArchitecture.Domain.Entities.User", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CleanArchitecture.Domain.Entities.Quiz", "Quiz")
+                        .WithMany()
+                        .HasForeignKey("QuizId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CleanArchitecture.Domain.Entities.SkinType", "SkinType")
+                        .WithMany()
+                        .HasForeignKey("SkinTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Quiz");
+
+                    b.Navigation("SkinType");
+                });
+
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Refund", b =>
                 {
                     b.HasOne("CleanArchitecture.Domain.Entities.User", "Customer")
@@ -1926,6 +2055,11 @@ namespace CleanArchitecture.Infrastructure.Migrations
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Quiz", b =>
                 {
                     b.Navigation("Questions");
+                });
+
+            modelBuilder.Entity("CleanArchitecture.Domain.Entities.QuizResult", b =>
+                {
+                    b.Navigation("QuizAnswers");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Refund", b =>

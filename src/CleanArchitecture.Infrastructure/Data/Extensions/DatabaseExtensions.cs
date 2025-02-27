@@ -148,7 +148,7 @@ public static class DatabaseExtensions
             new BlogTag { BlogId = blogs[1].Id, TagId = tags[1].Id }  // Business  
         };
 
-      await context.BlogsTags.AddRangeAsync(blogTags);
+      await context.BlogsTags.AddRangeAsync(InitialData.BlogTags);
       await context.SaveChangesAsync();
     }
   }
@@ -323,7 +323,7 @@ public static class DatabaseExtensions
             }
         };
 
-      await context.CosmeticSubCategories.AddRangeAsync(cosmeticSubCategories);
+      await context.CosmeticSubCategories.AddRangeAsync(InitialData.CosmeticSubCategories);
       await context.SaveChangesAsync();
     }
   }
@@ -535,7 +535,7 @@ public static class DatabaseExtensions
         }
       }
 
-      await context.RoutineSteps.AddRangeAsync(steps);
+      await context.RoutineSteps.AddRangeAsync(InitialData.RoutineSteps);
       await context.SaveChangesAsync();
     }
   }
@@ -721,7 +721,7 @@ public static class DatabaseExtensions
             }
         };
 
-      await context.SubCategories.AddRangeAsync(subCategories);
+      await context.SubCategories.AddRangeAsync(InitialData.SubCategories);
       await context.SaveChangesAsync();
     }
   }
