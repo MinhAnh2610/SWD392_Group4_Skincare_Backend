@@ -662,7 +662,8 @@ internal class InitialData
           MainUsage = "Cleansing and prepping the skin",
           Texture = "Gel",
           Origin = "USA",
-          Instructions = "Apply to wet skin, massage gently, then rinse."
+          Instructions = "Apply to wet skin, massage gently, then rinse.",
+          Size = (ushort)rand.Next(10,1000)
         });
 
         // Moisturizer for this skin type
@@ -680,7 +681,8 @@ internal class InitialData
           MainUsage = "Moisturizing and protection",
           Texture = "Cream",
           Origin = "France",
-          Instructions = "Apply to face after cleansing."
+          Instructions = "Apply to face after cleansing.",
+          Size = (ushort)rand.Next(10, 1000)
         });
 
         // Sunscreen for this skin type
@@ -698,7 +700,8 @@ internal class InitialData
           MainUsage = "Sun protection",
           Texture = "Lotion",
           Origin = "USA",
-          Instructions = "Apply generously 15 minutes before sun exposure."
+          Instructions = "Apply generously 15 minutes before sun exposure.",
+          Size = (ushort)rand.Next(10, 1000)
         });
 
         // Retinoid (using the Serums type) for this skin type
@@ -716,7 +719,8 @@ internal class InitialData
           MainUsage = "Anti-aging treatment",
           Texture = "Cream",
           Origin = "Italy",
-          Instructions = "Apply a pea-sized amount to cleansed skin at night."
+          Instructions = "Apply a pea-sized amount to cleansed skin at night.",
+          Size = (ushort)rand.Next(10, 1000)
         });
       }
 
@@ -736,7 +740,8 @@ internal class InitialData
           MainUsage = "Moisturizing and hydrating",
           Texture = "Cream",
           Origin = "France",
-          Instructions = "Apply on a cleansed face in the morning and at night."
+          Instructions = "Apply on a cleansed face in the morning and at night.",
+          Size = (ushort)rand.Next(10, 1000)
         },
         new Cosmetic
         {
@@ -752,7 +757,8 @@ internal class InitialData
           MainUsage = "Cleansing and gentle exfoliation",
           Texture = "Gel",
           Origin = "USA",
-          Instructions = "Massage onto wet skin and rinse thoroughly."
+          Instructions = "Massage onto wet skin and rinse thoroughly.",
+          Size = (ushort)rand.Next(10, 1000)
         },
         new Cosmetic
         {
@@ -768,7 +774,8 @@ internal class InitialData
           MainUsage = "Revitalizing and rejuvenating the skin",
           Texture = "Light Gel",
           Origin = "France",
-          Instructions = "Apply 2-3 drops on cleansed skin, morning and night."
+          Instructions = "Apply 2-3 drops on cleansed skin, morning and night.",
+          Size = (ushort)rand.Next(10, 1000)
         },
         new Cosmetic
         {
@@ -784,7 +791,8 @@ internal class InitialData
           MainUsage = "Hydration and nourishment",
           Texture = "Cream",
           Origin = "Germany",
-          Instructions = "Apply evenly to face and neck after cleansing."
+          Instructions = "Apply evenly to face and neck after cleansing.",
+          Size = (ushort)rand.Next(10, 1000)
         },
         new Cosmetic
         {
@@ -800,7 +808,8 @@ internal class InitialData
           MainUsage = "Toning and refreshing the skin",
           Texture = "Liquid",
           Origin = "USA",
-          Instructions = "Apply with a cotton pad after cleansing."
+          Instructions = "Apply with a cotton pad after cleansing.",
+          Size = (ushort)rand.Next(10, 1000)
         },
         new Cosmetic
         {
@@ -816,7 +825,8 @@ internal class InitialData
           MainUsage = "Exfoliation and smoothing skin texture",
           Texture = "Scrub",
           Origin = "USA",
-          Instructions = "Gently massage on damp skin and rinse off."
+          Instructions = "Gently massage on damp skin and rinse off.",
+          Size = (ushort)rand.Next(10, 1000)
         },
         new Cosmetic
         {
@@ -832,7 +842,8 @@ internal class InitialData
           MainUsage = "Deep hydration and skin regeneration",
           Texture = "Rich Cream",
           Origin = "Italy",
-          Instructions = "Apply evenly to clean skin before bed."
+          Instructions = "Apply evenly to clean skin before bed.",
+          Size = (ushort)rand.Next(10, 1000)
         },
         new Cosmetic
         {
@@ -848,7 +859,8 @@ internal class InitialData
           MainUsage = "Brightening and firming the eye area",
           Texture = "Gel-Cream",
           Origin = "France",
-          Instructions = "Gently tap around the eye area using your ring finger."
+          Instructions = "Gently tap around the eye area using your ring finger.",
+          Size = (ushort)rand.Next(10, 1000)
         },
         new Cosmetic
         {
@@ -864,7 +876,8 @@ internal class InitialData
           MainUsage = "Sun protection and prevention of premature aging",
           Texture = "Lotion",
           Origin = "USA",
-          Instructions = "Apply generously 15 minutes before sun exposure."
+          Instructions = "Apply generously 15 minutes before sun exposure.",
+          Size = (ushort)rand.Next(10, 1000)
         },
         new Cosmetic
         {
@@ -880,7 +893,8 @@ internal class InitialData
           MainUsage = "Lip hydration and care",
           Texture = "Balm",
           Origin = "USA",
-          Instructions = "Apply to lips as needed throughout the day."
+          Instructions = "Apply to lips as needed throughout the day.",
+          Size = (ushort)rand.Next(10, 1000)
         },
         new Cosmetic
         {
@@ -896,7 +910,8 @@ internal class InitialData
           MainUsage = "Hydration and revitalization",
           Texture = "Sheet Mask",
           Origin = "South Korea",
-          Instructions = "Apply for 15-20 minutes, then remove and pat remaining essence."
+          Instructions = "Apply for 15-20 minutes, then remove and pat remaining essence.",
+          Size = (ushort)rand.Next(10, 1000)
         },
         new Cosmetic
         {
@@ -912,7 +927,8 @@ internal class InitialData
           MainUsage = "Reduces fine lines and prevents acne",
           Texture = "Cream",
           Origin = "USA",
-          Instructions = "Apply a pea-sized amount to cleansed skin at night."
+          Instructions = "Apply a pea-sized amount to cleansed skin at night.",
+          Size = (ushort)rand.Next(10, 1000)
         }
       });
       return cosmetics;
