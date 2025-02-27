@@ -1,4 +1,6 @@
 ﻿using CleanArchitecture.Application.DTOs.FeedbackDto;
+using IdentityModel;
+using System.Security.Claims;
 
 namespace CleanArchitecture.Presentation.Endpoints;
 
@@ -26,6 +28,27 @@ public class FeedbackController : ICarterModule
     .WithDescription("Get Feedbacks");
     #endregion
 
+    #region Leave Feedback API
+    group.MapPost("/", async (IFeedbackService service, IHttpContextAccessor httpContextAccessor, FeedbackRequest request) =>
+    {
+      var user = httpContextAccessor.HttpContext?.User;
+      var userId = user!.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+      var userName = user!.FindFirst(JwtClaimTypes.Name)!.Value;
+      var result = await service.CreateFeedbackAsync(request, Guid.Parse(userId), userName);
+      return result.Match(Message.SUCCESSFUL_CREATED("Feedback"));
+    })
+    .WithName("LeaveFeedback")
+    .Produces<ApiResponse<List<FeedbackResponse>>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status500InternalServerError)
+    .WithSummary("LeaveFeedback")
+    .WithDescription("Leave Feedback")
+    .RequireAuthorization(new AuthorizeAttribute
+    {
+      Roles = "Customer"
+    });
+    #endregion
+
+    #region Get Feedback By Customer API
     group.MapGet("customer/{id:guid}", async (Guid id, IFeedbackService feedbackService) =>
     {
       var result = await feedbackService.GetFeedbacksByCustomerIdAsync(id);
@@ -41,6 +64,9 @@ public class FeedbackController : ICarterModule
     .WithName("GetFeedbacksByCustomer")
     .Produces<ApiResponse<List<FeedbackResponse>>>(StatusCodes.Status200OK)
     .ProducesProblem(StatusCodes.Status500InternalServerError)
+    .WithSummary("GetFeedbacksByCustomer")
+    .WithDescription("Get Feedbacks By Customer")
     .RequireAuthorization();
+    #endregion
   }
 }
