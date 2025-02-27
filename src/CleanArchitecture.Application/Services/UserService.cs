@@ -1,8 +1,11 @@
 ﻿using CleanArchitecture.Application.DTOs.UserDto;
+using CleanArchitecture.Application.Enums;
 using IdentityModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using System.Reflection;
 using System.Security.Claims;
+using static IdentityServer4.Models.IdentityResources;
 
 namespace CleanArchitecture.Application.Services;
 
@@ -73,6 +76,33 @@ public class UserService : IUserService
     return result.Succeeded
       ? Result<string>.Success(default!, StatusCodes.Status200OK)
       : Result<string>.Failure(resultErrors, StatusCodes.Status400BadRequest);
+  }
+
+  public async Task<Result<List<UserProfileResponse>>> GetAllUsers()
+  {
+    var users = await _userManager.Users.ToListAsync();
+
+    var userResponses = new List<UserProfileResponse>();
+
+    foreach (var user in users)
+    {
+      var roles = await _userManager.GetRolesAsync(user);
+
+      userResponses.Add(new UserProfileResponse
+      {
+        Id = user.Id.ToString(),
+        UserName = user.UserName,
+        Email = user.Email,
+        PhoneNumber = user.PhoneNumber,
+        BirthDate = (user.BirthDate == null) ? default : DateOnly.Parse(user.BirthDate.ToString()!),
+        FirstName = user.FirstName,
+        LastName = user.LastName,
+        Gender = Boolean.Parse(user.Gender.ToString()),
+        Roles = roles.ToList()
+      });
+    }
+
+    return Result<List<UserProfileResponse>>.Success(userResponses, StatusCodes.Status200OK);
   }
 
   public async Task<Result<UserProfileResponse>> GetUserProfile()
