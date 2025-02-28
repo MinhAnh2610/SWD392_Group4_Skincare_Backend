@@ -33,7 +33,7 @@ namespace CleanArchitecture.Application.DTOs.Cosmetic
     public string Texture { get; set; } = default!;
     public string Origin { get; set; } = default!;
     public string Instructions { get; set; } = default!;
-    public int Weigth { get; set; }
+    public int Weight { get; set; }
     public int Length { get; set; }
     public int Width { get; set; }
     public int Height { get; set; }
