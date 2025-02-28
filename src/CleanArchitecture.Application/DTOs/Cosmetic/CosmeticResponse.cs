@@ -40,11 +40,9 @@ namespace CleanArchitecture.Application.DTOs.Cosmetic
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public VolumeUnit VolumeUnit { get; set; }
     public List<CosmeticSubcategoryResponse>? CosmeticSubcategories { get; set; }
-    public List<CosmeticImageResponse>?CosmeticImages { get; set; }
-  //  public List<CartItemResponse>? CartItems { get; set; }
-    public List<OrderItem>? OrderItems { get; set; }
+    public List<CosmeticImageCosmeticResponse>?CosmeticImages { get; set; }
     public List<BatchResponse>? Batches { get; set; }
-    public List<FeedbackResponse>? Feedbacks { get; set; }
+    public List<FeedbackCosmeticResponse>? Feedbacks { get; set; }
     public int Quantity =>
     Batches?
         .Where(b => b.ExpirationDate > DateOnly.FromDateTime(DateTime.Now))
