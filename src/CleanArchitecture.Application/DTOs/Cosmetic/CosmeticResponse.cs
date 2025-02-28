@@ -1,6 +1,5 @@
 ﻿using CleanArchitecture.Application.DTOs.BatchDto;
 using CleanArchitecture.Application.DTOs.BrandDto;
-using CleanArchitecture.Application.DTOs.CartItem;
 using CleanArchitecture.Application.DTOs.CosmeticImageDto;
 using CleanArchitecture.Application.DTOs.CosmeticSubcategory;
 using CleanArchitecture.Application.DTOs.CosmeticTypeDto;
@@ -8,13 +7,7 @@ using CleanArchitecture.Application.DTOs.FeedbackDto;
 using CleanArchitecture.Application.DTOs.RefundItem;
 using CleanArchitecture.Application.DTOs.RoutineStepDto;
 using CleanArchitecture.Application.DTOs.SkinTypeDto;
-using CleanArchitecture.Application.DTOs.SubCategoryDto;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 namespace CleanArchitecture.Application.DTOs.Cosmetic
 {
   public class CosmeticResponse
@@ -40,7 +33,10 @@ namespace CleanArchitecture.Application.DTOs.Cosmetic
     public string Texture { get; set; } = default!;
     public string Origin { get; set; } = default!;
     public string Instructions { get; set; } = default!;
-    public ushort Size { get; set; } = default!;
+    public int Weigth { get; set; }
+    public int Length { get; set; }
+    public int Width { get; set; }
+    public int Height { get; set; }
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public VolumeUnit VolumeUnit { get; set; }
     public List<CosmeticSubcategoryResponse>? CosmeticSubcategories { get; set; }
