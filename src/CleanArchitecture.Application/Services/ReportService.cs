@@ -1,6 +1,7 @@
 using CleanArchitecture.Application.DTOs.ReportDto;
 using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Application.Strategies;
+using CleanArchitecture.Application.Strategies.ReportGenerateStrategy.ReportTypeStrategy;
 using Microsoft.AspNetCore.Http;
 
 namespace CleanArchitecture.Application.Services
@@ -10,16 +11,18 @@ namespace CleanArchitecture.Application.Services
     private readonly IErrorFactory _errorFactory;
     private readonly IEnumerable<IReportGenerateStrategy> _reportGenerateStrategies;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IEnumerable<IReportTypeStrategy> _reportTypeStrategies;
 
     public ReportService(IErrorFactory errorFactory, IEnumerable<IReportGenerateStrategy> reportGenerateStrategies,
-      IUnitOfWork unitOfWork)
+      IUnitOfWork unitOfWork, IEnumerable<IReportTypeStrategy> reportTypeStrategies)
     {
       _errorFactory = errorFactory;
       _reportGenerateStrategies = reportGenerateStrategies;
       _unitOfWork = unitOfWork;
+      _reportTypeStrategies = reportTypeStrategies;
     }
 
-    public async Task<Result<byte[]>> GenerateReport(GenerateReportRequest request)
+    public async Task<Result<byte[]>> GenerateReportAsync(GenerateReportRequest request)
     {
       byte[] reportFile = [];
 
@@ -33,36 +36,34 @@ namespace CleanArchitecture.Application.Services
         var error = _errorFactory.CreateInvalidDates();
         return Result<byte[]>.Failure([error.err], error.statusCode);
       }
-      
-      var cosmeticSales = await (
-        from orders in orderQuery
-        join orderItem in orderItemQuery on orders.Id equals orderItem.OrderId
-        join cosmetics in cosmeticQuery on orderItem.CosmeticId equals cosmetics.Id
-        where orders.OrderDate >= request.FromDate && orders.OrderDate <= request.ToDate
-        group new { orderItem, cosmetics } by new { cosmetics.Id, cosmetics.Name, cosmetics.Price}
-        into g
-        select new CosmeticSoldDto()
+
+      var reportType = request.Type;
+      decimal totalRevenue = 0;
+      List<CosmeticSoldDto> cosmeticSales = new List<CosmeticSoldDto>();
+      foreach (var strategy in _reportTypeStrategies)
+      {
+        var nameOfStrat = strategy.GetType().Name;
+        if (nameOfStrat.Contains(reportType, StringComparison.OrdinalIgnoreCase))
         {
-          CosmeticId = g.Key.Id,
-          CosmeticName = g.Key.Name,
-          NumberOfSales = g.Sum(x => x.orderItem.Quantity),
-          Revenue = g.Sum(x => x.orderItem.Quantity) * g.Key.Price
+          cosmeticSales = await strategy.GenerateListAsync(request, orderQuery, orderItemQuery, cosmeticQuery);
+          totalRevenue = cosmeticSales.Sum(x => x.Revenue);
+          break;
         }
-      ).ToListAsync();
+      }
       
-      decimal totalRevenue = cosmeticSales.Sum(cs => cs.Revenue);
-
       ReportContent reportContent = new(cosmeticSales, totalRevenue, request.FromDate, request.ToDate);
-
+      
       foreach (var strategy in _reportGenerateStrategies)
       {
         var nameOfStrat = strategy.GetType().Name;
         if (nameOfStrat.Contains(request.Format, StringComparison.OrdinalIgnoreCase))
         {
           reportFile = strategy.Generate(request, reportContent);
+          break;
         }
       }
 
+      
       if (reportFile.Length <= 0)
       {
         var error = _errorFactory.CreateFileCreatedFailed($"Report{request.Format}");
