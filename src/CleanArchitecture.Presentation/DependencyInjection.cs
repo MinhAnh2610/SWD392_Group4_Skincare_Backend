@@ -120,7 +120,7 @@ public static class DependencyInjection
       });
       app.MapScalarApiReference(options =>
       {
-        options.WithTheme(ScalarTheme.Purple)
+        options.WithTheme(ScalarTheme.Solarized)
             .WithDarkMode(true)
             .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient)
             .WithDarkModeToggle(false)

@@ -13,16 +13,21 @@ namespace CleanArchitecture.Presentation.Endpoints
       #region Generate Report
 
       group.MapGet("/",
-        async (IReportService service, [FromQuery] string? format, [FromQuery] string? type,
-          [FromQuery] DateTime? fromDate, [FromQuery] DateTime? toDate) =>
-        {
-          GenerateReportRequest request = new(format, type, fromDate, toDate);
-          var result = await service.GenerateReport(request);
-          if (result.IsSuccess)
-            return Results.File(result.Data, "application/pdf", "report.pdf");
-          
-          return result.Match("Test");
-        })
+          async (IReportService service, [FromQuery] DateTime? fromDate,
+            [FromQuery] DateTime? toDate, [FromQuery] string? format = "pdf",
+            [FromQuery] string? type = "revenue") =>
+          {
+            // Assign default values if not provided - for development
+            var startDate = fromDate ?? new DateTime(2025, 1, 14);
+            var endDate = toDate ?? new DateTime(2025, 1, 18);
+
+            GenerateReportRequest request = new(format, type, startDate, endDate);
+            var result = await service.GenerateReportAsync(request);
+            if (result.IsSuccess)
+              return Results.File(result.Data, "application/pdf", "report.pdf");
+
+            return result.Match("Test");
+          })
         .WithName("CreateReport")
         .Produces<ApiResponse<byte[]>>()
         .ProducesProblem(StatusCodes.Status500InternalServerError)
