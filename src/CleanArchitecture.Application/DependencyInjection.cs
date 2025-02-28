@@ -2,6 +2,7 @@ using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Application.Services;
 using CleanArchitecture.Application.Strategies;
 using CleanArchitecture.Application.Strategies.BlogFilterStrategy;
+using CleanArchitecture.Application.Strategies.ReportGenerateStrategy.ReportTypeStrategy;
 using CleanArchitecture.Application.Validators;
 using CleanArchitecture.Application.Validators.Blog;
 using IdentityServer4.Validation;
@@ -67,7 +68,8 @@ public static class DependencyInjection
 
     services.AddSingleton<IReportGenerateStrategy, PdfReportGenerateStrategy>();
     services.AddSingleton<IReportGenerateStrategy, WordReportGenerateStrategy>();
-
+    services.AddSingleton<IReportTypeStrategy, RevenueReportStrategy>();
+    services.AddSingleton<IReportTypeStrategy, ProductPerformanceReportStrategy>();
     #endregion
 
 

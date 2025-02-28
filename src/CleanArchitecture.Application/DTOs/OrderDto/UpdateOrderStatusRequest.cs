@@ -1,5 +1,5 @@
 ﻿// UpdateOrderStatusRequest.cs
-namespace CleanArchitecture.Application.DTOs.Order
+namespace CleanArchitecture.Application.DTOs.OrderDto
 {
   public class UpdateOrderStatusRequest
   {
