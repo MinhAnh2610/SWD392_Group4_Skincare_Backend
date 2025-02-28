@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CleanArchitecture.Application.DTOs.SubCategoryDto;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,5 +11,6 @@ namespace CleanArchitecture.Application.DTOs.CosmeticSubcategory
   {
     public Guid CosmeticId { get; set; }
     public Guid SubCategoryId { get; set; }
+    public SubCategoryResponse? SubCategory { get; set; }
   }
 }
