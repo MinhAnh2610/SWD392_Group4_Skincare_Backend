@@ -51,6 +51,15 @@ namespace CleanArchitecture.Application.DTOs.Cosmetic
     public List<RoutineStepResponse>? RoutineSteps { get; set; }
     public List<FeedbackResponse>? Feedbacks { get; set; }
     public List<RefundItemResponse>? RefundItems { get; set; }
+    public int Quantity =>
+    Batches?
+        .Where(b => b.ExpirationDate > DateOnly.FromDateTime(DateTime.Now))
+        .Sum(b => b.Quantity) ?? 0;
+
+    public decimal? Rating =>
+        Feedbacks?.Count > 0
+            ? Feedbacks.Average(f => f.Rating)
+            : 0;
 
   }
 }
