@@ -44,9 +44,7 @@ namespace CleanArchitecture.Application.DTOs.Cosmetic
   //  public List<CartItemResponse>? CartItems { get; set; }
     public List<OrderItem>? OrderItems { get; set; }
     public List<BatchResponse>? Batches { get; set; }
-    public List<RoutineStepResponse>? RoutineSteps { get; set; }
     public List<FeedbackResponse>? Feedbacks { get; set; }
-    public List<RefundItemResponse>? RefundItems { get; set; }
     public int Quantity =>
     Batches?
         .Where(b => b.ExpirationDate > DateOnly.FromDateTime(DateTime.Now))
