@@ -57,7 +57,7 @@ public class GHNService : IGHNService
       return Result<string>.Failure(new List<Error>
       {
         new Error(ex.Message, ex.InnerException!.ToString())
-      }, StatusCodes.Status502BadGateway);
+      }, StatusCodes.Status500InternalServerError);
     }
   }
 

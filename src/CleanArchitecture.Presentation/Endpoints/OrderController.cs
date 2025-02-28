@@ -35,6 +35,8 @@ public class OrderController : ICarterModule
     .WithName("CreateOrder")
     .Produces<ApiResponse<CreateOrderResponse>>(StatusCodes.Status200OK)
     .ProducesProblem(StatusCodes.Status400BadRequest)
+    .WithSummary("CreateOrder")
+    .WithDescription("Create Order")
     .RequireAuthorization();
 
     // 2. Complete Order (After payment)
@@ -55,6 +57,8 @@ public class OrderController : ICarterModule
     .WithName("CompleteOrder")
     .Produces<ApiResponse<OrderResponse>>(StatusCodes.Status200OK)
     .ProducesProblem(StatusCodes.Status404NotFound)
+    .WithSummary("CompleteOrder")
+    .WithDescription("Complete Order")
     .RequireAuthorization();
 
     // 3. Get All Orders (Admin)
@@ -73,6 +77,8 @@ public class OrderController : ICarterModule
     .WithName("GetAllOrders")
     .Produces<ApiResponse<List<OrderResponse>>>(StatusCodes.Status200OK)
     .ProducesProblem(StatusCodes.Status500InternalServerError)
+    .WithSummary("GetAllOrders")
+    .WithDescription("Get All Orders")
     .RequireAuthorization(policy => policy.RequireRole("Admin"));
 
     // 4. Get Customer Orders
@@ -91,6 +97,8 @@ public class OrderController : ICarterModule
     .WithName("GetMyOrders")
     .Produces<ApiResponse<List<OrderResponse>>>(StatusCodes.Status200OK)
     .ProducesProblem(StatusCodes.Status500InternalServerError)
+    .WithSummary("GetMyOrders")
+    .WithDescription("Get My Orders")
     .RequireAuthorization();
 
     // 5. Update Order Status (Admin)
@@ -111,6 +119,8 @@ public class OrderController : ICarterModule
     .WithName("UpdateOrderStatus")
     .Produces<ApiResponse<OrderResponse>>(StatusCodes.Status200OK)
     .ProducesProblem(StatusCodes.Status404NotFound)
+    .WithSummary("UpdateOrderStatus")
+    .WithDescription("Update Order Status")
     .RequireAuthorization(policy => policy.RequireRole("Admin"));
 
     // 6. Delete Order (Admin)
@@ -129,6 +139,8 @@ public class OrderController : ICarterModule
     .WithName("DeleteOrder")
     .Produces<ApiResponse<string>>(StatusCodes.Status200OK)
     .ProducesProblem(StatusCodes.Status404NotFound)
+    .WithSummary("DeleteOrder")
+    .WithDescription("Delete Order")
     .RequireAuthorization(policy => policy.RequireRole("Admin"));
   }
 }
