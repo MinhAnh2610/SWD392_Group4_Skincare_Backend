@@ -1,6 +1,4 @@
-﻿using CleanArchitecture.Domain.Entities;
-
-public class Payment : Entity<Guid>
+﻿public class Payment : Entity<Guid>
 {
     public Guid OrderId { get; set; }
     public Order Order { get; set; } = default!;

@@ -19,7 +19,10 @@ public class Cosmetic : Entity<Guid>
   public string Texture { get; set; } = default!;
   public string Origin { get; set; } = default!;
   public string Instructions { get; set; } = default!;
-  public ushort Size { get; set; }
+  public int Weight { get; set; }
+  public int Length { get; set; }
+  public int Width { get; set; }
+  public int Height { get; set; }
   public VolumeUnit VolumeUnit { get; set; }
   public List<CosmeticSubCategory> CosmeticSubcategories { get; set; } = new List<CosmeticSubCategory>();
   public List<CosmeticImage> CosmeticImages { get; set; } = new List<CosmeticImage>();

@@ -59,6 +59,9 @@ public static class DependencyInjection
     services.AddScoped<IErrorFactory, ErrorFactory>();
     services.AddScoped<IReportService, ReportService>();
 
+    // Add HttpClient for GHNService
+    services.AddHttpClient<IGHNService, GHNService>();
+
     #region Add Strategies
 
     services.AddSingleton<IBlogFilterStrategy, ContentFilterStrategy>();
