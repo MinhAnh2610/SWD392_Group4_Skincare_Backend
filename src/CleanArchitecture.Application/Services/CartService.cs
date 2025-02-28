@@ -1,21 +1,21 @@
 ﻿using CleanArchitecture.Application.DTOs.Cart;
 using CleanArchitecture.Application.DTOs.CartItem;
 using CleanArchitecture.Application.DTOs.UserDto;
-using CleanArchitecture.Domain.Entities;
-using CleanArchitecture.Domain.RepositoryContracts;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 
 namespace CleanArchitecture.Application.Services
 {
   public class CartService : ICartService
   {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly UserManager<User> _userManager;
     private readonly IClaimsService _claimsService;
-    public CartService(IUnitOfWork unitOfWork, IClaimsService claimsService)
+    public CartService(IUnitOfWork unitOfWork, IClaimsService claimsService, UserManager<User> userManager)
     {
       _unitOfWork = unitOfWork;
       _claimsService = claimsService;
- 
+      _userManager = userManager;
     }
 
     public async Task<Result<List<CartResponse>>> AddCartItemAsync(AddProductRequest addProductRequest)

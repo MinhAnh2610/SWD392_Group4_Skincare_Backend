@@ -30,7 +30,7 @@ public class OrderController : ICarterModule
             "Order initiated successfully."
         ));
       }
-      return Results.StatusCode(result.Status);
+      return result.Match(Message.SUCCESSFUL_CREATED(nameof(result)));
     })
     .WithName("CreateOrder")
     .Produces<ApiResponse<CreateOrderResponse>>(StatusCodes.Status200OK)

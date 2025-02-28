@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Application.DTOs.Order;
+﻿using CleanArchitecture.Application.Constants;
+using CleanArchitecture.Application.DTOs.Order;
 using CleanArchitecture.Application.DTOs.OrderDto;
 using CleanArchitecture.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -61,8 +62,8 @@ public class OrderService : IOrderService
         OrderDate = DateTime.UtcNow,
         ShippingAddress = request.ShippingAddress,
         BillingAddress = request.BillingAddress,
-        TrackingNumber = Guid.NewGuid().ToString(),
-        Status = "PENDING_PAYMENT",
+        TrackingNumber = null,
+        Status = OrderStatus.PENDING,
         CreateAt = DateTime.UtcNow,
         CreatedBy = cart.Customer.UserName,
         LastModified = DateTime.UtcNow,
@@ -103,7 +104,7 @@ public class OrderService : IOrderService
     try
     {
       var order = await _unitOfWork.Orders.GetByIdAsync(orderId);
-      if (order == null || order.Status != "PENDING_PAYMENT")
+      if (order == null || order.Status != OrderStatus.PENDING)
       {
         return Result<OrderResponse>.Failure(
             [new Error("Order.NotFound", "Invalid order or wrong status")],
@@ -111,11 +112,11 @@ public class OrderService : IOrderService
       }
 
       // Update order status based on payment result
-      order.Status = paymentStatus == "00" ? "CONFIRMED" : "PAYMENT_FAILED";
+      order.Status = paymentStatus == "00" ? OrderStatus.CONFIRMED : OrderStatus.FAILED;
       order.LastModified = DateTime.UtcNow;
       order.LastModifiedBy = _claimsService.CurrentUserId.ToString();
 
-      if (order.Status == "CONFIRMED")
+      if (order.Status == OrderStatus.CONFIRMED)
       {
         // Clear cart after successful payment
         await _unitOfWork.Carts.ClearCartItemsAsync(order.CustomerId);
@@ -261,7 +262,7 @@ public class OrderService : IOrderService
 
       foreach (var order in expiredOrders)
       {
-        order.Status = "EXPIRED";
+        order.Status = OrderStatus.EXPIRED;
         order.LastModified = DateTime.UtcNow;
         _unitOfWork.Orders.Update(order);
       }
@@ -281,7 +282,7 @@ public class OrderService : IOrderService
     {
       Id = order.Id,
       CustomerId = order.CustomerId,
-      CouponId = (Guid)order.CouponId,
+      CouponId = order.CouponId,
       SubTotal = order.SubTotal,
       TotalPrice = order.TotalPrice,
       OrderDate = order.OrderDate,
@@ -290,7 +291,7 @@ public class OrderService : IOrderService
       TrackingNumber = order.TrackingNumber,
       DeliveryDate = order.DeliveryDate,
       Status = order.Status,
-      CreateAt = (DateTime)order.CreateAt,
+      CreateAt = order.CreateAt,
       CreatedBy = order.CreatedBy,
       LastModified = order.LastModified,
       LastModifiedBy = order.LastModifiedBy

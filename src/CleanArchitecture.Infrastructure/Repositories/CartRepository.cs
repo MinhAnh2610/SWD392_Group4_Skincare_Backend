@@ -9,6 +9,16 @@ namespace CleanArchitecture.Infrastructure.Repositories
     {
     }
 
+    public override async Task<List<Cart>> GetAllAsync()
+    {
+      return await _context.Carts
+        .Include(c => c.Customer)
+        .Include(c => c.CartItems)
+          .ThenInclude(ci => ci.Cosmetic)
+            .ThenInclude(c => c.CosmeticImages)
+        .ToListAsync();
+    }
+
     public async Task ClearCartItemsAsync(Guid cartId)
     {
       var cartItems = await _context.CartItems
@@ -31,6 +41,7 @@ namespace CleanArchitecture.Infrastructure.Repositories
     public async Task<Cart?> GetCartWithItemsAsync(Guid cartId)
     {
       return await _context.Carts
+          .Include(c => c.Customer)
           .Include(c => c.CartItems)
           .ThenInclude(ci => ci.Cosmetic)
           .FirstOrDefaultAsync(c => c.Id == cartId);
