@@ -14,9 +14,8 @@ namespace CleanArchitecture.Application.Mapper
       config.NewConfig<UpdateCosmetic, CosmeticResponse>();
       config.NewConfig<CreateCosmetic, CosmeticResponse>();
       config.NewConfig<Cosmetic, CreateCosmetic>();
-      config.NewConfig<CosmeticResponse, CosmeticImageResponse>()
-        .Map(dest => dest.CosmeticId, src => src.Id)
-        .Map(dest => dest.CosmeticName, src => src.Name);
+
+
     }
   }
 }

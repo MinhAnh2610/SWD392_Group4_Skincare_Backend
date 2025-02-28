@@ -27,10 +27,12 @@ public class CosmeticRepository : GenericRepository<Cosmetic>, ICosmeticReposito
   }
   public override async Task<List<Cosmetic>> GetAllAsync()
   {
+
     var cosmeticsdtos = await _context.Cosmetics
         .ProjectToType<CosmeticResponse>()  
         .ToListAsync();
     var cosmetics = cosmeticsdtos.Adapt<List<Cosmetic>>();
+
     return cosmetics;
 
   }
