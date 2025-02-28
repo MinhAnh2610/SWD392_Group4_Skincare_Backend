@@ -1,205 +1,299 @@
-﻿using CleanArchitecture.Application.DTOs.Cosmetic;
-using CleanArchitecture.Application.DTOs.Order;
+﻿using CleanArchitecture.Application.DTOs.Order;
+using CleanArchitecture.Application.DTOs.OrderDto;
 using CleanArchitecture.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 
-namespace CleanArchitecture.Application.Services
+public class OrderService : IOrderService
 {
-  public class OrderService : IOrderService
+  private readonly IUnitOfWork _unitOfWork;
+  private readonly IErrorFactory _errorFactory;
+  private readonly IClaimsService _claimsService;
+
+  public OrderService(
+      IUnitOfWork unitOfWork,
+      IErrorFactory errorFactory,
+      IClaimsService claimsService)
   {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IErrorFactory _errorFactory;
+    _unitOfWork = unitOfWork;
+    _errorFactory = errorFactory;
+    _claimsService = claimsService;
+  }
 
-    public OrderService(IUnitOfWork unitOfWork, IErrorFactory errorFactory)
+  // 1. Initiate Order (First step of checkout)
+  public async Task<Result<OrderResponse>> InitiateOrder(CreateOrderRequest request)
+  {
+    try
     {
-      _unitOfWork = unitOfWork;
-      _errorFactory = errorFactory;
-    }
+      // Validate cart exists and has items
+      var cart = await _unitOfWork.Carts.GetCartWithItemsAsync(request.CartId);
+      if (cart == null || !cart.CartItems.Any())
+      {
+        return Result<OrderResponse>.Failure(
+            [new Error("Order.Invalid", "Cart not found or empty")],
+            StatusCodes.Status400BadRequest);
+      }
 
-    public async Task<Result<List<OrderResponse>>> GetAllOrdersAsync()
+      // Validate cart belongs to current user
+      if (cart.CustomerId != _claimsService.CurrentUserId)
+      {
+        return Result<OrderResponse>.Failure(
+            [new Error("Order.Unauthorized", "Not authorized to access this cart")],
+            StatusCodes.Status403Forbidden);
+      }
+
+      // Validate addresses
+      if (string.IsNullOrEmpty(request.ShippingAddress) ||
+          string.IsNullOrEmpty(request.BillingAddress))
+      {
+        return Result<OrderResponse>.Failure(
+            [new Error("Order.Invalid", "Shipping and billing addresses are required")],
+            StatusCodes.Status400BadRequest);
+      }
+
+      // Create order
+      var order = new Order
+      {
+        Id = Guid.NewGuid(),
+        CustomerId = cart.CustomerId,
+        CouponId = request.CouponId,
+        SubTotal = cart.TotalPrice,
+        TotalPrice = cart.TotalPrice, // Apply coupon discount if needed
+        OrderDate = DateTime.UtcNow,
+        ShippingAddress = request.ShippingAddress,
+        BillingAddress = request.BillingAddress,
+        TrackingNumber = Guid.NewGuid().ToString(),
+        Status = "PENDING_PAYMENT",
+        CreateAt = DateTime.UtcNow,
+        CreatedBy = cart.Customer.UserName,
+        LastModified = DateTime.UtcNow,
+        LastModifiedBy = cart.Customer.UserName,
+        OrderItems = cart.CartItems.Select(ci => new OrderItem
+        {
+          CosmeticId = ci.CosmeticId,
+          Quantity = ci.Quantity
+        }).ToList()
+      };
+
+      // Save order
+      _unitOfWork.Orders.Create(order);
+      var saved = await _unitOfWork.CompleteAsync();
+
+      if (!saved)
+      {
+        return Result<OrderResponse>.Failure(
+            [new Error("Order.Create", "Failed to save order")],
+            StatusCodes.Status500InternalServerError);
+      }
+
+      return Result<OrderResponse>.Success(
+          MapToOrderResponse(order),
+          StatusCodes.Status200OK);
+    }
+    catch (Exception ex)
     {
-      try
-      {
-        var orders = await _unitOfWork.Orders.GetAllAsync();
-        var response = orders.Select(MapToOrderResponse).ToList();
-        return Result<List<OrderResponse>>.Success(response, StatusCodes.Status200OK);
-      }
-      catch (Exception ex)
-      {
-        return Result<List<OrderResponse>>.Failure(
-          new List<Error> { new Error("Order.GetAll", ex.Message) },
-          StatusCodes.Status500InternalServerError
-        );
-      }
+      return Result<OrderResponse>.Failure(
+          [new Error("Order.Create", ex.Message)],
+          StatusCodes.Status500InternalServerError);
     }
+  }
 
-    public async Task<Result<List<OrderResponse>>> GetOrdersByCustomerIdAsync(Guid customerId)
+  // 2. Complete Order (After payment)
+  public async Task<Result<OrderResponse>> CompleteOrder(Guid orderId, string paymentStatus)
+  {
+    try
     {
-      try
+      var order = await _unitOfWork.Orders.GetByIdAsync(orderId);
+      if (order == null || order.Status != "PENDING_PAYMENT")
       {
-        var orders = await _unitOfWork.Orders.GetOrdersByCustomerIdAsync(customerId);
-        var response = orders.Select(MapToOrderResponse).ToList();
-        return Result<List<OrderResponse>>.Success(response, StatusCodes.Status200OK);
+        return Result<OrderResponse>.Failure(
+            [new Error("Order.NotFound", "Invalid order or wrong status")],
+            StatusCodes.Status404NotFound);
       }
-      catch (Exception ex)
-      {
-        return Result<List<OrderResponse>>.Failure(
-          new List<Error> { new Error("Order.GetByCustomerId", ex.Message) },
-          StatusCodes.Status500InternalServerError
-        );
-      }
-    }
 
-    public async Task<Result<OrderResponse>> UpdateOrderStatusAsync(Guid orderId, UpdateOrderStatusRequest request)
+      // Update order status based on payment result
+      order.Status = paymentStatus == "00" ? "CONFIRMED" : "PAYMENT_FAILED";
+      order.LastModified = DateTime.UtcNow;
+      order.LastModifiedBy = _claimsService.CurrentUserId.ToString();
+
+      if (order.Status == "CONFIRMED")
+      {
+        // Clear cart after successful payment
+        await _unitOfWork.Carts.ClearCartItemsAsync(order.CustomerId);
+      }
+
+      _unitOfWork.Orders.Update(order);
+      var saved = await _unitOfWork.CompleteAsync();
+
+      if (!saved)
+      {
+        return Result<OrderResponse>.Failure(
+            [new Error("Order.Complete", "Failed to update order")],
+            StatusCodes.Status500InternalServerError);
+      }
+
+      return Result<OrderResponse>.Success(
+          MapToOrderResponse(order),
+          StatusCodes.Status200OK);
+    }
+    catch (Exception ex)
+    {
+      return Result<OrderResponse>.Failure(
+          [new Error("Order.Complete", ex.Message)],
+          StatusCodes.Status500InternalServerError);
+    }
+  }
+
+  // 3. Get All Orders (Admin)
+  public async Task<Result<List<OrderResponse>>> GetAllOrdersAsync()
+  {
+    try
+    {
+      var orders = await _unitOfWork.Orders.GetAllAsync();
+      var response = orders.Select(MapToOrderResponse).ToList();
+      return Result<List<OrderResponse>>.Success(response, StatusCodes.Status200OK);
+    }
+    catch (Exception ex)
+    {
+      return Result<List<OrderResponse>>.Failure(
+          [new Error("Order.GetAll", ex.Message)],
+          StatusCodes.Status500InternalServerError);
+    }
+  }
+
+  // 4. Get Customer Orders
+  public async Task<Result<List<OrderResponse>>> GetOrdersByCustomerIdAsync(Guid customerId)
+  {
+    try
+    {
+      var orders = await _unitOfWork.Orders.GetOrdersByCustomerIdAsync(customerId);
+      var response = orders.Select(MapToOrderResponse).ToList();
+      return Result<List<OrderResponse>>.Success(response, StatusCodes.Status200OK);
+    }
+    catch (Exception ex)
+    {
+      return Result<List<OrderResponse>>.Failure(
+          [new Error("Order.GetByCustomerId", ex.Message)],
+          StatusCodes.Status500InternalServerError);
+    }
+  }
+
+  // 5. Update Order Status (Admin)
+  public async Task<Result<OrderResponse>> UpdateOrderStatusAsync(Guid orderId, UpdateOrderStatusRequest request)
+  {
+    try
     {
       var order = await _unitOfWork.Orders.GetByIdAsync(orderId);
       if (order == null)
       {
-        var error = _errorFactory.CreateNotFoundError("Order");
-        return Result<OrderResponse>.Failure([error.err], error.statusCode);
+        return Result<OrderResponse>.Failure(
+            [new Error("Order.NotFound", "Order not found")],
+            StatusCodes.Status404NotFound);
       }
 
-      // Update the status and last modified date
       order.Status = request.Status;
       order.LastModified = DateTime.UtcNow;
+      order.LastModifiedBy = _claimsService.CurrentUserId.ToString();
 
       _unitOfWork.Orders.Update(order);
+      var saved = await _unitOfWork.CompleteAsync();
 
-      var isSaved = await _unitOfWork.CompleteAsync();
-      if (!isSaved)
-      {
-        var error = _errorFactory.CreateDatabaseError("Order");
-        return Result<OrderResponse>.Failure([error.err], error.statusCode);
-      }
-
-      var response = MapToOrderResponse(order);
-      return Result<OrderResponse>.Success(response, StatusCodes.Status200OK);
-    }
-
-    public async Task<Result<OrderResponse>> CheckOut(CheckOutRequest checkOutRequest)
-    {
-      try
-      {
-        var cart = await _unitOfWork.Carts.GetByIdAsync(checkOutRequest.CartId);
-        if (cart == null)
-        {
-          return Result<OrderResponse>.Failure(
-            new List<Error> { new Error("Order.NotFound", "Order not found") },
-            StatusCodes.Status404NotFound
-          );
-        }
-
-        if (cart.CartItems != null && cart.CartItems.Count == 0)
-        {
-          return Result<OrderResponse>.Failure(
-            new List<Error> { new Error("Order.CheckOut", "Cart is empty") },
-            StatusCodes.Status400BadRequest
-          );
-        }
-
-        if (cart.Customer.Id != checkOutRequest.UserId)
-        {
-          return Result<OrderResponse>.Failure(
-            new List<Error> { new Error("Order.CheckOut", "Customer Id is not valid") },
-            StatusCodes.Status400BadRequest
-          );
-        }
-
-        if (checkOutRequest.ShippingAddress == null)
-        {
-          return Result<OrderResponse>.Failure(
-            new List<Error> { new Error("Order.CheckOut", "Shipping Address is required") },
-            StatusCodes.Status400BadRequest
-          );
-        }
-
-        if (checkOutRequest.BillingAddress == null)
-        {
-          return Result<OrderResponse>.Failure(
-            new List<Error> { new Error("Order.CheckOut", "Billing Address is required") },
-            StatusCodes.Status400BadRequest
-          );
-        }
-
-        Order order = new Order
-        {
-          CustomerId = cart.Customer.Id,
-          CouponId = checkOutRequest.CouponId,
-          SubTotal = cart.TotalPrice,
-          TotalPrice = cart.TotalPrice,
-          OrderDate = DateTime.UtcNow,
-          ShippingAddress = checkOutRequest.ShippingAddress,
-          BillingAddress = checkOutRequest.BillingAddress,
-          TrackingNumber = Guid.NewGuid().ToString(),
-          Status = "Pending",
-          CreateAt = DateTime.UtcNow,
-          CreatedBy = cart.Customer.NormalizedUserName,
-          LastModified = DateTime.UtcNow,
-          LastModifiedBy = cart.Customer.NormalizedUserName
-        };
-
-        var response = MapToOrderResponse(order);
-        return Result<OrderResponse>.Success(response, StatusCodes.Status200OK);
-      }
-      catch (Exception ex)
+      if (!saved)
       {
         return Result<OrderResponse>.Failure(
-          new List<Error> { new Error("Order.UpdateStatus", ex.Message) },
-          StatusCodes.Status500InternalServerError
-        );
+            [new Error("Order.Update", "Failed to update order")],
+            StatusCodes.Status500InternalServerError);
       }
+
+      return Result<OrderResponse>.Success(
+          MapToOrderResponse(order),
+          StatusCodes.Status200OK);
     }
-
-// New Delete Order Method
-    public async Task<Result<string>> DeleteOrderAsync(Guid orderId)
+    catch (Exception ex)
     {
-      try
-      {
-        var order = await _unitOfWork.Orders.GetByIdAsync(orderId);
-        if (order == null)
-        {
-          return Result<string>.Failure(
-            new List<Error> { new Error("Order.Delete", "Order not found") },
-            StatusCodes.Status404NotFound
-          );
-        }
+      return Result<OrderResponse>.Failure(
+          [new Error("Order.Update", ex.Message)],
+          StatusCodes.Status500InternalServerError);
+    }
+  }
 
-        // Remove the order from the repository.
-        _unitOfWork.Orders.Remove(order);
-        var isSaved = await _unitOfWork.CompleteAsync();
-        if (!isSaved)
-        {
-          var error = _errorFactory.CreateDatabaseError("Order");
-          return Result<string>.Failure([error.err], error.statusCode);
-        }
-
-        return Result<string>.Success("Order deleted successfully", StatusCodes.Status200OK);
-      }
-      catch (Exception ex)
+  // 6. Delete Order (Admin)
+  public async Task<Result<string>> DeleteOrderAsync(Guid orderId)
+  {
+    try
+    {
+      var order = await _unitOfWork.Orders.GetByIdAsync(orderId);
+      if (order == null)
       {
         return Result<string>.Failure(
-          new List<Error> { new Error("Order.Delete", ex.Message) },
-          StatusCodes.Status500InternalServerError
-        );
+            [new Error("Order.Delete", "Order not found")],
+            StatusCodes.Status404NotFound);
       }
-    }
 
-    private static OrderResponse MapToOrderResponse(Order order)
-    {
-      return new OrderResponse
+      _unitOfWork.Orders.Remove(order);
+      var saved = await _unitOfWork.CompleteAsync();
+
+      if (!saved)
       {
-        Id = order.Id,
-        CustomerId = order.CustomerId,
-        CouponId = (Guid)order.CouponId,
-        SubTotal = order.SubTotal,
-        TotalPrice = order.TotalPrice,
-        OrderDate = order.OrderDate,
-        ShippingAddress = order.ShippingAddress,
-        BillingAddress = order.BillingAddress,
-        TrackingNumber = order.TrackingNumber,
-        DeliveryDate = order.DeliveryDate,
-        Status = order.Status
-      };
+        return Result<string>.Failure(
+            [new Error("Order.Delete", "Failed to delete order")],
+            StatusCodes.Status500InternalServerError);
+      }
+
+      return Result<string>.Success(
+          "Order deleted successfully",
+          StatusCodes.Status200OK);
     }
+    catch (Exception ex)
+    {
+      return Result<string>.Failure(
+          [new Error("Order.Delete", ex.Message)],
+          StatusCodes.Status500InternalServerError);
+    }
+  }
+
+  // 7. Cleanup Expired Orders (Background Job)
+  public async Task CleanupExpiredOrders()
+  {
+    try
+    {
+      var expiryTime = DateTime.UtcNow.AddMinutes(-15);
+      var expiredOrders = await _unitOfWork.Orders.GetExpiredPendingOrdersAsync(expiryTime);
+
+      foreach (var order in expiredOrders)
+      {
+        order.Status = "EXPIRED";
+        order.LastModified = DateTime.UtcNow;
+        _unitOfWork.Orders.Update(order);
+      }
+
+      await _unitOfWork.CompleteAsync();
+    }
+    catch (Exception ex)
+    {
+      // Log error
+      throw;
+    }
+  }
+
+  private static OrderResponse MapToOrderResponse(Order order)
+  {
+    return new OrderResponse
+    {
+      Id = order.Id,
+      CustomerId = order.CustomerId,
+      CouponId = (Guid)order.CouponId,
+      SubTotal = order.SubTotal,
+      TotalPrice = order.TotalPrice,
+      OrderDate = order.OrderDate,
+      ShippingAddress = order.ShippingAddress,
+      BillingAddress = order.BillingAddress,
+      TrackingNumber = order.TrackingNumber,
+      DeliveryDate = order.DeliveryDate,
+      Status = order.Status,
+      CreateAt = (DateTime)order.CreateAt,
+      CreatedBy = order.CreatedBy,
+      LastModified = order.LastModified,
+      LastModifiedBy = order.LastModifiedBy
+    };
   }
 }

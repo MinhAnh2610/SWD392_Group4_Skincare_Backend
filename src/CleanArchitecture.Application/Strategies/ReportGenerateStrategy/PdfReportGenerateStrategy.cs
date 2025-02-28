@@ -84,7 +84,7 @@ namespace CleanArchitecture.Application.Strategies
       });
 
       // Optionally, uncomment the next line to preview in QuestPDF Companion.
-      document.ShowInCompanion();
+      document.ShowInCompanion(12500);
 
       byte[] fileBytes = document.GeneratePdf();
       return fileBytes;
@@ -94,8 +94,7 @@ namespace CleanArchitecture.Application.Strategies
     {
       return reportType switch
       {
-        "monthly" => "Monthly Revenue Report",
-        "daily" => "Daily Revenue Report",
+        "revenue" => "Revenue Report",
         "product_performance" => "Product Performance Report",
         _ => "Report"
       };

@@ -1,21 +1,7 @@
-﻿using Castle.MicroKernel.Registration;
-using CleanArchitecture.Application.DTOs.Cosmetic;
-using CleanArchitecture.Application.DTOs.SkinTypeDto;
-using CleanArchitecture.Application.DTOs.SubCategoryDto;
+﻿using CleanArchitecture.Application.DTOs.Cosmetic;
 using CleanArchitecture.Application.Interfaces;
-using CleanArchitecture.Application.ServiceContracts;
-using CleanArchitecture.Domain.Entities;
-using CleanArchitecture.Domain.RepositoryContracts;
 using Mapster;
-using MapsterMapper;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.WebSockets;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace CleanArchitecture.Application.Services
 {

@@ -1,107 +1,134 @@
-﻿// OrderController.cs
-using CleanArchitecture.Application.DTOs.Order;
-using Microsoft.AspNetCore.Http;
+﻿using CleanArchitecture.Application.DTOs.Order;
+using CleanArchitecture.Application.DTOs.OrderDto;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.RegularExpressions;
 
-namespace CleanArchitecture.Presentation.Endpoints
+public class OrderController : ICarterModule
 {
-  public class OrderController : ICarterModule
+  public void AddRoutes(IEndpointRouteBuilder app)
   {
-    public void AddRoutes(IEndpointRouteBuilder app)
+    var group = app.MapGroup("api/orders").WithTags("Order Management");
+
+    // 1. Create Order (Initial checkout step)
+    group.MapPost("/create", async (CreateOrderRequest request, IOrderService orderService) =>
     {
-      var group = app.MapGroup("api/orders").WithTags("Order Management");
-
-      // GET /orders → View All Customer Orders
-      group.MapGet("/get-all-orders", async (IOrderService orderService) =>
+      var result = await orderService.InitiateOrder(request);
+      if (result.IsSuccess)
       {
-        var result = await orderService.GetAllOrdersAsync();
-        if (result.IsSuccess)
+        // If VNPay payment, include payment URL in response
+        var response = new CreateOrderResponse
         {
-          return Results.Ok(ApiResponse<List<OrderResponse>>.SuccessResponse(
-              result.Data!,
-              "Retrieved Orders Successfully."
-          ));
-        }
-        return Results.StatusCode(result.Status);
-      })
-      .WithName("GetAllOrders")
-      .Produces<ApiResponse<List<OrderResponse>>>(StatusCodes.Status200OK)
-      .ProducesProblem(StatusCodes.Status500InternalServerError)
-      .RequireAuthorization();
+          OrderId = result.Data.Id,
+          //PaymentUrl = result.Data.PaymentMethod.ToUpper() == "VNPAY"
+          //      ? $"/api/payment/process?orderId={result.Data.Id}"
+          //      : null,
+          PaymentUrl = $"/api/payment/process?orderId={result.Data.Id}",
+          Status = result.Data.Status
+        };
 
-      // PUT /orders/{id}/update → Update Order Status
-      group.MapPut("/{id:guid}/update", async (Guid id, UpdateOrderStatusRequest request, IOrderService orderService) =>
+        return Results.Ok(ApiResponse<CreateOrderResponse>.SuccessResponse(
+            response,
+            "Order initiated successfully."
+        ));
+      }
+      return Results.StatusCode(result.Status);
+    })
+    .WithName("CreateOrder")
+    .Produces<ApiResponse<CreateOrderResponse>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status400BadRequest)
+    .RequireAuthorization();
+
+    // 2. Complete Order (After payment)
+    group.MapPost("/{orderId}/complete", async (Guid orderId,
+        [FromQuery] string paymentStatus,
+        IOrderService orderService) =>
+    {
+      var result = await orderService.CompleteOrder(orderId, paymentStatus);
+      if (result.IsSuccess)
       {
-        var result = await orderService.UpdateOrderStatusAsync(id, request);
-        if (result.IsSuccess)
-        {
-          return Results.Ok(ApiResponse<OrderResponse>.SuccessResponse(
-              result.Data!,
-              "Order status updated successfully."
-          ));
-        }
-        return Results.StatusCode(result.Status);
-      })
-      .WithName("UpdateOrderStatus")
-      .Produces<ApiResponse<OrderResponse>>(StatusCodes.Status200OK)
-      .ProducesProblem(StatusCodes.Status404NotFound)
-      .ProducesProblem(StatusCodes.Status500InternalServerError)
-      .RequireAuthorization();
+        return Results.Ok(ApiResponse<OrderResponse>.SuccessResponse(
+            result.Data!,
+            "Order completed successfully."
+        ));
+      }
+      return Results.StatusCode(result.Status);
+    })
+    .WithName("CompleteOrder")
+    .Produces<ApiResponse<OrderResponse>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status404NotFound)
+    .RequireAuthorization();
 
-      // GET /customers/{id}/orders → View Customer Order History
-      group.MapGet("/customers/{id:guid}/orders", async (Guid id, IOrderService orderService) =>
+    // 3. Get All Orders (Admin)
+    group.MapGet("/get-all-orders", async (IOrderService orderService) =>
+    {
+      var result = await orderService.GetAllOrdersAsync();
+      if (result.IsSuccess)
       {
-        var result = await orderService.GetOrdersByCustomerIdAsync(id);
-        if (result.IsSuccess)
-        {
-          return Results.Ok(ApiResponse<List<OrderResponse>>.SuccessResponse(
-              result.Data!,
-              "Retrieved Customer Order History Successfully."
-          ));
-        }
-        return Results.StatusCode(result.Status);
-      })
-      .WithName("GetCustomerOrderHistory")
-      .Produces<ApiResponse<List<OrderResponse>>>(StatusCodes.Status200OK)
-      .ProducesProblem(StatusCodes.Status500InternalServerError)
-      .RequireAuthorization();
+        return Results.Ok(ApiResponse<List<OrderResponse>>.SuccessResponse(
+            result.Data!,
+            "Retrieved Orders Successfully."
+        ));
+      }
+      return Results.StatusCode(result.Status);
+    })
+    .WithName("GetAllOrders")
+    .Produces<ApiResponse<List<OrderResponse>>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status500InternalServerError)
+    .RequireAuthorization(policy => policy.RequireRole("Admin"));
 
-      group.MapPost("/check-out", async (CheckOutRequest request, IOrderService orderService) =>
+    // 4. Get Customer Orders
+    group.MapGet("/my-orders", async (IOrderService orderService, IClaimsService claimsService) =>
+    {
+      var result = await orderService.GetOrdersByCustomerIdAsync(claimsService.CurrentUserId);
+      if (result.IsSuccess)
       {
-        var result = await orderService.CheckOut(request);
-        if (result.IsSuccess)
-        {
-          return Results.Created($"/orders/{result.Data!.Id}", ApiResponse<OrderResponse>.SuccessResponse(
-                 result.Data!,
-                 "Order created successfully."
-                 ));
-        }
-        return Results.StatusCode(result.Status);
-      })
-      .WithName("Check out")
-      .Produces<ApiResponse<List<OrderResponse>>>(StatusCodes.Status200OK)
-      .ProducesProblem(StatusCodes.Status500InternalServerError)
-      .RequireAuthorization();
+        return Results.Ok(ApiResponse<List<OrderResponse>>.SuccessResponse(
+            result.Data!,
+            "Retrieved Customer Orders Successfully."
+        ));
+      }
+      return Results.StatusCode(result.Status);
+    })
+    .WithName("GetMyOrders")
+    .Produces<ApiResponse<List<OrderResponse>>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status500InternalServerError)
+    .RequireAuthorization();
 
-      group.MapDelete("/{orderId}", async (Guid orderId, IOrderService orderService) =>
+    // 5. Update Order Status (Admin)
+    group.MapPut("/{id:guid}/status", async (Guid id,
+        UpdateOrderStatusRequest request,
+        IOrderService orderService) =>
+    {
+      var result = await orderService.UpdateOrderStatusAsync(id, request);
+      if (result.IsSuccess)
       {
-        var result = await orderService.DeleteOrderAsync(orderId);
-        if (result.IsSuccess)
-        {
-          return Results.Ok(ApiResponse<string>.SuccessResponse(result.Data!, "Order deleted successfully."));
-        }
-        return Results.StatusCode(result.Status);
-      })
-   .WithName("DeleteOrder")
-   .Produces<ApiResponse<string>>(StatusCodes.Status200OK)
-   .ProducesProblem(StatusCodes.Status404NotFound)
-   .ProducesProblem(StatusCodes.Status500InternalServerError)
-   .WithSummary("Delete Order")
-   .WithDescription("Deletes an order by its identifier.")
-   .RequireAuthorization();
+        return Results.Ok(ApiResponse<OrderResponse>.SuccessResponse(
+            result.Data!,
+            "Order status updated successfully."
+        ));
+      }
+      return Results.StatusCode(result.Status);
+    })
+    .WithName("UpdateOrderStatus")
+    .Produces<ApiResponse<OrderResponse>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status404NotFound)
+    .RequireAuthorization(policy => policy.RequireRole("Admin"));
 
-    }
-
+    // 6. Delete Order (Admin)
+    group.MapDelete("/{orderId}", async (Guid orderId, IOrderService orderService) =>
+    {
+      var result = await orderService.DeleteOrderAsync(orderId);
+      if (result.IsSuccess)
+      {
+        return Results.Ok(ApiResponse<string>.SuccessResponse(
+            result.Data!,
+            "Order deleted successfully."
+        ));
+      }
+      return Results.StatusCode(result.Status);
+    })
+    .WithName("DeleteOrder")
+    .Produces<ApiResponse<string>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status404NotFound)
+    .RequireAuthorization(policy => policy.RequireRole("Admin"));
   }
 }

@@ -1,9 +1,6 @@
 ﻿using CleanArchitecture.Application.DTOs.Cosmetic;
-using CleanArchitecture.Application.DTOs.CosmeticSubcategory;
-using CleanArchitecture.Domain.Entities;
 using CleanArchitecture.Domain.RepositoryContracts;
 using Mapster;
-using System.Configuration;
 using System.Linq.Expressions;
 
 namespace CleanArchitecture.Infrastructure.Repositories;
