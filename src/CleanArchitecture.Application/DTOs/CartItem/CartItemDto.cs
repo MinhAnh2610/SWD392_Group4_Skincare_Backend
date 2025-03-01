@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CleanArchitecture.Application.DTOs.CartItem
+﻿namespace CleanArchitecture.Application.DTOs.CartItem
 {
   public class CartItemDto
   {
@@ -14,5 +8,9 @@ namespace CleanArchitecture.Application.DTOs.CartItem
     public decimal Price { get; set; }
     public int Quantity { get; set; }
     public decimal Subtotal => Price * Quantity;
+    public int Weight { get; set; }
+    public int Length { get; set; }
+    public int Width { get; set; }
+    public int Height { get; set; }
   }
 }

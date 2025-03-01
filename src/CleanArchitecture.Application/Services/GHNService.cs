@@ -1,6 +1,5 @@
 ﻿namespace CleanArchitecture.Application.Services;
 
-using CleanArchitecture.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.Net.Http;
@@ -50,13 +49,13 @@ public class GHNService : IGHNService
         }, int.Parse(response.StatusCode.ToString()));
       }
 
-      return Result<string>.Success(content, int.Parse(response.StatusCode.ToString()));
+      return Result<string>.Success(content, StatusCodes.Status200OK);
     }
     catch (Exception ex)
     {
       return Result<string>.Failure(new List<Error>
       {
-        new Error(ex.Message, ex.InnerException!.ToString())
+        new Error(ex.Message, ex.StackTrace!)
       }, StatusCodes.Status500InternalServerError);
     }
   }
@@ -72,4 +71,16 @@ public class GHNService : IGHNService
 
   public Task<Result<string>> CreateReturnOrderAsync(object returnData) =>
       SendRequestAsync(CreateRequest(HttpMethod.Post, "v2/shipping-order/create", returnData));
+
+  public Task<Result<string>> GetStoreInformationAsync(object queryData) =>
+      SendRequestAsync(CreateRequest(HttpMethod.Post, "v2/shop/all", queryData));
+
+  public Task<Result<string>> GetDistrictAsync(int provinceId) =>
+      SendRequestAsync(CreateRequest(HttpMethod.Get, "master-data/district", provinceId));
+
+  public Task<Result<string>> GetWardAsync(int districtId) =>
+      SendRequestAsync(CreateRequest(HttpMethod.Post, "master-data/ward?district_id", districtId));
+
+  public Task<Result<string>> GetProvinceAsync() =>
+      SendRequestAsync(CreateRequest(HttpMethod.Get, "master-data/province"));
 }

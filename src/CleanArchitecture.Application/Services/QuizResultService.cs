@@ -3,15 +3,18 @@ using CleanArchitecture.Application.DTOs.QuizDto;
 using CleanArchitecture.Application.DTOs.QuizResultDto;
 using CleanArchitecture.Application.DTOs.RoutineDTO;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 
 namespace CleanArchitecture.Application.Services;
 
 public class QuizResultService : IQuizResultService
 {
   private readonly IUnitOfWork _unitOfWork;
-  public QuizResultService(IUnitOfWork unitOfWork)
+  private readonly UserManager<User> _userManager;
+  public QuizResultService(IUnitOfWork unitOfWork, UserManager<User> userManager)
   {
     _unitOfWork = unitOfWork;
+    _userManager = userManager;
   }
 
   public async Task<Result<List<QuizResultResponse>>> GetAllCustomerQuizResultsAsync()
@@ -119,6 +122,9 @@ public class QuizResultService : IQuizResultService
             )!
       }).ToList()
     };
+
+    var user = await _userManager.FindByIdAsync(customerId.ToString());
+    user!.SkinTypeId = skinType.Id;
 
     await _unitOfWork.QuizResults.CreateAsync(quizResult);
     await _unitOfWork.CompleteAsync();

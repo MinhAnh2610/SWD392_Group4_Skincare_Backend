@@ -1,21 +1,21 @@
 ﻿using CleanArchitecture.Application.DTOs.Cart;
 using CleanArchitecture.Application.DTOs.CartItem;
 using CleanArchitecture.Application.DTOs.UserDto;
-using CleanArchitecture.Domain.Entities;
-using CleanArchitecture.Domain.RepositoryContracts;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 
 namespace CleanArchitecture.Application.Services
 {
   public class CartService : ICartService
   {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly UserManager<User> _userManager;
     private readonly IClaimsService _claimsService;
-    public CartService(IUnitOfWork unitOfWork, IClaimsService claimsService)
+    public CartService(IUnitOfWork unitOfWork, IClaimsService claimsService, UserManager<User> userManager)
     {
       _unitOfWork = unitOfWork;
       _claimsService = claimsService;
- 
+      _userManager = userManager;
     }
 
     public async Task<Result<List<CartResponse>>> AddCartItemAsync(AddProductRequest addProductRequest)
@@ -223,7 +223,11 @@ namespace CleanArchitecture.Application.Services
           // Select only the first image URL to avoid circular references:
           CosmeticImage = ci.Cosmetic?.CosmeticImages.FirstOrDefault()?.ImageUrl ?? string.Empty,
           Price = ci.Cosmetic?.Price ?? 0,
-          Quantity = ci.Quantity
+          Quantity = ci.Quantity,
+          Height = ci.Cosmetic.Height,
+          Length = ci.Cosmetic.Length,
+          Weight = ci.Cosmetic.Weight,
+          Width = ci.Cosmetic.Width
         }).ToList()
       };
     }

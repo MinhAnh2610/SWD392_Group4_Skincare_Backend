@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CleanArchitecture.Application.DTOs.OrderDto
+﻿namespace CleanArchitecture.Application.DTOs.OrderDto
 {
   public class CreateOrderRequest
   {
@@ -14,6 +8,6 @@ namespace CleanArchitecture.Application.DTOs.OrderDto
     public string BillingAddress { get; set; } = string.Empty;
     public string PaymentMethod { get; set; } = string.Empty; // "VNPAY", "CARD", etc.
     public string Currency { get; set; } = string.Empty; // "VND", "USD"
-    public decimal Amount { get; set; }
+    //public decimal Amount { get; set; }
   }
 }

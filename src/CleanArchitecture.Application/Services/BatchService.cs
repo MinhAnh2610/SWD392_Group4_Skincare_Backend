@@ -1,15 +1,8 @@
-﻿using Abp.Domain.Repositories;
-using Abp.Linq.Expressions;
+﻿using Abp.Linq.Expressions;
 using CleanArchitecture.Application.DTOs.BatchDto;
 using CleanArchitecture.Application.Interfaces;
-using CleanArchitecture.Domain.Entities;
 using Mapster;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CleanArchitecture.Application.Services
 {
