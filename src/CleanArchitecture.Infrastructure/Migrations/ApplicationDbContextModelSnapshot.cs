@@ -62,7 +62,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("CosmeticId");
 
-                    b.ToTable("Batches");
+                    b.ToTable("Batches", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Blog", b =>
@@ -99,7 +99,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("StaffId");
 
-                    b.ToTable("Blogs");
+                    b.ToTable("Blogs", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.BlogTag", b =>
@@ -114,7 +114,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("TagId");
 
-                    b.ToTable("BlogsTags");
+                    b.ToTable("BlogsTags", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Brand", b =>
@@ -156,7 +156,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Brands");
+                    b.ToTable("Brands", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Cart", b =>
@@ -190,7 +190,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Carts");
+                    b.ToTable("Carts", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.CartItem", b =>
@@ -208,7 +208,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("CosmeticId");
 
-                    b.ToTable("CartItems");
+                    b.ToTable("CartItems", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Category", b =>
@@ -242,7 +242,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.CompanyInformation", b =>
@@ -292,7 +292,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CompanyInformation");
+                    b.ToTable("CompanyInformation", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Cosmetic", b =>
@@ -382,7 +382,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("SkinTypeId");
 
-                    b.ToTable("Cosmetics");
+                    b.ToTable("Cosmetics", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.CosmeticImage", b =>
@@ -417,7 +417,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("CosmeticId");
 
-                    b.ToTable("CosmeticsImages");
+                    b.ToTable("CosmeticsImages", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.CosmeticSubCategory", b =>
@@ -432,7 +432,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("CosmeticId");
 
-                    b.ToTable("CosmeticSubCategories");
+                    b.ToTable("CosmeticSubCategories", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.CosmeticType", b =>
@@ -466,7 +466,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CosmeticTypes");
+                    b.ToTable("CosmeticTypes", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Coupon", b =>
@@ -510,7 +510,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Coupons");
+                    b.ToTable("Coupons", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.FAQ", b =>
@@ -544,7 +544,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FAQs");
+                    b.ToTable("FAQs", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Feedback", b =>
@@ -586,7 +586,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Feedbacks");
+                    b.ToTable("Feedbacks", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Order", b =>
@@ -651,7 +651,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.OrderItem", b =>
@@ -669,7 +669,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("CosmeticId");
 
-                    b.ToTable("OrderItems");
+                    b.ToTable("OrderItems", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Policy", b =>
@@ -703,7 +703,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Policies");
+                    b.ToTable("Policies", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Question", b =>
@@ -751,7 +751,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("QuizId");
 
-                    b.ToTable("Questions");
+                    b.ToTable("Questions", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.QuestionOption", b =>
@@ -788,7 +788,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("QuestionId");
 
-                    b.ToTable("QuestionOptions");
+                    b.ToTable("QuestionOptions", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.QuestionType", b =>
@@ -817,7 +817,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("QuestionTypes");
+                    b.ToTable("QuestionTypes", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Quiz", b =>
@@ -855,7 +855,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Quizzes");
+                    b.ToTable("Quizzes", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.QuizAnswer", b =>
@@ -895,7 +895,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("QuizResultId");
 
-                    b.ToTable("QuizAnswers");
+                    b.ToTable("QuizAnswers", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.QuizResult", b =>
@@ -936,7 +936,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("SkinTypeId");
 
-                    b.ToTable("QuizResults");
+                    b.ToTable("QuizResults", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Refund", b =>
@@ -992,7 +992,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("StaffId");
 
-                    b.ToTable("Refunds");
+                    b.ToTable("Refunds", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.RefundItem", b =>
@@ -1035,7 +1035,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("RefundId");
 
-                    b.ToTable("RefundItems");
+                    b.ToTable("RefundItems", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Role", b =>
@@ -1101,7 +1101,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("SkinTypeId");
 
-                    b.ToTable("Routines");
+                    b.ToTable("Routines", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.RoutineStep", b =>
@@ -1140,7 +1140,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("RoutineId");
 
-                    b.ToTable("RoutineSteps");
+                    b.ToTable("RoutineSteps", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.SkinType", b =>
@@ -1186,7 +1186,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SkinTypes");
+                    b.ToTable("SkinTypes", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.SubCategory", b =>
@@ -1225,7 +1225,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("SubCategories");
+                    b.ToTable("SubCategories", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Tag", b =>
@@ -1257,7 +1257,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tags");
+                    b.ToTable("Tags", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Testimonial", b =>
@@ -1295,7 +1295,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Testimonials");
+                    b.ToTable("Testimonials", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.User", b =>
@@ -1398,7 +1398,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRole");
+                    b.ToTable("UserRole", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -1547,7 +1547,7 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.HasIndex("OrderId")
                         .IsUnique();
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Batch", b =>

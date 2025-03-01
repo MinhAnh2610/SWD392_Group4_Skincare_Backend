@@ -3,6 +3,8 @@ using CleanArchitecture.Application.DTOs.GHN;
 using CleanArchitecture.Application.DTOs.Order;
 using CleanArchitecture.Application.DTOs.OrderDto;
 using CleanArchitecture.Application.Interfaces;
+using CleanArchitecture.Application.Strategies.InvoiceGenerateStrategy;
+using CleanArchitecture.Domain.RepositoryContracts;
 using Microsoft.AspNetCore.Http;
 
 public class OrderService : IOrderService
@@ -11,17 +13,20 @@ public class OrderService : IOrderService
   private readonly IErrorFactory _errorFactory;
   private readonly IClaimsService _claimsService;
   private readonly IGHNService _ghnService;
+  private readonly IEnumerable<IInvoiceGenerateStrategy> _invoiceGenerateStrategies;
+  private readonly ITimeZoneService _timeZoneService;
 
   public OrderService(
       IUnitOfWork unitOfWork,
       IErrorFactory errorFactory,
       IClaimsService claimsService,
-      IGHNService ghnService)
+      IGHNService ghnService, ITimeZoneService timeZoneService)
   {
     _unitOfWork = unitOfWork;
     _errorFactory = errorFactory;
     _claimsService = claimsService;
     _ghnService = ghnService;
+    _timeZoneService = timeZoneService;
   }
 
   // 1. Initiate Order (First step of checkout)
@@ -163,14 +168,14 @@ public class OrderService : IOrderService
         CouponId = request.CouponId,
         SubTotal = cart.TotalPrice,
         TotalPrice = cart.TotalPrice, // Apply coupon discount if needed
-        OrderDate = DateTime.UtcNow,
+        OrderDate = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow),
         ShippingAddress = request.ShippingAddress,
         BillingAddress = request.BillingAddress,
         TrackingNumber = null,
         Status = OrderStatus.PENDING,
-        CreateAt = DateTime.UtcNow,
+        CreateAt = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow),
         CreatedBy = cart.Customer.UserName,
-        LastModified = DateTime.UtcNow,
+        LastModified = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow),
         LastModifiedBy = cart.Customer.UserName,
         OrderItems = cart.CartItems.Select(ci => new OrderItem
         {
@@ -190,8 +195,21 @@ public class OrderService : IOrderService
             StatusCodes.Status500InternalServerError);
       }
 
+      var orderResponse = MapToOrderResponse(order);
+      
+      for(int i = 0; i < _invoiceGenerateStrategies.Count(); i++)
+      {
+        var nameOfStrat = _invoiceGenerateStrategies.ElementAt(i).GetType().Name;
+        if (nameOfStrat.Contains("online", StringComparison.OrdinalIgnoreCase))
+        {
+          var invoice = _invoiceGenerateStrategies.ElementAt(i).Generate(order);
+          orderResponse.Invoice = invoice;
+          break;
+        }
+      } 
+
       return Result<OrderResponse>.Success(
-          MapToOrderResponse(order),
+          orderResponse,
           StatusCodes.Status200OK);
     }
     catch (Exception ex)

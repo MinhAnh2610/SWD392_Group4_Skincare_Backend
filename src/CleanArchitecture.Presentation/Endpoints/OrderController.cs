@@ -10,34 +10,33 @@ public class OrderController : ICarterModule
 
     // 1. Create Order (Initial checkout step)
     group.MapPost("/create", async (CreateOrderRequest request, IOrderService orderService) =>
-    {
-      var result = await orderService.InitiateOrder(request);
-      if (result.IsSuccess)
       {
-        // If VNPay payment, include payment URL in response
-        var response = new CreateOrderResponse
+        var result = await orderService.InitiateOrder(request);
+        if (result.IsSuccess)
         {
-          OrderId = result.Data.Id,
-          //PaymentUrl = result.Data.PaymentMethod.ToUpper() == "VNPAY"
-          //      ? $"/api/payment/process?orderId={result.Data.Id}"
-          //      : null,
-          PaymentUrl = $"/api/payment/process?orderId={result.Data.Id}",
-          Status = result.Data.Status
-        };
+          // If VNPay payment, include payment URL in response
+          var response = new CreateOrderResponse
+          {
+            OrderId = result.Data.Id,
+            //PaymentUrl = result.Data.PaymentMethod.ToUpper() == "VNPAY"
+            //      ? $"/api/payment/process?orderId={result.Data.Id}"
+            //      : null,
+            PaymentUrl = $"/api/payment/process?orderId={result.Data.Id}",
+            Status = result.Data.Status
+          };
 
-        return Results.Ok(ApiResponse<CreateOrderResponse>.SuccessResponse(
+          return Results.Ok(ApiResponse<CreateOrderResponse>.SuccessResponse(
             response,
             "Order initiated successfully."
-        ));
-      }
-      return result.Match(Message.SUCCESSFUL_CREATED(nameof(result)));
-    })
-    .WithName("CreateOrder")
-    .Produces<ApiResponse<CreateOrderResponse>>(StatusCodes.Status200OK)
-    .ProducesProblem(StatusCodes.Status400BadRequest)
-    .WithSummary("CreateOrder")
-    .WithDescription("Create Order")
-    .RequireAuthorization();
+          ));
+        }
+
+        return Results.StatusCode(result.Status);
+      })
+      .WithName("CreateOrder")
+      .Produces<ApiResponse<CreateOrderResponse>>(StatusCodes.Status200OK)
+      .ProducesProblem(StatusCodes.Status400BadRequest);
+    // .RequireAuthorization();
 
     // 2. Complete Order (After payment)
     group.MapPost("/{orderId}/complete", async (Guid orderId,
@@ -57,8 +56,6 @@ public class OrderController : ICarterModule
     .WithName("CompleteOrder")
     .Produces<ApiResponse<OrderResponse>>(StatusCodes.Status200OK)
     .ProducesProblem(StatusCodes.Status404NotFound)
-    .WithSummary("CompleteOrder")
-    .WithDescription("Complete Order")
     .RequireAuthorization();
 
     // 3. Get All Orders (Admin)
@@ -77,8 +74,6 @@ public class OrderController : ICarterModule
     .WithName("GetAllOrders")
     .Produces<ApiResponse<List<OrderResponse>>>(StatusCodes.Status200OK)
     .ProducesProblem(StatusCodes.Status500InternalServerError)
-    .WithSummary("GetAllOrders")
-    .WithDescription("Get All Orders")
     .RequireAuthorization(policy => policy.RequireRole("Admin"));
 
     // 4. Get Customer Orders
@@ -97,8 +92,6 @@ public class OrderController : ICarterModule
     .WithName("GetMyOrders")
     .Produces<ApiResponse<List<OrderResponse>>>(StatusCodes.Status200OK)
     .ProducesProblem(StatusCodes.Status500InternalServerError)
-    .WithSummary("GetMyOrders")
-    .WithDescription("Get My Orders")
     .RequireAuthorization();
 
     // 5. Update Order Status (Admin)
@@ -119,8 +112,6 @@ public class OrderController : ICarterModule
     .WithName("UpdateOrderStatus")
     .Produces<ApiResponse<OrderResponse>>(StatusCodes.Status200OK)
     .ProducesProblem(StatusCodes.Status404NotFound)
-    .WithSummary("UpdateOrderStatus")
-    .WithDescription("Update Order Status")
     .RequireAuthorization(policy => policy.RequireRole("Admin"));
 
     // 6. Delete Order (Admin)
@@ -139,8 +130,6 @@ public class OrderController : ICarterModule
     .WithName("DeleteOrder")
     .Produces<ApiResponse<string>>(StatusCodes.Status200OK)
     .ProducesProblem(StatusCodes.Status404NotFound)
-    .WithSummary("DeleteOrder")
-    .WithDescription("Delete Order")
     .RequireAuthorization(policy => policy.RequireRole("Admin"));
   }
 }

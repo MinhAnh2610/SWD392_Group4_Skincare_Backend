@@ -1,18 +1,28 @@
-﻿namespace CleanArchitecture.Application.DTOs.Order
+﻿using CleanArchitecture.Application.DTOs.Payment;
+using CleanArchitecture.Application.DTOs.Refund;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CleanArchitecture.Application.DTOs.Order
 {
   public class OrderResponse
   {
-    public Guid Id { get; set; }
-    public Guid CustomerId { get; set; }
+    public Guid? Id { get; set; }
+    public Guid? CustomerId { get; set; }
     public Guid? CouponId { get; set; }
-    public decimal SubTotal { get; set; }
-    public decimal TotalPrice { get; set; }
-    public DateTime OrderDate { get; set; }
-    public string ShippingAddress { get; set; } = default!;
-    public string BillingAddress { get; set; } = default!;
+    public decimal? SubTotal { get; set; }
+    public decimal? TotalPrice { get; set; }
+    public DateTime? OrderDate { get; set; }
+    public string? ShippingAddress { get; set; } = default!;
+    public string? BillingAddress { get; set; } = default!;
     public string? TrackingNumber { get; set; } = default!;
-    public DateTime DeliveryDate { get; set; }
-    public string Status { get; set; } = default!;
+    public DateTime? DeliveryDate { get; set; }
+    public string? Status { get; set; } = default!;
+
+    public byte[]? Invoice { get; set; } = null; 
     // Audit properties
     public DateTime? CreateAt { get; set; }
     public string? CreatedBy { get; set; }

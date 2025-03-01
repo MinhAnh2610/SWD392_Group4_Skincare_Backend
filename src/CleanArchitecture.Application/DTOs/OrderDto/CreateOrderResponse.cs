@@ -9,8 +9,8 @@ namespace CleanArchitecture.Application.DTOs.OrderDto
   public class CreateOrderResponse
 
   {
-    public Guid OrderId { get; set; }
-    public string PaymentUrl{ get; set; }
-    public string Status { get; set; }
+    public Guid? OrderId { get; set; }
+    public string? PaymentUrl{ get; set; }
+    public string? Status { get; set; }
   }
 }
