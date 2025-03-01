@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Application.Constants;
+using CleanArchitecture.Application.DTOs.GHN;
 using CleanArchitecture.Application.DTOs.Order;
 using CleanArchitecture.Application.DTOs.OrderDto;
 using CleanArchitecture.Application.Interfaces;
@@ -9,15 +10,18 @@ public class OrderService : IOrderService
   private readonly IUnitOfWork _unitOfWork;
   private readonly IErrorFactory _errorFactory;
   private readonly IClaimsService _claimsService;
+  private readonly IGHNService _ghnService;
 
   public OrderService(
       IUnitOfWork unitOfWork,
       IErrorFactory errorFactory,
-      IClaimsService claimsService)
+      IClaimsService claimsService,
+      IGHNService ghnService)
   {
     _unitOfWork = unitOfWork;
     _errorFactory = errorFactory;
     _claimsService = claimsService;
+    _ghnService = ghnService;
   }
 
   // 1. Initiate Order (First step of checkout)
@@ -25,6 +29,7 @@ public class OrderService : IOrderService
   {
     try
     {
+      #region Validate Request
       // Validate cart exists and has items
       var cart = await _unitOfWork.Carts.GetCartWithItemsAsync(request.CartId);
       if (cart == null || !cart.CartItems.Any())
@@ -50,6 +55,105 @@ public class OrderService : IOrderService
             [new Error("Order.Invalid", "Shipping and billing addresses are required")],
             StatusCodes.Status400BadRequest);
       }
+      #endregion
+
+      #region Deduct cosmetic quantity from batches (check the availability of batches)
+      var requiredQuantities = cart.CartItems
+        .GroupBy(ci => ci.CosmeticId)
+        .ToDictionary(g => g.Key, g => g.Sum(ci => ci.Quantity));
+
+      foreach (var (cosmeticId, quantityNeeded) in requiredQuantities)
+      {
+        var availableBatches = await _unitOfWork.Batches.GetListByAnyId(e => e.CosmeticId == cosmeticId, 2);
+
+        // get only the non-expired batches
+        availableBatches = availableBatches
+          .Where(b => b.ExpirationDate >= DateOnly.FromDateTime(DateTime.UtcNow)) // Skip expired batches
+          .OrderBy(b => b.ExportedDate)
+          .ToList();
+
+        if (!availableBatches.Any())
+        {
+          return Result<OrderResponse>.Failure(
+              [new Error("Order.ExpiredStock", "All available stock has expired")],
+              StatusCodes.Status400BadRequest);
+        }
+
+        int totalAvailable = availableBatches.Sum(b => b.Quantity);
+        if (totalAvailable < quantityNeeded)
+        {
+          return Result<OrderResponse>.Failure(
+              [new Error("Order.InsufficientStock", "Not enough stock available")],
+              StatusCodes.Status400BadRequest);
+        }
+
+        // Deduct from batches (FIFO)
+        foreach (var batch in availableBatches.OrderBy(b => b.ExportedDate))
+        {
+          if (quantityNeeded <= 0) break;
+
+          int deducted = Math.Min(batch.Quantity, quantityNeeded);
+          batch.Quantity -= deducted;
+          //quantityNeeded -= deducted;
+
+          _unitOfWork.Batches.Update(batch);
+        }
+      }
+      #endregion
+
+      #region Calculate the total shipping weight and dimesions
+      var totalWeight = 0;
+      var totalLength = 0;
+      var totalWidth = 0;
+      var totalHeight = 0;
+
+      foreach (var cartItem in cart.CartItems)
+      {
+        totalWeight += cartItem.Cosmetic.Weight * cartItem.Quantity;
+        totalLength = Math.Max(totalLength, cartItem.Cosmetic.Length);
+        totalWidth = Math.Max(totalWidth, cartItem.Cosmetic.Width);
+        totalHeight += cartItem.Cosmetic.Height * cartItem.Quantity; // Stack height
+      }
+      #endregion
+
+      #region Payment methods business flow
+      //string ghnOrderId = null;
+      //if (request.PaymentMethod == PaymentMethods.COD)
+      //{
+      //  var ghnRequest = new CreateGHNOrderRequest
+      //  {
+      //    ServiceId = 53320, // Example service ID
+      //    FromDistrictId = 1452, // Your shop’s district ID
+      //    ToDistrictId = request.DistrictId, // Customer's district
+      //    Weight = totalWeight,
+      //    Length = totalLength,
+      //    Width = totalWidth,
+      //    Height = totalHeight,
+      //    PaymentTypeId = 2, // 2 = COD, 1 = Prepaid
+      //    Items = cart.CartItems.Select(ci => new GHNOrderItemRequest
+      //    {
+      //      Name = ci.Cosmetic.Name,
+      //      Quantity = ci.Quantity,
+      //      Price = ci.Cosmetic.Price,
+      //      Code = ci.CosmeticId.ToString(),
+      //      Weight = ci.Cosmetic.Weight,
+      //      Height = ci.Cosmetic.Height,
+      //      Width = ci.Cosmetic.Width,
+      //      Length = ci.Cosmetic.Length
+      //    }).ToList()
+      //  };
+
+      //  var deliveryResponse = await _ghnService.CreateShippingOrderAsync(ghnRequest);
+      //  if (!deliveryResponse.IsSuccess)
+      //  {
+      //    return Result<OrderResponse>.Failure(
+      //        [new Error("Order.Delivery", "Failed to initiate delivery")],
+      //        StatusCodes.Status500InternalServerError);
+      //  }
+
+      //  ghnOrderId = deliveryResponse.GHNOrderId;
+      //}
+      #endregion
 
       // Create order
       var order = new Order

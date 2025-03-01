@@ -223,7 +223,11 @@ namespace CleanArchitecture.Application.Services
           // Select only the first image URL to avoid circular references:
           CosmeticImage = ci.Cosmetic?.CosmeticImages.FirstOrDefault()?.ImageUrl ?? string.Empty,
           Price = ci.Cosmetic?.Price ?? 0,
-          Quantity = ci.Quantity
+          Quantity = ci.Quantity,
+          Height = ci.Cosmetic.Height,
+          Length = ci.Cosmetic.Length,
+          Weight = ci.Cosmetic.Weight,
+          Width = ci.Cosmetic.Width
         }).ToList()
       };
     }
