@@ -10,12 +10,12 @@ public class UserController : ICarterModule
     var group = app.MapGroup("api/user").WithTags("User Management");
 
     #region User Profile API
-    group.MapGet("/profile", async (IUserService userService) =>
+    group.MapGet("/me", async (IUserService userService) =>
     {
       var result = await userService.GetUserProfile();
       if (result.IsSuccess)
       {
-        return Results.Ok(ApiResponse<UserProfileResponse>.SuccessResponse(result.Data!, "Retrieve User Profile Successfully."));
+        return Results.Ok(ApiResponse<UserProfileResponse>.SuccessResponse(result.Data!, "Retrieved User Profile Successfully."));
       }
 
       return result.Status switch
@@ -23,13 +23,13 @@ public class UserController : ICarterModule
         _ => Results.StatusCode(StatusCodes.Status500InternalServerError)
       };
     })
-    .WithName("UserProfile")
-    .Produces<ApiResponse<UserProfileResponse>>(StatusCodes.Status200OK)
-    .ProducesProblem(StatusCodes.Status401Unauthorized)
-    .ProducesProblem(StatusCodes.Status500InternalServerError)
-    .WithSummary("UserProfile")
-    .WithDescription("Get User Profile")
-    .RequireAuthorization();
+  .WithName("GetCurrentUserProfile")
+  .Produces<ApiResponse<UserProfileResponse>>(StatusCodes.Status200OK)
+  .ProducesProblem(StatusCodes.Status401Unauthorized)
+  .ProducesProblem(StatusCodes.Status500InternalServerError)
+  .WithSummary("GetCurrentUserProfile")
+  .WithDescription("Get Current User Profile")
+  .RequireAuthorization();
     #endregion
 
     #region Get All Users API
@@ -56,12 +56,12 @@ public class UserController : ICarterModule
     #endregion
 
     #region Update User Profile API
-    group.MapPut("/profile", async (IUserService userService, UpdateProfileRequest request) =>
+    group.MapPut("/me", async (IUserService userService, UpdateProfileRequest request) =>
     {
       var result = await userService.UpdateUserProfileAsync(request);
       if (result.IsSuccess)
       {
-        Results.Ok(ApiResponse<UserProfileResponse>.SuccessResponse(result.Data!, "Update User Profile Successfully."));
+        return Results.Ok(ApiResponse<UserProfileResponse>.SuccessResponse(result.Data!, "Updated User Profile Successfully."));
       }
 
       return result.Status switch
@@ -73,21 +73,22 @@ public class UserController : ICarterModule
         _ => Results.StatusCode(StatusCodes.Status500InternalServerError)
       };
     })
-    .WithName("UpdateProfile")
-    .Produces<ApiResponse<UserProfileResponse>>(StatusCodes.Status200OK)
-    .ProducesProblem(StatusCodes.Status400BadRequest)
-    .ProducesProblem(StatusCodes.Status401Unauthorized)
-    .ProducesProblem(StatusCodes.Status404NotFound)
-    .ProducesProblem(StatusCodes.Status409Conflict)
-    .ProducesProblem(StatusCodes.Status500InternalServerError)
-    .WithSummary("UpdateProfile")
-    .WithDescription("Update User Profile")
-    .RequireAuthorization();
+  .WithName("UpdateCurrentUserProfile")
+  .Produces<ApiResponse<UserProfileResponse>>(StatusCodes.Status200OK)
+  .ProducesProblem(StatusCodes.Status400BadRequest)
+  .ProducesProblem(StatusCodes.Status401Unauthorized)
+  .ProducesProblem(StatusCodes.Status404NotFound)
+  .ProducesProblem(StatusCodes.Status409Conflict)
+  .ProducesProblem(StatusCodes.Status500InternalServerError)
+  .WithSummary("UpdateCurrentUserProfile")
+  .WithDescription("Update Current User Profile")
+  .RequireAuthorization();
     #endregion
 
     #region Enable User API
     group.MapPut("/enable", async (IUserService userService, UserRequest request) =>
     {
+     
       var result = await userService.EnableUserAsync(request);
       if (result.IsSuccess)
       {
