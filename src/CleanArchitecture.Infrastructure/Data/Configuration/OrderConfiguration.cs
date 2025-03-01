@@ -23,5 +23,17 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
     builder.Property(order => order.OrderDate)
       .HasColumnType("timestamp")
       .HasDefaultValueSql("CURRENT_TIMESTAMP");
+    
+    builder.Property(order => order.DeliveryDate)
+      .HasColumnType("timestamp")
+      .HasDefaultValueSql("CURRENT_TIMESTAMP");
+    
+    builder.Property(order => order.CreateAt)
+      .HasColumnType("timestamp")
+      .HasDefaultValueSql("CURRENT_TIMESTAMP");
+    
+    builder.Property(order => order.LastModified)
+      .HasColumnType("timestamp")
+      .HasDefaultValueSql("CURRENT_TIMESTAMP");
   }
 }

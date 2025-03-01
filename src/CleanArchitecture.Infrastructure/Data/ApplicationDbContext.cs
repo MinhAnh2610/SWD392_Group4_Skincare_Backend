@@ -12,6 +12,8 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>, IApplic
 {
   public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
   {
+    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+    AppContext.SetSwitch("Npgsql.DisableDateTimeInfinityConversions", true);
   }
   
   public ApplicationDbContext()

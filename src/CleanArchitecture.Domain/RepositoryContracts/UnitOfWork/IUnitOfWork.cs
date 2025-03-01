@@ -2,6 +2,7 @@
 
 public interface IUnitOfWork : IDisposable
 {
+  #region Repositories
   IBatchRepository Batches { get; }
   IBlogRepository Blogs { get; } 
   IBlogTagRepository BlogTags { get; }
@@ -36,6 +37,8 @@ public interface IUnitOfWork : IDisposable
   ITagRepository Tags { get; }
   ITestimonialRepository Testimonials { get; }
   IUserRepository Users { get; }
+  #endregion
 
+  Task RollBackAsync();
   Task<bool> CompleteAsync();
 }

@@ -1,9 +1,7 @@
-using CleanArchitecture.Application.Constants;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using CleanArchitecture.Application.DTOs.ReportDto;
-using Microsoft.IdentityModel.Tokens;
 using QuestPDF.Companion;
 using System.Globalization;
 

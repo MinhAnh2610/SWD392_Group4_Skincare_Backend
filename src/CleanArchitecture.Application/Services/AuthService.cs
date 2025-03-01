@@ -81,7 +81,7 @@ public class AuthService : IAuthService
     }
 
     var client = _httpClientFactory.CreateClient();
-    var disco = await client.GetDiscoveryDocumentAsync("https://api.pak160404.click/");
+    var disco = await client.GetDiscoveryDocumentAsync("https://localhost:5051");
     if (disco.IsError)
     {
       return Result<AuthResponse>.Failure([AuthErrors.IdentityServerFailed], StatusCodes.Status500InternalServerError);

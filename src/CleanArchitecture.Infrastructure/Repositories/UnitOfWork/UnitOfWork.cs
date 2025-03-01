@@ -1,90 +1,69 @@
 ﻿using CleanArchitecture.Application.ServiceContracts;
 using CleanArchitecture.Domain.RepositoryContracts;
 using CleanArchitecture.Domain.RepositoryContracts.UnitOfWork;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 
 namespace CleanArchitecture.Infrastructure.Repositories.UnitOfWork;
 
-public class UnitOfWork : IUnitOfWork
+public class UnitOfWork : IUnitOfWork 
 {
   private readonly ApplicationDbContext _context;
+  private IDbContextTransaction _transaction;
+  private bool _commited;
   private readonly ILogger<UnitOfWork> _logger;
   private readonly ITimeZoneService _timeZoneService;
-  
-  public IBatchRepository Batches { get; }
-  public IBlogRepository Blogs { get; }
-  public IBlogTagRepository BlogTags { get; }
-  public IBrandRepository Brands { get; }
-  public ICartItemRepository CartItems { get; }
-  public ICartRepository Carts { get; }
-  public ICategoryRepository Categories { get; }
-  public ICompanyInformationRepository CompanyInformation { get; }
-  public ICosmeticImageRepository CosmeticImages { get; }
-  public ICosmeticRepository Cosmetics { get; }
-  public ICosmeticSubCategoryRepository CosmeticSubCategories { get; }
-  public ICosmeticTypeRepository CosmeticTypes { get; } 
-  public ICouponRepository Coupons { get; }
-  public IFAQRepository FAQs { get; }
-  public IFeedbackRepository Feedbacks { get; }
-  public IOrderItemRepository OrderItems { get; }
-  public IOrderRepository Orders { get; }
-  public IPaymentRepository Payments { get; }
-  public IPolicyRepository Policies { get; }
-  public IQuestionOptionRepository QuestionOptions { get; }
-  public IQuestionRepository Questions { get; }
-  public IQuestionTypeRepository QuestionTypes { get; }
-  public IQuizRepository Quizs { get; }
-  public IQuizResultRepository QuizResults { get; }
-  public IQuizAnswerRepository QuizAnswers { get; }
-  public IRefundRepository Refunds { get; }
-  public IRefundItemRepository RefundItems { get; }
-  public IRoutineRepository Routines { get; }
-  public IRoutineStepRepository RoutineSteps { get; }
-  public ISkinTypeRepository SkinTypes { get; }
-  public ISubCategoryRepository SubCategories { get; }
-  public ITagRepository Tags { get; }
-  public ITestimonialRepository Testimonials { get; }
-  public IUserRepository Users { get; }
+
+  #region Repositories
+
+  public IBatchRepository Batches => new BatchRepository(_context);
+  public IBlogRepository Blogs => new BlogRepository(_context);
+  public IBlogTagRepository BlogTags => new BlogTagRepository(_context);
+  public IBrandRepository Brands => new BrandRepository(_context);
+  public ICartItemRepository CartItems => new CartItemRepository(_context);
+  public ICartRepository Carts => new CartRepository(_context);
+  public ICategoryRepository Categories => new CategoryRepository(_context);
+  public ICompanyInformationRepository CompanyInformation => new CompanyInformationRepository(_context);
+  public ICosmeticImageRepository CosmeticImages => new CosmeticImageRepository(_context);
+  public ICosmeticRepository Cosmetics => new CosmeticRepository(_context);
+  public ICosmeticSubCategoryRepository CosmeticSubCategories => new CosmeticSubCategoryRepository(_context);
+  public ICosmeticTypeRepository CosmeticTypes => new CosmeticTypeRepository(_context);
+  public ICouponRepository Coupons => new CouponRepository(_context);
+  public IFAQRepository FAQs => new FAQRepository(_context);
+  public IFeedbackRepository Feedbacks => new FeedbackRepository(_context);
+  public IOrderItemRepository OrderItems => new OrderItemRepository(_context);
+  public IOrderRepository Orders => new OrderRepository(_context);
+  public IPaymentRepository Payments => new PaymentRepository(_context);
+  public IPolicyRepository Policies => new PolicyRepository(_context);
+  public IQuestionOptionRepository QuestionOptions => new QuestionOptionRepository(_context);
+  public IQuestionRepository Questions => new QuestionRepository(_context);
+  public IQuestionTypeRepository QuestionTypes => new QuestionTypeRepository(_context);
+  public IQuizRepository Quizs => new QuizRepository(_context);
+  public IQuizResultRepository QuizResults => new QuizResultRepository(_context);
+  public IQuizAnswerRepository QuizAnswers => new QuizAnswerRepository(_context);
+  public IRefundRepository Refunds => new RefundRepository(_context);
+  public IRefundItemRepository RefundItems => new RefundItemRepository(_context);
+  public IRoutineRepository Routines => new RoutineRepository(_context);
+  public IRoutineStepRepository RoutineSteps => new RoutineStepRepository(_context);
+  public ISkinTypeRepository SkinTypes => new SkinTypeRepository(_context);
+  public ISubCategoryRepository SubCategories => new SubCategoryRepository(_context);
+  public ITagRepository Tags => new TagRepository(_context);
+  public ITestimonialRepository Testimonials => new TestimonialRepository(_context);
+  public IUserRepository Users => new UserRepository(_context);
+
+  #endregion
 
   public UnitOfWork(ApplicationDbContext context, ILogger<UnitOfWork> logger, ITimeZoneService timeZoneService)
   {
     _context = context;
     _logger = logger;
     _timeZoneService = timeZoneService;
-    Batches = new BatchRepository(_context);
-    Blogs = new BlogRepository(_context);
-    BlogTags = new BlogTagRepository(_context);
-    Brands = new BrandRepository(_context);
-    CartItems = new CartItemRepository(_context);
-    Carts = new CartRepository(_context);
-    Categories = new CategoryRepository(_context);
-    CompanyInformation = new CompanyInformationRepository(_context);
-    CosmeticImages = new CosmeticImageRepository(_context);
-    Cosmetics = new CosmeticRepository(_context);
-    CosmeticSubCategories = new CosmeticSubCategoryRepository(_context);
-    CosmeticTypes = new CosmeticTypeRepository(_context);
-    Coupons = new CouponRepository(_context);
-    FAQs = new FAQRepository(_context);
-    Feedbacks = new FeedbackRepository(_context);
-    OrderItems = new OrderItemRepository(_context);
-    Orders = new OrderRepository(_context);
-    Payments = new PaymentRepository(_context);
-    Policies = new PolicyRepository(_context);
-    QuestionOptions = new QuestionOptionRepository(_context);
-    Questions = new QuestionRepository(_context);
-    QuestionTypes = new QuestionTypeRepository(_context);
-    Quizs = new QuizRepository(_context);
-    QuizResults = new QuizResultRepository(_context);
-    QuizAnswers = new QuizAnswerRepository(_context);
-    Refunds = new RefundRepository(_context);
-    RefundItems = new RefundItemRepository(_context);
-    Routines = new RoutineRepository(_context);
-    RoutineSteps = new RoutineStepRepository(_context);
-    SkinTypes = new SkinTypeRepository(_context);
-    SubCategories = new SubCategoryRepository(_context);
-    Tags = new TagRepository(_context);
-    Testimonials = new TestimonialRepository(_context);
-    Users = new UserRepository(_context);
+    _transaction = _context.Database.BeginTransaction();
+  }
+
+  public async Task RollBackAsync()
+  {
+    await _transaction.RollbackAsync();
   }
 
   public async Task<bool> CompleteAsync()
@@ -95,11 +74,13 @@ public class UnitOfWork : IUnitOfWork
       if (linesChanged <= 0)
         return false;
 
+      await _transaction.CommitAsync();
       return true;
     }
     catch (Exception ex)
     {
-      _logger.LogError($"Database saved failed at {DateTime.Now}\n" +
+      _transaction.RollbackAsync();
+      _logger.LogError($"Database saved failed at {_timeZoneService.ConvertToLocalTime(DateTime.UtcNow)}\n" +
                        $"with error: {ex.Message}");
       return false;
     }
@@ -107,6 +88,7 @@ public class UnitOfWork : IUnitOfWork
 
   public void Dispose()
   {
-    _context.Dispose();
+    _transaction?.Dispose();
+    _transaction = null;
   }
 }
