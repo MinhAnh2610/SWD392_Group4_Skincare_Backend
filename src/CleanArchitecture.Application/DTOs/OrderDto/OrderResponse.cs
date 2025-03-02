@@ -21,7 +21,7 @@ namespace CleanArchitecture.Application.DTOs.Order
     public string? TrackingNumber { get; set; } = default!;
     public DateTime? DeliveryDate { get; set; }
     public string? Status { get; set; } = default!;
-
+    public string? PaymentUrl { get; set; }
     public byte[]? Invoice { get; set; } = null; 
     // Audit properties
     public DateTime? CreateAt { get; set; }
