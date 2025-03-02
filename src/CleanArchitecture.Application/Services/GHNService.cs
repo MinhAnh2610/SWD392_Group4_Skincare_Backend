@@ -71,14 +71,14 @@ public class GHNService : IGHNService
   public Task<Result<ShippingFeeData>> CreateShippingOrderAsync(CreateGHNOrderRequest request) =>
       SendRequestAsync<ShippingFeeData>(CreateRequest(HttpMethod.Post, "v2/shipping-order/create", request));
 
-  public Task<Result<object>> GetShippingFeeAsync(object feeData) =>
-      SendRequestAsync<object>(CreateRequest(HttpMethod.Post, "v2/shipping-order/fee", feeData));
+  public Task<Result<FeeData>> GetShippingFeeAsync(CalculateShippingFeeRequest request) =>
+      SendRequestAsync<FeeData>(CreateRequest(HttpMethod.Post, "v2/shipping-order/fee", request));
 
-  public Task<Result<object>> GetOrderTrackingAsync(string orderCode) =>
-      SendRequestAsync<object>(CreateRequest(HttpMethod.Get, $"v2/shipping-order/detail?order_code={orderCode}"));
+  public Task<Result<ShippingOrderData>> GetOrderTrackingAsync(GetShippingOrderRequest request) =>
+      SendRequestAsync<ShippingOrderData>(CreateRequest(HttpMethod.Get, $"v2/shipping-order/detail", request));
 
-  public Task<Result<object>> CreateReturnOrderAsync(object returnData) =>
-      SendRequestAsync<object>(CreateRequest(HttpMethod.Post, "v2/shipping-order/create", returnData));
+  public Task<Result<List<ShippingOrderStatus>>> ChangeShippingOrderStatus(SwitchShippingOrdersStatusRequest request, string status) =>
+      SendRequestAsync<List<ShippingOrderStatus>>(CreateRequest(HttpMethod.Post, $"v2/switch-status/{status}", request));
 
   public Task<Result<List<StoreData>>> GetStoreInformationAsync(object queryData) =>
       SendRequestAsync<List<StoreData>>(CreateRequest(HttpMethod.Post, "v2/shop/all", queryData));

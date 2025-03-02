@@ -1,7 +1,6 @@
 ﻿using CleanArchitecture.Application.DTOs.GHN.Request;
 using CleanArchitecture.Application.DTOs.GHN.Response;
 using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CleanArchitecture.Presentation.Endpoints;
 
@@ -26,47 +25,45 @@ public class GHNController : CarterModule
     #endregion
 
     #region Calculate Fee API
-    group.MapPost("/calculate-fee", async (IGHNService service, HttpContext context) =>
+    group.MapPost("/calculate-fee", async (IGHNService service, [FromBody] CalculateShippingFeeRequest request) =>
     {
-      var requestData = await context.Request.ReadFromJsonAsync<object>();
-      var result = await service.GetShippingFeeAsync(requestData!);
+      var result = await service.GetShippingFeeAsync(request!);
 
       return result.Match(Message.SUCCESSFUL_RETRIEVED(nameof(result)));
     })
     .WithName("CalculateFee")
-    .Produces<ApiResponse<string>>()
+    .Produces<ApiResponse<FeeData>>()
     .ProducesProblem(StatusCodes.Status500InternalServerError)
     .WithSummary("CalculateFee")
     .WithDescription("Calculate Shipping Order Fee");
     #endregion
 
     #region Track Order API
-    group.MapGet("/track-order/{orderCode}", async (IGHNService service, string orderCode) =>
+    group.MapGet("/track-order", async (IGHNService service, [FromBody] GetShippingOrderRequest request) =>
     {
-      var result = await service.GetOrderTrackingAsync(orderCode);
+      var result = await service.GetOrderTrackingAsync(request);
 
       return result.Match(Message.SUCCESSFUL_RETRIEVED(nameof(result)));
     })
     .WithName("TrackOrder")
-    .Produces<ApiResponse<string>>()
+    .Produces<ApiResponse<ShippingOrderData>>()
     .ProducesProblem(StatusCodes.Status500InternalServerError)
     .WithSummary("TrackOrder")
     .WithDescription("Track Shipping Order");
     #endregion
 
-    #region Create Return Order API
-    group.MapPost("/create-return-order", async (IGHNService service, HttpContext context) =>
+    #region Change Shipping Order Status API
+    group.MapPost("/create-return-order", async (IGHNService service, [FromBody] SwitchShippingOrdersStatusRequest request, [FromQuery] string status) =>
     {
-      var requestData = await context.Request.ReadFromJsonAsync<object>();
-      var result = await service.CreateReturnOrderAsync(requestData!);
+      var result = await service.ChangeShippingOrderStatus(request, status);
 
       return result.Match(Message.SUCCESSFUL_RETRIEVED(nameof(result)));
     })
-    .WithName("CreateReturnOrder")
-    .Produces<ApiResponse<string>>()
+    .WithName("ChangeShippingOrderStatus")
+    .Produces<ApiResponse<ShippingOrderStatus>>()
     .ProducesProblem(StatusCodes.Status500InternalServerError)
-    .WithSummary("CreateReturnOrder")
-    .WithDescription("Create Return Shipping Order");
+    .WithSummary("ChangeShippingOrderStatus")
+    .WithDescription("Change Shipping Order Status");
     #endregion
 
     #region Get Store Info API
