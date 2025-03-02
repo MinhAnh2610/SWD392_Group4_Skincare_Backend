@@ -15,7 +15,7 @@ namespace CleanArchitecture.Application.ServiceContracts
     Task<Result<List<OrderResponse>>> GetOrdersByCustomerIdAsync(Guid customerId);
     Task<Result<OrderResponse>> UpdateOrderStatusAsync(Guid orderId, UpdateOrderStatusRequest request);
     Task<Result<string>> DeleteOrderAsync(Guid orderId);
-    Task<Result<OrderResponse>> InitiateOrder(CreateOrderRequest checkOutRequest);
+    Task<Result<OrderResponse>> InitiateOrder(CreateOrderRequest request);
     Task<Result<OrderResponse>> CompleteOrder(Guid orderId, string paymentStatus, PaymentReturnData paymentData);
     Task CleanupExpiredOrders();
 

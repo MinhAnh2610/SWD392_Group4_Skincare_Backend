@@ -18,6 +18,10 @@ public class OrderService : IOrderService
   private readonly ITimeZoneService _timeZoneService;
   private readonly IVnPayIntegrationService _vnPayIntegrationService;
   private readonly IHttpContextAccessor _httpContextAccessor;
+
+  // Exchange rate from USD to VND - should ideally come from a service
+  private const decimal USD_TO_VND_RATE = 24850;
+
   public OrderService(
       IUnitOfWork unitOfWork,
       IErrorFactory errorFactory,
@@ -36,166 +40,46 @@ public class OrderService : IOrderService
     _httpContextAccessor = httpContextAccessor;
   }
 
-
   // 1. Initiate Order (First step of checkout)
   public async Task<Result<OrderResponse>> InitiateOrder(CreateOrderRequest request)
   {
     try
     {
-      #region Validate Request
-      // Validate cart exists and has items
-      var cart = await _unitOfWork.Carts.GetCartWithItemsAsync(request.CartId);
-      if (cart == null || !cart.CartItems.Any())
+      // Validate cart and user
+      var cartValidationResult = await ValidateOrderRequest(request);
+      if (!cartValidationResult.IsSuccess)
+      {
+        // Create a proper Result<OrderResponse> from the Result<Cart>
+        return Result<OrderResponse>.Failure(
+            cartValidationResult.Errors,
+            cartValidationResult.Status);
+      }
+
+      var cart = cartValidationResult.Data;
+
+      // Check and deduct inventory
+      var inventoryResult = await CheckAndDeductInventory(cart);
+      if (!inventoryResult.IsSuccess)
       {
         return Result<OrderResponse>.Failure(
-            [new Error("Order.Invalid", "Cart not found or empty")],
-            StatusCodes.Status400BadRequest);
+            inventoryResult.Errors,
+            inventoryResult.Status);
       }
 
-      // Validate cart belongs to current user
-      if (cart.CustomerId != _claimsService.CurrentUserId)
+      // Calculate shipping dimensions
+      var shippingDetails = CalculateShippingDetails(cart.CartItems);
+
+      // Convert currency if needed
+      decimal totalPrice = cart.TotalPrice;
+      if (request.Currency == "USD")
       {
-        return Result<OrderResponse>.Failure(
-            [new Error("Order.Unauthorized", "Not authorized to access this cart")],
-            StatusCodes.Status403Forbidden);
+        totalPrice = ConvertUsdToVnd(totalPrice);
       }
 
-      // Validate addresses
-      if (string.IsNullOrEmpty(request.ShippingAddress) ||
-          string.IsNullOrEmpty(request.BillingAddress))
-      {
-        return Result<OrderResponse>.Failure(
-            [new Error("Order.Invalid", "Shipping and billing addresses are required")],
-            StatusCodes.Status400BadRequest);
-      }
-      #endregion
+      // Create order
+      var order = CreateOrderEntity(request, cart, totalPrice);
 
-      #region Deduct cosmetic quantity from batches (check the availability of batches)
-      var requiredQuantities = cart.CartItems
-        .GroupBy(ci => ci.CosmeticId)
-        .ToDictionary(g => g.Key, g => g.Sum(ci => ci.Quantity));
-
-      foreach (var (cosmeticId, quantityNeeded) in requiredQuantities)
-      {
-        var availableBatches = await _unitOfWork.Batches.GetListByAnyId(e => e.CosmeticId == cosmeticId, 2);
-
-        // get only the non-expired batches
-        availableBatches = availableBatches
-          .Where(b => b.ExpirationDate >= DateOnly.FromDateTime(DateTime.UtcNow)) // Skip expired batches
-          .OrderBy(b => b.ExportedDate)
-          .ToList();
-
-        if (!availableBatches.Any())
-        {
-          return Result<OrderResponse>.Failure(
-              [new Error("Order.ExpiredStock", "All available stock has expired")],
-              StatusCodes.Status400BadRequest);
-        }
-
-        int totalAvailable = availableBatches.Sum(b => b.Quantity);
-        if (totalAvailable < quantityNeeded)
-        {
-          return Result<OrderResponse>.Failure(
-              [new Error("Order.InsufficientStock", "Not enough stock available")],
-              StatusCodes.Status400BadRequest);
-        }
-
-        // Deduct from batches (FIFO)
-        foreach (var batch in availableBatches.OrderBy(b => b.ExportedDate))
-        {
-          if (quantityNeeded <= 0) break;
-
-          int deducted = Math.Min(batch.Quantity, quantityNeeded);
-          batch.Quantity -= deducted;
-          //quantityNeeded -= deducted;
-
-          _unitOfWork.Batches.Update(batch);
-        }
-      }
-      #endregion
-
-      #region Calculate the total shipping weight and dimesions
-      var totalWeight = 0;
-      var totalLength = 0;
-      var totalWidth = 0;
-      var totalHeight = 0;
-
-      foreach (var cartItem in cart.CartItems)
-      {
-        totalWeight += cartItem.Cosmetic.Weight * cartItem.Quantity;
-        totalLength = Math.Max(totalLength, cartItem.Cosmetic.Length);
-        totalWidth = Math.Max(totalWidth, cartItem.Cosmetic.Width);
-        totalHeight += cartItem.Cosmetic.Height * cartItem.Quantity; // Stack height
-      }
-      #endregion
-
-      #region Payment methods business flow
-      //string ghnOrderId = null;
-      //if (request.PaymentMethod == PaymentMethods.COD)
-      //{
-      //  var ghnRequest = new CreateGHNOrderRequest
-      //  {
-      //    ServiceId = 53320, // Example service ID
-      //    FromDistrictId = 1452, // Your shop’s district ID
-      //    ToDistrictId = request.DistrictId, // Customer's district
-      //    Weight = totalWeight,
-      //    Length = totalLength,
-      //    Width = totalWidth,
-      //    Height = totalHeight,
-      //    PaymentTypeId = 2, // 2 = COD, 1 = Prepaid
-      //    Items = cart.CartItems.Select(ci => new GHNOrderItemRequest
-      //    {
-      //      Name = ci.Cosmetic.Name,
-      //      Quantity = ci.Quantity,
-      //      Price = ci.Cosmetic.Price,
-      //      Code = ci.CosmeticId.ToString(),
-      //      Weight = ci.Cosmetic.Weight,
-      //      Height = ci.Cosmetic.Height,
-      //      Width = ci.Cosmetic.Width,
-      //      Length = ci.Cosmetic.Length
-      //    }).ToList()
-      //  };
-
-      //  var deliveryResponse = await _ghnService.CreateShippingOrderAsync(ghnRequest);
-      //  if (!deliveryResponse.IsSuccess)
-      //  {
-      //    return Result<OrderResponse>.Failure(
-      //        [new Error("Order.Delivery", "Failed to initiate delivery")],
-      //        StatusCodes.Status500InternalServerError);
-      //  }
-
-      //  ghnOrderId = deliveryResponse.GHNOrderId;
-      //}
-      #endregion
-
-      // Create order in PENDING state
-      var order = new Order
-      {
-        Id = Guid.NewGuid(),
-        CustomerId = cart.CustomerId,
-        CouponId = request.CouponId,
-        SubTotal = cart.TotalPrice,
-        TotalPrice = cart.TotalPrice, // apply coupon discount if needed
-        OrderDate = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow),
-        ShippingAddress = request.ShippingAddress,
-        BillingAddress = request.BillingAddress,
-        TrackingNumber = null,
-        Status = OrderStatus.PENDING,
-        CreateAt = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow),
-        CreatedBy = cart.Customer.UserName,
-        LastModified = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow),
-        LastModifiedBy = cart.Customer.UserName,
-        OrderItems = cart.CartItems.Select(ci => new OrderItem
-        {
-          CosmeticId = ci.CosmeticId,
-          Quantity = ci.Quantity
-        }).ToList(),
-        // Set default delivery date to 7 days from now
-        DeliveryDate = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow.AddDays(7))
-      };
-
-
-      // Save order
+      // Save order to database
       _unitOfWork.Orders.Create(order);
       var saved = await _unitOfWork.CompleteAsync();
 
@@ -205,51 +89,12 @@ public class OrderService : IOrderService
             [new Error("Order.Create", "Failed to save order")],
             StatusCodes.Status500InternalServerError);
       }
+
+      // Generate order response
       var orderResponse = MapToOrderResponse(order);
 
-
-      // If the payment method is ONLINE, generate a payment URL.
-      if (request.PaymentMethod == PaymentMethods.ONLINE)
-      {
-        // Create a VNPay payment request DTO using the order details.
-        var vnPayRequest = new VnPayPaymentRequestDto
-        {
-          OrderId = order.Id,
-          PaymentMethod = PaymentMethods.ONLINE,
-          Amount = (float)order.TotalPrice  // Make sure your amount type is compatible
-        };
-
-        // Get HttpContext from the accessor.
-        var httpContext = _httpContextAccessor.HttpContext;
-        if (httpContext != null)
-        {
-          var paymentUrlResult = _vnPayIntegrationService.CreatePaymentUrl(vnPayRequest, httpContext);
-          if (paymentUrlResult.IsSuccess)
-          {
-            // Add the generated URL to your order response.
-            orderResponse.PaymentUrl = paymentUrlResult.Data;
-          }
-          else
-          {
-            // Optionally log or handle error
-          }
-        }
-      }
-
-      
-      //TO DO FOR ANH TAN
-
-
-      //for(int i = 0; i < _invoiceGenerateStrategies.Count(); i++)
-      //{
-      //  var nameOfStrat = _invoiceGenerateStrategies.ElementAt(i).GetType().Name;
-      //  if (nameOfStrat.Contains("online", StringComparison.OrdinalIgnoreCase))
-      //  {
-      //    var invoice = _invoiceGenerateStrategies.ElementAt(i).Generate(order);
-      //    orderResponse.Invoice = invoice;
-      //    break;
-      //  }
-      //} 
+      // Handle payment method specific logic
+      await HandlePaymentMethod(request.PaymentMethod, order, orderResponse);
 
       return Result<OrderResponse>.Success(
           orderResponse,
@@ -261,6 +106,180 @@ public class OrderService : IOrderService
           [new Error("Order.Create", ex.Message)],
           StatusCodes.Status500InternalServerError);
     }
+  }
+
+  private async Task<Result<Cart>> ValidateOrderRequest(CreateOrderRequest request)
+  {
+    // Validate cart exists and has items
+    var cart = await _unitOfWork.Carts.GetCartWithItemsAsync(request.CartId);
+    if (cart == null || !cart.CartItems.Any())
+    {
+      return Result<Cart>.Failure(
+          [new Error("Order.Invalid", "Cart not found or empty")],
+          StatusCodes.Status400BadRequest);
+    }
+
+    // Validate cart belongs to current user
+    if (cart.CustomerId != _claimsService.CurrentUserId)
+    {
+      return Result<Cart>.Failure(
+          [new Error("Order.Unauthorized", "Not authorized to access this cart")],
+          StatusCodes.Status403Forbidden);
+    }
+
+    // Validate addresses
+    if (string.IsNullOrEmpty(request.ShippingAddress) ||
+        string.IsNullOrEmpty(request.BillingAddress))
+    {
+      return Result<Cart>.Failure(
+          [new Error("Order.Invalid", "Shipping and billing addresses are required")],
+          StatusCodes.Status400BadRequest);
+    }
+
+    return Result<Cart>.Success(cart, StatusCodes.Status200OK);
+  }
+
+  private async Task<Result<bool>> CheckAndDeductInventory(Cart cart)
+  {
+    var requiredQuantities = cart.CartItems
+      .GroupBy(ci => ci.CosmeticId)
+      .ToDictionary(g => g.Key, g => g.Sum(ci => ci.Quantity));
+
+    // Keep track of batches to update to avoid multiple database calls
+    var batchesToUpdate = new List<Batch>();
+
+    foreach (var (cosmeticId, quantityNeeded) in requiredQuantities)
+    {
+      var availableBatches = await _unitOfWork.Batches.GetListByAnyId(e => e.CosmeticId == cosmeticId, 2);
+
+      // Filter non-expired batches and order by FIFO principle
+      availableBatches = availableBatches
+        .Where(b => b.ExpirationDate >= DateOnly.FromDateTime(DateTime.UtcNow))
+        .OrderBy(b => b.ExportedDate)
+        .ToList();
+
+      if (!availableBatches.Any())
+      {
+        return Result<bool>.Failure(
+            [new Error("Order.ExpiredStock", "All available stock has expired")],
+            StatusCodes.Status400BadRequest);
+      }
+
+      int totalAvailable = availableBatches.Sum(b => b.Quantity);
+      if (totalAvailable < quantityNeeded)
+      {
+        return Result<bool>.Failure(
+            [new Error("Order.InsufficientStock", "Not enough stock available")],
+            StatusCodes.Status400BadRequest);
+      }
+
+      // Deduct from batches (FIFO)
+      int remainingQuantity = quantityNeeded;
+      foreach (var batch in availableBatches)
+      {
+        if (remainingQuantity <= 0) break;
+
+        int deducted = Math.Min(batch.Quantity, remainingQuantity);
+        batch.Quantity -= deducted;
+        remainingQuantity -= deducted;
+
+        batchesToUpdate.Add(batch);
+      }
+    }
+
+    // Update all batches at once
+    foreach (var batch in batchesToUpdate)
+    {
+      _unitOfWork.Batches.Update(batch);
+    }
+
+    return Result<bool>.Success(true, StatusCodes.Status200OK);
+  }
+
+  private ShippingDetails CalculateShippingDetails(IEnumerable<CartItem> cartItems)
+  {
+    var totalWeight = 0;
+    var totalLength = 0;
+    var totalWidth = 0;
+    var totalHeight = 0;
+
+    foreach (var cartItem in cartItems)
+    {
+      totalWeight += cartItem.Cosmetic.Weight * cartItem.Quantity;
+      totalLength = Math.Max(totalLength, cartItem.Cosmetic.Length);
+      totalWidth = Math.Max(totalWidth, cartItem.Cosmetic.Width);
+      totalHeight += cartItem.Cosmetic.Height * cartItem.Quantity; // Stack height
+    }
+
+    return new ShippingDetails
+    {
+      Weight = totalWeight,
+      Length = totalLength,
+      Width = totalWidth,
+      Height = totalHeight
+    };
+  }
+
+  private Order CreateOrderEntity(CreateOrderRequest request, Cart cart, decimal totalPrice)
+  {
+    return new Order
+    {
+      Id = Guid.NewGuid(),
+      CustomerId = cart.CustomerId,
+      CouponId = request.CouponId,
+      SubTotal = totalPrice, // Using possibly converted price
+      TotalPrice = totalPrice, // Using possibly converted price
+      OrderDate = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow),
+      ShippingAddress = request.ShippingAddress,
+      BillingAddress = request.BillingAddress,
+      TrackingNumber = null,
+      Status = OrderStatus.PENDING,
+      CreateAt = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow),
+      CreatedBy = cart.Customer.UserName,
+      LastModified = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow),
+      LastModifiedBy = cart.Customer.UserName,
+      OrderItems = cart.CartItems.Select(ci => new OrderItem
+      {
+        CosmeticId = ci.CosmeticId,
+        Quantity = ci.Quantity
+      }).ToList(),
+      // Set default delivery date to 7 days from now
+      DeliveryDate = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow.AddDays(7))
+    };
+  }
+
+  private decimal ConvertUsdToVnd(decimal usdAmount)
+  {
+    // Convert USD to VND using fixed rate
+    // In a production environment, this should use a real-time exchange rate service
+    return usdAmount * USD_TO_VND_RATE;
+  }
+
+  private async Task HandlePaymentMethod(string paymentMethod, Order order, OrderResponse orderResponse)
+  {
+    // Handle online payment
+    if (paymentMethod == PaymentMethods.ONLINE)
+    {
+      var vnPayRequest = new VnPayPaymentRequestDto
+      {
+        OrderId = order.Id,
+        PaymentMethod = PaymentMethods.ONLINE,
+        Amount = (float)order.TotalPrice
+      };
+
+      var httpContext = _httpContextAccessor.HttpContext;
+      if (httpContext != null)
+      {
+        var paymentUrlResult = _vnPayIntegrationService.CreatePaymentUrl(vnPayRequest, httpContext);
+        if (paymentUrlResult.IsSuccess)
+        {
+          orderResponse.PaymentUrl = paymentUrlResult.Data;
+        }
+      }
+    }
+
+    // Handle COD payment (if needed in the future)
+    // else if (paymentMethod == PaymentMethods.COD) { ... }
   }
 
   public async Task<Result<OrderResponse>> CompleteOrder(Guid orderId, string paymentStatus, PaymentReturnData paymentData)
@@ -326,7 +345,6 @@ public class OrderService : IOrderService
           StatusCodes.Status500InternalServerError);
     }
   }
-
 
   // 3. Get All Orders (Admin)
   public async Task<Result<List<OrderResponse>>> GetAllOrdersAsync()
@@ -481,4 +499,13 @@ public class OrderService : IOrderService
       LastModifiedBy = order.LastModifiedBy
     };
   }
+}
+
+// Helper class for shipping calculations
+public class ShippingDetails
+{
+  public int Weight { get; set; }
+  public int Length { get; set; }
+  public int Width { get; set; }
+  public int Height { get; set; }
 }

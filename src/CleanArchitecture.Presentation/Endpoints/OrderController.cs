@@ -1,11 +1,7 @@
-﻿using CleanArchitecture.Application.Constants;
-using CleanArchitecture.Application.DTOs.Order;
+﻿using CleanArchitecture.Application.DTOs.Order;
 using CleanArchitecture.Application.DTOs.OrderDto;
 using CleanArchitecture.Application.DTOs.VnPay;
-using CleanArchitecture.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using System;
 
 public class OrderController : ICarterModule
 {
@@ -13,8 +9,8 @@ public class OrderController : ICarterModule
   {
     var group = app.MapGroup("api/orders").WithTags("Order Management");
 
-    // 1. Create Order (Initial checkout step)
-    group.MapPost("/create", async (
+    // 1. Create Order
+    group.MapPost("/", async (
         [FromBody] CreateOrderRequest request,
         IOrderService orderService,
         IVnPayIntegrationService vnPayIntegrationService,
@@ -23,15 +19,12 @@ public class OrderController : ICarterModule
       var result = await orderService.InitiateOrder(request);
       if (result.IsSuccess)
       {
-        // Build the base response.
         var response = new CreateOrderResponse
         {
           OrderId = result.Data.Id,
           Status = result.Data.Status,
           PaymentUrl = result.Data.PaymentUrl
         };
-
-       
 
         return Results.Ok(ApiResponse<CreateOrderResponse>.SuccessResponse(
           response,
@@ -44,9 +37,8 @@ public class OrderController : ICarterModule
       .WithName("CreateOrder")
       .Produces<ApiResponse<CreateOrderResponse>>(StatusCodes.Status200OK)
       .ProducesProblem(StatusCodes.Status400BadRequest);
-    // .RequireAuthorization(); // Uncomment if needed
 
-    // 2. Complete Order (After payment) remains unchanged.
+    // 2. Complete Order (After payment)
     group.MapPost("/{orderId}/complete", async (
         Guid orderId,
         [FromQuery] string paymentStatus,
@@ -69,14 +61,14 @@ public class OrderController : ICarterModule
     .RequireAuthorization();
 
     // 3. Get All Orders (Admin)
-    group.MapGet("/get-all-orders", async (IOrderService orderService) =>
+    group.MapGet("/", async (IOrderService orderService) =>
     {
       var result = await orderService.GetAllOrdersAsync();
       if (result.IsSuccess)
       {
         return Results.Ok(ApiResponse<List<OrderResponse>>.SuccessResponse(
             result.Data!,
-            "Retrieved Orders Successfully."
+            "Retrieved orders successfully."
         ));
       }
       return Results.StatusCode(result.Status);
@@ -86,15 +78,15 @@ public class OrderController : ICarterModule
     .ProducesProblem(StatusCodes.Status500InternalServerError)
     .RequireAuthorization(policy => policy.RequireRole("Admin"));
 
-    // 4. Get Customer Orders
-    group.MapGet("/my-orders", async (IOrderService orderService, IClaimsService claimsService) =>
+    // 4. Get Orders for the Current User
+    group.MapGet("/my", async (IOrderService orderService, IClaimsService claimsService) =>
     {
       var result = await orderService.GetOrdersByCustomerIdAsync(claimsService.CurrentUserId);
       if (result.IsSuccess)
       {
         return Results.Ok(ApiResponse<List<OrderResponse>>.SuccessResponse(
             result.Data!,
-            "Retrieved Customer Orders Successfully."
+            "Retrieved customer orders successfully."
         ));
       }
       return Results.StatusCode(result.Status);
@@ -105,7 +97,7 @@ public class OrderController : ICarterModule
     .RequireAuthorization();
 
     // 5. Update Order Status (Admin)
-    group.MapPut("/{id:guid}/status", async (
+    group.MapPut("/{id}/status", async (
         Guid id,
         [FromBody] UpdateOrderStatusRequest request,
         IOrderService orderService) =>
