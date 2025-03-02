@@ -1,11 +1,6 @@
 ﻿using CleanArchitecture.Application.DTOs.Order;
 using CleanArchitecture.Application.DTOs.OrderDto;
 using CleanArchitecture.Application.DTOs.VnPay;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CleanArchitecture.Application.ServiceContracts
 {

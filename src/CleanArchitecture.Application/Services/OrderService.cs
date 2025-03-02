@@ -1,11 +1,9 @@
 ﻿using CleanArchitecture.Application.Constants;
-using CleanArchitecture.Application.DTOs.GHN;
 using CleanArchitecture.Application.DTOs.Order;
 using CleanArchitecture.Application.DTOs.OrderDto;
 using CleanArchitecture.Application.DTOs.VnPay;
 using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Application.Strategies.InvoiceGenerateStrategy;
-using CleanArchitecture.Domain.RepositoryContracts;
 using Microsoft.AspNetCore.Http;
 
 public class OrderService : IOrderService
