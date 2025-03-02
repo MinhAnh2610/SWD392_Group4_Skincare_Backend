@@ -57,7 +57,7 @@ public class Result<T>
   public IResult Match(string message)
   {
     var response = IsSuccess
-      ? ApiResponse<T>.SuccessResponse(Data, message)
+      ? ApiResponse<T>.SuccessResponse(Data!, message)
       : ApiResponse<T>.FailureResponse(Errors, message);
     if (Errors.Count > 0)
     {

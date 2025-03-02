@@ -49,7 +49,7 @@ public class AuthService : IAuthService
 
       return Result<string>.Failure(errors, StatusCodes.Status400BadRequest);
     }
-    var user = await _userManager.FindByEmailAsync(request.Email);
+    var user = await _userManager.FindByEmailAsync(request.Email!);
     if (user == null)
     {
       return Result<string>.Failure([AuthErrors.UserNotFound], StatusCodes.Status404NotFound);
@@ -74,8 +74,8 @@ public class AuthService : IAuthService
       return Result<AuthResponse>.Failure(errors, StatusCodes.Status400BadRequest);
     }
 
-    var user = await _userManager.FindByNameAsync(request.UserName);
-    if (user == null || !await _userManager.CheckPasswordAsync(user, request.Password))
+    var user = await _userManager.FindByNameAsync(request.UserName!);
+    if (user == null || !await _userManager.CheckPasswordAsync(user, request.Password!))
     {
       return Result<AuthResponse>.Failure([AuthErrors.InvalidCredentials], StatusCodes.Status400BadRequest);
     }
@@ -154,7 +154,7 @@ public class AuthService : IAuthService
       ClientId = "api_client",
       ClientSecret = "secret",
 
-      RefreshToken = request.RefreshToken,
+      RefreshToken = request.RefreshToken!,
 
       //Scope = "openid profile email roles API offline_access"
     });
@@ -178,11 +178,11 @@ public class AuthService : IAuthService
 
   public async Task<Result<string>> RegisterAsync(RegisterRequest request)
   {
-    if (await _userManager.FindByEmailAsync(request.Email) != null)
+    if (await _userManager.FindByEmailAsync(request.Email!) != null)
     {
       return Result<string>.Failure([AuthErrors.AlreadyRegistered], StatusCodes.Status409Conflict);
     }
-    if (await _userManager.FindByNameAsync(request.UserName) != null)
+    if (await _userManager.FindByNameAsync(request.UserName!) != null)
     {
       return Result<string>.Failure([AuthErrors.DuplicateUserName], StatusCodes.Status409Conflict);
     }
@@ -206,7 +206,7 @@ public class AuthService : IAuthService
       PhoneNumber = request.PhoneNumber
     };
 
-    var result = await _userManager.CreateAsync(user, request.Password);
+    var result = await _userManager.CreateAsync(user, request.Password!);
     if (!result.Succeeded)
     {
       var errors = result.Errors.Select(e => new Error(e.Code, e.Description)).ToList();
@@ -244,7 +244,7 @@ public class AuthService : IAuthService
     //  return Result<string>.Failure([AuthErrors.TokenResponseError(tokenResponse.Error!)], StatusCodes.Status500InternalServerError);
     //}
 
-    return Result<string>.Success(null, StatusCodes.Status200OK);
+    return Result<string>.Success(default!, StatusCodes.Status200OK);
   }
 
   public async Task<Result<string>> ResetPasswordAsync(ResetPasswordRequest request)
@@ -258,19 +258,19 @@ public class AuthService : IAuthService
 
       return Result<string>.Failure(errors, StatusCodes.Status400BadRequest);
     }
-    var user = await _userManager.FindByEmailAsync(request.Email);
+    var user = await _userManager.FindByEmailAsync(request.Email!);
     if (user == null)
     {
       return Result<string>.Failure([AuthErrors.UserNotFound], StatusCodes.Status404NotFound);
     }
 
-    var result = await _userManager.ResetPasswordAsync(user, request.AccessToken, request.Password);
+    var result = await _userManager.ResetPasswordAsync(user, request.AccessToken!, request.Password!);
     if (!result.Succeeded)
     {
       var errors = result.Errors.Select(e => new Error(e.Code, e.Description)).ToList();
       return Result<string>.Failure(errors, StatusCodes.Status500InternalServerError);
     }
 
-    return Result<string>.Success(null, StatusCodes.Status200OK);
+    return Result<string>.Success(default!, StatusCodes.Status200OK);
   }
 }
