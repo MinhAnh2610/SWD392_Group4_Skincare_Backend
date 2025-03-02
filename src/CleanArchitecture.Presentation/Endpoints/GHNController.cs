@@ -67,10 +67,9 @@ public class GHNController : CarterModule
     #endregion
 
     #region Get Store Info API
-    group.MapPost("/get-store-info", async (IGHNService service, HttpContext context) =>
+    group.MapPost("/get-store-info", async (IGHNService service) =>
     {
-      var requestData = await context.Request.ReadFromJsonAsync<object>();
-      var result = await service.GetStoreInformationAsync(requestData!);
+      var result = await service.GetStoreInformationAsync();
 
       return result.Match(Message.SUCCESSFUL_RETRIEVED(nameof(result)));
     })
