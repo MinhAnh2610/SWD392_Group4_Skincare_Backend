@@ -1,8 +1,10 @@
 ﻿using Carter;
+using CleanArchitecture.Application.DTOs.Order;
 using CleanArchitecture.Application.DTOs.Payment;
 using CleanArchitecture.Application.DTOs.VnPay;
-using CleanArchitecture.Application.ServiceContracts;
+using CleanArchitecture.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 
 namespace CleanArchitecture.Presentation.Endpoints
@@ -29,7 +31,7 @@ namespace CleanArchitecture.Presentation.Endpoints
       #endregion
 
       #region Create Payment URL Endpoint
-      group.MapPost("/create-payment", (IVnPayIntegrationService vnPayIntegrationService, HttpContext context, VnPayPaymentRequestDto request) =>
+      group.MapPost("/payment-url", (IVnPayIntegrationService vnPayIntegrationService, HttpContext context, VnPayPaymentRequestDto request) =>
       {
         var result = vnPayIntegrationService.CreatePaymentUrl(request, context);
         return result.Match("Payment URL created successfully.");
@@ -42,16 +44,42 @@ namespace CleanArchitecture.Presentation.Endpoints
       #endregion
 
       #region Process VNPay Return Endpoint
-      group.MapGet("/vnpay-return", async (IVnPayIntegrationService vnPayIntegrationService, HttpContext context) =>
+      group.MapGet("/vnpay-return", async (IVnPayIntegrationService vnPayIntegrationService, IOrderService orderService, HttpContext context) =>
       {
-        var result = await vnPayIntegrationService.ProcessReturnAsync(context.Request.Query);
-        return result.Match("Payment processed successfully.");
+        // Process the VNPay callback.
+        var vnPayResult = await vnPayIntegrationService.ProcessReturnAsync(context.Request.Query);
+        if (vnPayResult.IsFailure)
+        {
+          return vnPayResult.Match("Payment processing failed.");
+        }
+
+        var vnPayResponse = vnPayResult.Data;
+        // Validate that the TransactionOrderId is a valid GUID (the order's ID).
+        if (!Guid.TryParse(vnPayResponse.TransactionOrderId, out var orderId))
+        {
+          return Results.BadRequest(ApiResponse<VnPayPaymentResponseDto>.FailureResponse(
+            new List<Error> { new Error("InvalidOrderId", "Invalid Order Id returned from VNPay") },
+            "Invalid Order Id returned from VNPay."));
+        }
+
+        // Map the VNPay response directly to the PaymentReturnData.
+        // (If you prefer, you can use vnPayResponse directly if it has all the needed data.)
+        var paymentReturnData = new PaymentReturnData
+        {
+          TransactionId = vnPayResponse.TransactionId,
+          TotalAmount = vnPayResponse.TotalAmount,
+          ResponseCode = vnPayResponse.ResponseCode
+        };
+
+        // Complete the order using the VNPay response.
+        var orderResult = await orderService.CompleteOrder(orderId, vnPayResponse.ResponseCode ?? string.Empty, paymentReturnData);
+        return orderResult.Match("Order completed successfully.");
       })
       .WithName("ProcessVnPayReturn")
       .Produces<ApiResponse<VnPayPaymentResponseDto>>(StatusCodes.Status200OK)
       .ProducesProblem(StatusCodes.Status400BadRequest)
       .WithSummary("Process VNPay Return")
-      .WithDescription("Processes the VNPay return response, validates the signature, and stores the payment record.");
+      .WithDescription("Processes the VNPay return response, validates the signature, and updates the order.");
       #endregion
     }
   }

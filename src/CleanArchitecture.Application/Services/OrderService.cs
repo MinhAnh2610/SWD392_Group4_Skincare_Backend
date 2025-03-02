@@ -2,6 +2,7 @@
 using CleanArchitecture.Application.DTOs.GHN;
 using CleanArchitecture.Application.DTOs.Order;
 using CleanArchitecture.Application.DTOs.OrderDto;
+using CleanArchitecture.Application.DTOs.VnPay;
 using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Application.Strategies.InvoiceGenerateStrategy;
 using CleanArchitecture.Domain.RepositoryContracts;
@@ -15,19 +16,26 @@ public class OrderService : IOrderService
   private readonly IGHNService _ghnService;
   private readonly IEnumerable<IInvoiceGenerateStrategy> _invoiceGenerateStrategies;
   private readonly ITimeZoneService _timeZoneService;
-
+  private readonly IVnPayIntegrationService _vnPayIntegrationService;
+  private readonly IHttpContextAccessor _httpContextAccessor;
   public OrderService(
       IUnitOfWork unitOfWork,
       IErrorFactory errorFactory,
       IClaimsService claimsService,
-      IGHNService ghnService, ITimeZoneService timeZoneService)
+      IGHNService ghnService,
+      ITimeZoneService timeZoneService,
+      IVnPayIntegrationService vnPayIntegrationService,
+      IHttpContextAccessor httpContextAccessor)
   {
     _unitOfWork = unitOfWork;
     _errorFactory = errorFactory;
     _claimsService = claimsService;
     _ghnService = ghnService;
     _timeZoneService = timeZoneService;
+    _vnPayIntegrationService = vnPayIntegrationService;
+    _httpContextAccessor = httpContextAccessor;
   }
+
 
   // 1. Initiate Order (First step of checkout)
   public async Task<Result<OrderResponse>> InitiateOrder(CreateOrderRequest request)
@@ -160,14 +168,14 @@ public class OrderService : IOrderService
       //}
       #endregion
 
-      // Create order
+      // Create order in PENDING state
       var order = new Order
       {
         Id = Guid.NewGuid(),
         CustomerId = cart.CustomerId,
         CouponId = request.CouponId,
         SubTotal = cart.TotalPrice,
-        TotalPrice = cart.TotalPrice, // Apply coupon discount if needed
+        TotalPrice = cart.TotalPrice, // apply coupon discount if needed
         OrderDate = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow),
         ShippingAddress = request.ShippingAddress,
         BillingAddress = request.BillingAddress,
@@ -181,8 +189,11 @@ public class OrderService : IOrderService
         {
           CosmeticId = ci.CosmeticId,
           Quantity = ci.Quantity
-        }).ToList()
+        }).ToList(),
+        // Set default delivery date to 7 days from now
+        DeliveryDate = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow.AddDays(7))
       };
+
 
       // Save order
       _unitOfWork.Orders.Create(order);
@@ -194,19 +205,51 @@ public class OrderService : IOrderService
             [new Error("Order.Create", "Failed to save order")],
             StatusCodes.Status500InternalServerError);
       }
-
       var orderResponse = MapToOrderResponse(order);
-      
-      for(int i = 0; i < _invoiceGenerateStrategies.Count(); i++)
+
+
+      // If the payment method is ONLINE, generate a payment URL.
+      if (request.PaymentMethod == PaymentMethods.ONLINE)
       {
-        var nameOfStrat = _invoiceGenerateStrategies.ElementAt(i).GetType().Name;
-        if (nameOfStrat.Contains("online", StringComparison.OrdinalIgnoreCase))
+        // Create a VNPay payment request DTO using the order details.
+        var vnPayRequest = new VnPayPaymentRequestDto
         {
-          var invoice = _invoiceGenerateStrategies.ElementAt(i).Generate(order);
-          orderResponse.Invoice = invoice;
-          break;
+          OrderId = order.Id,
+          PaymentMethod = PaymentMethods.ONLINE,
+          Amount = (float)order.TotalPrice  // Make sure your amount type is compatible
+        };
+
+        // Get HttpContext from the accessor.
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext != null)
+        {
+          var paymentUrlResult = _vnPayIntegrationService.CreatePaymentUrl(vnPayRequest, httpContext);
+          if (paymentUrlResult.IsSuccess)
+          {
+            // Add the generated URL to your order response.
+            orderResponse.PaymentUrl = paymentUrlResult.Data;
+          }
+          else
+          {
+            // Optionally log or handle error
+          }
         }
-      } 
+      }
+
+      
+      //TO DO FOR ANH TAN
+
+
+      //for(int i = 0; i < _invoiceGenerateStrategies.Count(); i++)
+      //{
+      //  var nameOfStrat = _invoiceGenerateStrategies.ElementAt(i).GetType().Name;
+      //  if (nameOfStrat.Contains("online", StringComparison.OrdinalIgnoreCase))
+      //  {
+      //    var invoice = _invoiceGenerateStrategies.ElementAt(i).Generate(order);
+      //    orderResponse.Invoice = invoice;
+      //    break;
+      //  }
+      //} 
 
       return Result<OrderResponse>.Success(
           orderResponse,
@@ -220,8 +263,7 @@ public class OrderService : IOrderService
     }
   }
 
-  // 2. Complete Order (After payment)
-  public async Task<Result<OrderResponse>> CompleteOrder(Guid orderId, string paymentStatus)
+  public async Task<Result<OrderResponse>> CompleteOrder(Guid orderId, string paymentStatus, PaymentReturnData paymentData)
   {
     try
     {
@@ -229,42 +271,62 @@ public class OrderService : IOrderService
       if (order == null || order.Status != OrderStatus.PENDING)
       {
         return Result<OrderResponse>.Failure(
-            [new Error("Order.NotFound", "Invalid order or wrong status")],
+            new List<Error> { new Error("Order.NotFound", "Invalid order or wrong status") },
             StatusCodes.Status404NotFound);
       }
 
-      // Update order status based on payment result
-      order.Status = paymentStatus == "00" ? OrderStatus.CONFIRMED : OrderStatus.FAILED;
-      order.LastModified = DateTime.UtcNow;
-      order.LastModifiedBy = _claimsService.CurrentUserId.ToString();
-
-      if (order.Status == OrderStatus.CONFIRMED)
+      // Determine order status based on VNPay's return paymentStatus (e.g. "00" means success)
+      if (paymentStatus == "00")
       {
-        // Clear cart after successful payment
+        order.Status = OrderStatus.CONFIRMED;
+
+        // Create a payment record for this order
+        var payment = new Payment
+        {
+          Id = Guid.NewGuid(),
+          OrderId = order.Id,
+          Method = PaymentMethods.ONLINE,
+          TotalAmount = order.TotalPrice,
+          Date = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow),
+          TransactionId = paymentData.TransactionId // from VNPay return data
+        };
+
+        // Save payment record using your PaymentRepository
+        _unitOfWork.Payments.Create(payment);
+        order.Payment = payment;
+
+        // Optionally, clear the cart after successful payment
         await _unitOfWork.Carts.ClearCartItemsAsync(order.CustomerId);
       }
+      else
+      {
+        order.Status = OrderStatus.FAILED;
+      }
 
+      order.LastModified = DateTime.UtcNow;
+      order.LastModifiedBy = _claimsService.CurrentUserId.ToString();
       _unitOfWork.Orders.Update(order);
-      var saved = await _unitOfWork.CompleteAsync();
 
+      var saved = await _unitOfWork.CompleteAsync();
       if (!saved)
       {
         return Result<OrderResponse>.Failure(
-            [new Error("Order.Complete", "Failed to update order")],
+            new List<Error> { new Error("Order.Complete", "Failed to update order") },
             StatusCodes.Status500InternalServerError);
       }
 
       return Result<OrderResponse>.Success(
-          MapToOrderResponse(order),
-          StatusCodes.Status200OK);
+            MapToOrderResponse(order),
+            StatusCodes.Status200OK);
     }
     catch (Exception ex)
     {
       return Result<OrderResponse>.Failure(
-          [new Error("Order.Complete", ex.Message)],
+          new List<Error> { new Error("Order.Complete", ex.Message) },
           StatusCodes.Status500InternalServerError);
     }
   }
+
 
   // 3. Get All Orders (Admin)
   public async Task<Result<List<OrderResponse>>> GetAllOrdersAsync()

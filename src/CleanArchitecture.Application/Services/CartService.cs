@@ -18,46 +18,56 @@ namespace CleanArchitecture.Application.Services
       _userManager = userManager;
     }
 
-    public async Task<Result<List<CartResponse>>> AddCartItemAsync(AddProductRequest addProductRequest)
+    public async Task<Result<List<CartResponse>>> AddCartItemForCurrentUserAsync(AddProductRequest addProductRequest)
     {
-      // Retrieve the cart by its ID
-      var cart = await _unitOfWork.Carts.GetByIdAsync(addProductRequest.CartId);
-      if (cart == null)
+      // Get the current user's ID via IClaimsService.
+      var userId = _claimsService.CurrentUserId;
+      if (userId == Guid.Empty)
       {
         return Result<List<CartResponse>>.Failure(
-              new List<Error> { new Error("Cart.AddCartItem", "Cart Not Found") },
-              StatusCodes.Status500InternalServerError
-        );
+            new List<Error> { new Error("Cart.AddCartItem", "User not authenticated") },
+            StatusCodes.Status401Unauthorized);
       }
 
-      // Retrieve the cosmetic (product) being added
+      // Retrieve the current user's cart; create one if it doesn't exist.
+      var cart = await _unitOfWork.Carts.GetCartByUserIdAsync(userId);
+      if (cart == null)
+      {
+        cart = new Cart
+        {
+          Id = Guid.NewGuid(),
+          CustomerId = userId,
+          TotalPrice = 0,
+          CartItems = new List<CartItem>()
+        };
+
+        await _unitOfWork.Carts.CreateAsync(cart);
+        await _unitOfWork.CompleteAsync();
+      }
+
+      // Retrieve the cosmetic (product) being added.
       var cosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(addProductRequest.CosmeticId);
       if (cosmetic == null)
       {
         return Result<List<CartResponse>>.Failure(
-              new List<Error> { new Error("Cart.AddCartItem", "Cosmetic Not Found") },
-              StatusCodes.Status500InternalServerError
-        );
+            new List<Error> { new Error("Cart.AddCartItem", "Cosmetic not found") },
+            StatusCodes.Status500InternalServerError);
       }
 
-      // Check available quantity (assuming cosmetic.Batches holds stock info)
+      // Check available quantity (assuming cosmetic.Batches holds stock info).
       int availableQuantity = 0;
-      if (cosmetic.Batches != null)
+      if (cosmetic.Batches != null && cosmetic.Batches.Any())
       {
-        foreach (Batch batch in cosmetic.Batches)
-        {
-          availableQuantity += batch.Quantity;
-        }
+        availableQuantity = cosmetic.Batches.Sum(batch => batch.Quantity);
       }
       if (availableQuantity < addProductRequest.Quantity)
       {
         return Result<List<CartResponse>>.Failure(
-               new List<Error> { new Error("Cart.AddCartItem", "Not enough Quantity") },
-               StatusCodes.Status500InternalServerError
-        );
+            new List<Error> { new Error("Cart.AddCartItem", "Not enough quantity available") },
+            StatusCodes.Status500InternalServerError);
       }
 
-      // If the item is already in the cart, update its quantity; otherwise, add a new CartItem
+      // Check if the item is already in the cart; if so, update its quantity.
       var existingCartItem = cart.CartItems.FirstOrDefault(ci => ci.CosmeticId == addProductRequest.CosmeticId);
       if (existingCartItem != null)
       {
@@ -67,26 +77,28 @@ namespace CleanArchitecture.Application.Services
       {
         var cartItem = new CartItem
         {
-          CartId = addProductRequest.CartId,
+          CartId = cart.Id,
           CosmeticId = addProductRequest.CosmeticId,
           Quantity = addProductRequest.Quantity
         };
         cart.CartItems.Add(cartItem);
       }
 
-      // Recalculate TotalPrice for the cart
+      // Recalculate the cart's total price.
+      // Here, we assume that if the Cosmetic is not loaded in the CartItem, we fallback to the cosmetic's current price.
       cart.TotalPrice = cart.CartItems.Sum(ci =>
-          ci.Quantity * (ci.Cosmetic?.Price ?? cosmetic.Price)); // Use cosmetic.Price if not loaded
+          ci.Quantity * (ci.Cosmetic?.Price ?? cosmetic.Price));
 
       await _unitOfWork.CompleteAsync();
 
-      // Map the updated cart to a DTO and return it wrapped in a list
+      // Map the updated cart to a DTO.
       var cartResponse = MapCartToCartResponse(cart);
       return Result<List<CartResponse>>.Success(new List<CartResponse> { cartResponse }, StatusCodes.Status200OK);
     }
 
     public async Task<Result<List<CartResponse>>> DeletebyIdAsync(RemoveProductRequest removeProductRequest)
     {
+    
       var cart = await _unitOfWork.Carts.GetByIdAsync(removeProductRequest.CartId);
       if (cart == null)
       {
@@ -204,7 +216,6 @@ namespace CleanArchitecture.Application.Services
     // Helper method to map a Cart (domain entity) to CartResponse (DTO)
     private CartResponse MapCartToCartResponse(Cart cart)
     {
-
       return new CartResponse
       {
         Id = cart.Id,
@@ -212,7 +223,6 @@ namespace CleanArchitecture.Application.Services
         Customer = new CustomerDto
         {
           Id = cart.CustomerId,
-          // Use the first name of the customer as a placeholder
           UserName = cart.Customer?.FirstName ?? string.Empty,
           Email = cart.Customer?.Email ?? string.Empty
         },
@@ -224,13 +234,14 @@ namespace CleanArchitecture.Application.Services
           CosmeticImage = ci.Cosmetic?.CosmeticImages.FirstOrDefault()?.ImageUrl ?? string.Empty,
           Price = ci.Cosmetic?.Price ?? 0,
           Quantity = ci.Quantity,
-          Height = ci.Cosmetic.Height,
-          Length = ci.Cosmetic.Length,
-          Weight = ci.Cosmetic.Weight,
-          Width = ci.Cosmetic.Width
+          Height = ci.Cosmetic?.Height ?? 0,   // Use null-conditional operator
+          Length = ci.Cosmetic?.Length ?? 0,
+          Weight = ci.Cosmetic?.Weight ?? 0,
+          Width = ci.Cosmetic?.Width ?? 0
         }).ToList()
       };
     }
+
 
   }
 }

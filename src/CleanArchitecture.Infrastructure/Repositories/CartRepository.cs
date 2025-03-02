@@ -37,6 +37,15 @@ namespace CleanArchitecture.Infrastructure.Repositories
         .Include(c => c.Customer)
         .FirstOrDefaultAsync(c => c.Id == id);
     }
+    public async Task<Cart?> GetCartByUserIdAsync(Guid userId)
+    {
+      return await _context.Carts
+        .Include(c => c.Customer)
+        .Include(c => c.CartItems)
+          .ThenInclude(ci => ci.Cosmetic)
+            .ThenInclude(cos => cos.CosmeticImages)
+        .FirstOrDefaultAsync(c => c.CustomerId == userId);
+    }
 
     public async Task<Cart?> GetCartWithItemsAsync(Guid cartId)
     {
