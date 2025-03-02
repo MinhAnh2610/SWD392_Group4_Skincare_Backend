@@ -11,7 +11,6 @@ public class Cosmetic : Entity<Guid>
   public Guid CosmeticTypeId { get; set; }
   public CosmeticType CosmeticType { get; set; } = default!;
   public string Name { get; set; } = default!;
-  public decimal Price { get; set; }
   public bool Gender { get; set; } = true;
   public string Notice { get; set; } = default!;
   public string Ingredients { get; set; } = default!;
@@ -32,6 +31,8 @@ public class Cosmetic : Entity<Guid>
   public List<RoutineStep> RoutineSteps { get; set; } = new List<RoutineStep>();
   public List<Feedback> Feedbacks { get; set; } = new List<Feedback>();
   public List<RefundItem> RefundItems { get; set; } = new List<RefundItem>();
+  public List<CosmeticPrice> CosmeticPrices { get; set; } = new List<CosmeticPrice>();
+  
 
 }
 public enum VolumeUnit

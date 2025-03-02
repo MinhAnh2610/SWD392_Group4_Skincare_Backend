@@ -20,7 +20,8 @@ public static class DatabaseExtensions
     await SeedAsync(context, roleManager, userManager);
   }
 
-  private static async Task SeedAsync(ApplicationDbContext context, RoleManager<Role> roleManager, UserManager<User> userManager)
+  private static async Task SeedAsync(ApplicationDbContext context, RoleManager<Role> roleManager,
+    UserManager<User> userManager)
   {
     await SeedRoleAsync(context, roleManager);
     await SeedUserAsync(context, userManager);
@@ -28,6 +29,8 @@ public static class DatabaseExtensions
     await SeedBrandAsync(context);
     await SeedCosmeticTypeAsync(context);
     await SeedCosmeticAsync(context);
+    await SeedEventsAsync(context);
+    await SeedCosmeticPricesAsync(context);
     await SeedBatchAsync(context);
     await SeedTagAsync(context);
     await SeedBlogAsync(context);
@@ -52,7 +55,6 @@ public static class DatabaseExtensions
     await SeedRoutineAsync(context);
     await SeedRoutineStepAsync(context);
 
-   
 
     await SeedTestimonialAsync(context);
     await context.SaveChangesAsync();
@@ -143,10 +145,10 @@ public static class DatabaseExtensions
       }
 
       var blogTags = new List<BlogTag>
-        {
-            new BlogTag { BlogId = blogs[0].Id, TagId = tags[0].Id }, // AI & Tech
-            new BlogTag { BlogId = blogs[1].Id, TagId = tags[1].Id }  // Business  
-        };
+      {
+        new BlogTag { BlogId = blogs[0].Id, TagId = tags[0].Id }, // AI & Tech
+        new BlogTag { BlogId = blogs[1].Id, TagId = tags[1].Id } // Business  
+      };
 
       await context.BlogsTags.AddRangeAsync(InitialData.BlogTags);
       await context.SaveChangesAsync();
@@ -177,14 +179,12 @@ public static class DatabaseExtensions
       }
 
       var carts = new List<Cart>
+      {
+        new Cart
         {
-            new Cart
-            {
-                Id = new Guid("A5D8471E-7C24-48D9-8233-CD598E6DD1C3"),
-                CustomerId = customers[5].Id,
-                TotalPrice = 89.97m
-            }
-        };
+          Id = new Guid("A5D8471E-7C24-48D9-8233-CD598E6DD1C3"), CustomerId = customers[5].Id, TotalPrice = 89.97m
+        }
+      };
 
       await context.Carts.AddRangeAsync(carts);
       await context.SaveChangesAsync();
@@ -206,20 +206,10 @@ public static class DatabaseExtensions
       }
 
       var cartItems = new List<CartItem>
-        {
-            new CartItem
-            {
-                CartId = carts[0].Id,
-                CosmeticId = cosmetics[0].Id,
-                Quantity = 2
-            },
-            new CartItem
-            {
-                CartId = carts[0].Id,
-                CosmeticId = cosmetics[1].Id,
-                Quantity = 1
-            }
-        };
+      {
+        new CartItem { CartId = carts[0].Id, CosmeticId = cosmetics[0].Id, Quantity = 2 },
+        new CartItem { CartId = carts[0].Id, CosmeticId = cosmetics[1].Id, Quantity = 1 }
+      };
 
       await context.CartItems.AddRangeAsync(cartItems);
       await context.SaveChangesAsync();
@@ -248,12 +238,28 @@ public static class DatabaseExtensions
   {
     if (!await context.Cosmetics.AnyAsync())
     {
-
       await context.Cosmetics.AddRangeAsync(InitialData.Cosmetics);
       await context.SaveChangesAsync();
     }
   }
 
+  private static async Task SeedCosmeticPricesAsync(ApplicationDbContext context)
+  {
+    if (!await context.CosmeticPrices.AnyAsync())
+    {
+      await context.CosmeticPrices.AddRangeAsync(InitialData.CosmeticPrices);
+      await context.SaveChangesAsync();
+    }
+  }
+
+  private static async Task SeedEventsAsync(ApplicationDbContext context)
+  {
+    if (!await context.Events.AnyAsync())
+    {
+      await context.Events.AddRangeAsync(InitialData.Events);
+      await context.SaveChangesAsync();
+    }
+  }
 
   public static async Task SeedCosmeticImageAsync(ApplicationDbContext context)
   {
@@ -269,20 +275,20 @@ public static class DatabaseExtensions
       }
 
       var cosmeticImages = new List<CosmeticImage>
+      {
+        new CosmeticImage
         {
-            new CosmeticImage
-            {
-                Id = new Guid("74D96977-165F-428B-8DE8-5488D6427355"),
-                CosmeticId = cosmetics[0].Id,
-                ImageUrl = "https://example.com/hydrating-face-cream.png"
-            },
-            new CosmeticImage
-            {
-                Id = new Guid("76AB322C-CD7C-4862-ADA1-15AE2AE78E84"),
-                CosmeticId = cosmetics[1].Id,
-                ImageUrl = "https://example.com/gentle-facial-cleanser.png"
-            }
-        };
+          Id = new Guid("74D96977-165F-428B-8DE8-5488D6427355"),
+          CosmeticId = cosmetics[0].Id,
+          ImageUrl = "https://example.com/hydrating-face-cream.png"
+        },
+        new CosmeticImage
+        {
+          Id = new Guid("76AB322C-CD7C-4862-ADA1-15AE2AE78E84"),
+          CosmeticId = cosmetics[1].Id,
+          ImageUrl = "https://example.com/gentle-facial-cleanser.png"
+        }
+      };
 
       await context.CosmeticsImages.AddRangeAsync(cosmeticImages);
       await context.SaveChangesAsync();
@@ -305,23 +311,11 @@ public static class DatabaseExtensions
       }
 
       var cosmeticSubCategories = new List<CosmeticSubCategory>
-        {
-            new CosmeticSubCategory
-            {
-                CosmeticId = cosmetics[0].Id,
-                SubCategoryId = subCategories[0].Id
-            },
-            new CosmeticSubCategory
-            {
-                CosmeticId = cosmetics[0].Id,
-                SubCategoryId = subCategories[2].Id
-            },
-            new CosmeticSubCategory
-            {
-                CosmeticId = cosmetics[1].Id,
-                SubCategoryId = subCategories[1].Id
-            }
-        };
+      {
+        new CosmeticSubCategory { CosmeticId = cosmetics[0].Id, SubCategoryId = subCategories[0].Id },
+        new CosmeticSubCategory { CosmeticId = cosmetics[0].Id, SubCategoryId = subCategories[2].Id },
+        new CosmeticSubCategory { CosmeticId = cosmetics[1].Id, SubCategoryId = subCategories[1].Id }
+      };
 
       await context.CosmeticSubCategories.AddRangeAsync(InitialData.CosmeticSubCategories);
       await context.SaveChangesAsync();
@@ -368,32 +362,32 @@ public static class DatabaseExtensions
       }
 
       var feedbacks = new List<Feedback>
+      {
+        new Feedback
         {
-            new Feedback
-            {
-                Id = new Guid("16784D61-99F6-4242-879D-AE16C088AE0D"),
-                CosmeticId = cosmetics[0].Id,
-                CustomerId = users[5].Id,
-                Content = "This cleanser left my skin feeling incredibly soft and refreshed.",
-                Rating = 4.5m
-            },
-            new Feedback
-            {
-                Id = new Guid("476FB2C8-476B-4426-B025-87BEE1AE00C6"),
-                CosmeticId = cosmetics[1].Id,
-                CustomerId = users[5].Id,
-                Content = "The serum really brightened my complexion. Highly recommend!",
-                Rating = 5.0m
-            },
-            new Feedback
-            {
-                Id = new Guid("F7D08F8A-4650-4320-89DE-FD790D992BF0"),
-                CosmeticId = cosmetics[0].Id,
-                CustomerId = users[5].Id,
-                Content = "Decent product, but didn't meet all my expectations.",
-                Rating = 3.5m
-            }
-        };
+          Id = new Guid("16784D61-99F6-4242-879D-AE16C088AE0D"),
+          CosmeticId = cosmetics[0].Id,
+          CustomerId = users[5].Id,
+          Content = "This cleanser left my skin feeling incredibly soft and refreshed.",
+          Rating = 4.5m
+        },
+        new Feedback
+        {
+          Id = new Guid("476FB2C8-476B-4426-B025-87BEE1AE00C6"),
+          CosmeticId = cosmetics[1].Id,
+          CustomerId = users[5].Id,
+          Content = "The serum really brightened my complexion. Highly recommend!",
+          Rating = 5.0m
+        },
+        new Feedback
+        {
+          Id = new Guid("F7D08F8A-4650-4320-89DE-FD790D992BF0"),
+          CosmeticId = cosmetics[0].Id,
+          CustomerId = users[5].Id,
+          Content = "Decent product, but didn't meet all my expectations.",
+          Rating = 3.5m
+        }
+      };
 
       await context.Feedbacks.AddRangeAsync(feedbacks);
       await context.SaveChangesAsync();
@@ -460,10 +454,14 @@ public static class DatabaseExtensions
 
       foreach (var routine in routines)
       {
-        var cleanser = cosmetics.FirstOrDefault(c => c.Name.Contains("cleanser", StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
-        var moisturizer = cosmetics.FirstOrDefault(c => c.Name.Contains("moisturizer",StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
-        var sunscreen = cosmetics.FirstOrDefault(c => c.Name.Contains("sunscreen", StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
-        var retinoid = cosmetics.FirstOrDefault(c => c.Name.Contains("retinoid", StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
+        var cleanser = cosmetics.FirstOrDefault(c =>
+          c.Name.Contains("cleanser", StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
+        var moisturizer = cosmetics.FirstOrDefault(c =>
+          c.Name.Contains("moisturizer", StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
+        var sunscreen = cosmetics.FirstOrDefault(c =>
+          c.Name.Contains("sunscreen", StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
+        var retinoid = cosmetics.FirstOrDefault(c =>
+          c.Name.Contains("retinoid", StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
 
         if (routine.Period.Equals("Morning", StringComparison.OrdinalIgnoreCase))
         {
@@ -472,30 +470,23 @@ public static class DatabaseExtensions
           {
             steps.Add(new RoutineStep
             {
-              Id = Guid.NewGuid(),
-              RoutineId = routine.Id,
-              CosmeticId = cleanser.Id,
-              StepNumber = 1
+              Id = Guid.NewGuid(), RoutineId = routine.Id, CosmeticId = cleanser.Id, StepNumber = 1
             });
           }
+
           if (moisturizer != null)
           {
             steps.Add(new RoutineStep
             {
-              Id = Guid.NewGuid(),
-              RoutineId = routine.Id,
-              CosmeticId = moisturizer.Id,
-              StepNumber = 2
+              Id = Guid.NewGuid(), RoutineId = routine.Id, CosmeticId = moisturizer.Id, StepNumber = 2
             });
           }
+
           if (sunscreen != null)
           {
             steps.Add(new RoutineStep
             {
-              Id = Guid.NewGuid(),
-              RoutineId = routine.Id,
-              CosmeticId = sunscreen.Id,
-              StepNumber = 3
+              Id = Guid.NewGuid(), RoutineId = routine.Id, CosmeticId = sunscreen.Id, StepNumber = 3
             });
           }
         }
@@ -506,30 +497,23 @@ public static class DatabaseExtensions
           {
             steps.Add(new RoutineStep
             {
-              Id = Guid.NewGuid(),
-              RoutineId = routine.Id,
-              CosmeticId = cleanser.Id,
-              StepNumber = 1
+              Id = Guid.NewGuid(), RoutineId = routine.Id, CosmeticId = cleanser.Id, StepNumber = 1
             });
           }
+
           if (moisturizer != null)
           {
             steps.Add(new RoutineStep
             {
-              Id = Guid.NewGuid(),
-              RoutineId = routine.Id,
-              CosmeticId = moisturizer.Id,
-              StepNumber = 2
+              Id = Guid.NewGuid(), RoutineId = routine.Id, CosmeticId = moisturizer.Id, StepNumber = 2
             });
           }
+
           if (retinoid != null)
           {
             steps.Add(new RoutineStep
             {
-              Id = Guid.NewGuid(),
-              RoutineId = routine.Id,
-              CosmeticId = retinoid.Id,
-              StepNumber = 3
+              Id = Guid.NewGuid(), RoutineId = routine.Id, CosmeticId = retinoid.Id, StepNumber = 3
             });
           }
         }
@@ -563,163 +547,163 @@ public static class DatabaseExtensions
       }
 
       var subCategories = new List<SubCategory>
+      {
+        // Radiance (Category 1)
+        new SubCategory
         {
-            // Radiance (Category 1)
-            new SubCategory
-            {
-                Id = new Guid("FA5585BA-D79A-4738-973A-2A46BAAFEF02"),
-                CategoryId = categories[0].Id,
-                Name = "Glow Boosters",
-                Description = "Enhance natural radiance and luminosity."
-            },
-            new SubCategory
-            {
-                Id = new Guid("924F9CB9-DA41-4B51-A9E6-3F43B15BF4A6"),
-                CategoryId = categories[0].Id,
-                Name = "Brightening Formulas",
-                Description = "Products formulated to brighten and even out skin tone."
-            },
-            new SubCategory
-            {
-                Id = new Guid("9B4F16A4-3163-4744-9399-E9381819283A"),
-                CategoryId = categories[0].Id,
-                Name = "Illuminators",
-                Description = "Subtle enhancers for a lit-from-within glow."
-            },
+          Id = new Guid("FA5585BA-D79A-4738-973A-2A46BAAFEF02"),
+          CategoryId = categories[0].Id,
+          Name = "Glow Boosters",
+          Description = "Enhance natural radiance and luminosity."
+        },
+        new SubCategory
+        {
+          Id = new Guid("924F9CB9-DA41-4B51-A9E6-3F43B15BF4A6"),
+          CategoryId = categories[0].Id,
+          Name = "Brightening Formulas",
+          Description = "Products formulated to brighten and even out skin tone."
+        },
+        new SubCategory
+        {
+          Id = new Guid("9B4F16A4-3163-4744-9399-E9381819283A"),
+          CategoryId = categories[0].Id,
+          Name = "Illuminators",
+          Description = "Subtle enhancers for a lit-from-within glow."
+        },
 
-            // Rejuvenation (Category 2)
-            new SubCategory
-            {
-                Id = new Guid("A8EF488E-56C6-46AC-889B-4A0FFBD680AC"),
-                CategoryId = categories[1].Id,
-                Name = "Age-Defying Treatments",
-                Description = "Reduce the signs of aging and smooth wrinkles."
-            },
-            new SubCategory
-            {
-                Id = new Guid("9A924542-D844-43C2-88CB-5641D00A22DD"),
-                CategoryId = categories[1].Id,
-                Name = "Firming Solutions",
-                Description = "Products that help to tighten and firm the skin."
-            },
-            new SubCategory
-            {
-                Id = new Guid("277169B9-E26C-4EE1-9CBC-B4E326E82EE0"),
-                CategoryId = categories[1].Id,
-                Name = "Renewal Complex",
-                Description = "Promote cell turnover and skin renewal."
-            },
+        // Rejuvenation (Category 2)
+        new SubCategory
+        {
+          Id = new Guid("A8EF488E-56C6-46AC-889B-4A0FFBD680AC"),
+          CategoryId = categories[1].Id,
+          Name = "Age-Defying Treatments",
+          Description = "Reduce the signs of aging and smooth wrinkles."
+        },
+        new SubCategory
+        {
+          Id = new Guid("9A924542-D844-43C2-88CB-5641D00A22DD"),
+          CategoryId = categories[1].Id,
+          Name = "Firming Solutions",
+          Description = "Products that help to tighten and firm the skin."
+        },
+        new SubCategory
+        {
+          Id = new Guid("277169B9-E26C-4EE1-9CBC-B4E326E82EE0"),
+          CategoryId = categories[1].Id,
+          Name = "Renewal Complex",
+          Description = "Promote cell turnover and skin renewal."
+        },
 
-            // Purity (Category 3)
-            new SubCategory
-            {
-                Id = new Guid("C7C096CE-8959-494D-8913-4139CA48B160"),
-                CategoryId = categories[2].Id,
-                Name = "Deep Cleansing",
-                Description = "Thorough cleansers to purify the skin."
-            },
-            new SubCategory
-            {
-                Id = new Guid("FA60A320-490A-4CCF-8BA8-1386DF682A61"),
-                CategoryId = categories[2].Id,
-                Name = "Detox & Clarify",
-                Description = "Remove impurities and unclog pores."
-            },
-            new SubCategory
-            {
-                Id = new Guid("17E228DD-F780-4CCE-8884-DFE530FD5A00"),
-                CategoryId = categories[2].Id,
-                Name = "Pore Refiners",
-                Description = "Minimize pores and smooth skin texture."
-            },
+        // Purity (Category 3)
+        new SubCategory
+        {
+          Id = new Guid("C7C096CE-8959-494D-8913-4139CA48B160"),
+          CategoryId = categories[2].Id,
+          Name = "Deep Cleansing",
+          Description = "Thorough cleansers to purify the skin."
+        },
+        new SubCategory
+        {
+          Id = new Guid("FA60A320-490A-4CCF-8BA8-1386DF682A61"),
+          CategoryId = categories[2].Id,
+          Name = "Detox & Clarify",
+          Description = "Remove impurities and unclog pores."
+        },
+        new SubCategory
+        {
+          Id = new Guid("17E228DD-F780-4CCE-8884-DFE530FD5A00"),
+          CategoryId = categories[2].Id,
+          Name = "Pore Refiners",
+          Description = "Minimize pores and smooth skin texture."
+        },
 
-            // Hydration (Category 4)
-            new SubCategory
-            {
-                Id = new Guid("7FB4A783-8587-4A18-A0DA-94D40682EEFC"),
-                CategoryId = categories[3].Id,
-                Name = "Moisture Locks",
-                Description = "Seal in hydration for long-lasting moisture."
-            },
-            new SubCategory
-            {
-                Id = new Guid("F86FA2D9-B3C1-48DF-828E-4BD6CDD76319"),
-                CategoryId = categories[3].Id,
-                Name = "Hydrating Essentials",
-                Description = "Fundamental products for daily hydration."
-            },
-            new SubCategory
-            {
-                Id = new Guid("C6A71C5D-A067-4BB6-8D9C-3CA3F180ADFD"),
-                CategoryId = categories[3].Id,
-                Name = "Nourishing Creams",
-                Description = "Rich creams that deeply nourish the skin."
-            },
+        // Hydration (Category 4)
+        new SubCategory
+        {
+          Id = new Guid("7FB4A783-8587-4A18-A0DA-94D40682EEFC"),
+          CategoryId = categories[3].Id,
+          Name = "Moisture Locks",
+          Description = "Seal in hydration for long-lasting moisture."
+        },
+        new SubCategory
+        {
+          Id = new Guid("F86FA2D9-B3C1-48DF-828E-4BD6CDD76319"),
+          CategoryId = categories[3].Id,
+          Name = "Hydrating Essentials",
+          Description = "Fundamental products for daily hydration."
+        },
+        new SubCategory
+        {
+          Id = new Guid("C6A71C5D-A067-4BB6-8D9C-3CA3F180ADFD"),
+          CategoryId = categories[3].Id,
+          Name = "Nourishing Creams",
+          Description = "Rich creams that deeply nourish the skin."
+        },
 
-            // Balance (Category 5)
-            new SubCategory
-            {
-                Id = new Guid("71895946-0B7C-40F9-97E0-9195D7BDC5E2"),
-                CategoryId = categories[4].Id,
-                Name = "pH Balancing",
-                Description = "Products to maintain the skin's natural pH."
-            },
-            new SubCategory
-            {
-                Id = new Guid("9AD8FBB8-DB09-4842-95B3-590F3728ED42"),
-                CategoryId = categories[4].Id,
-                Name = "Soothing Solutions",
-                Description = "Calm and reduce irritation for balanced skin."
-            },
+        // Balance (Category 5)
+        new SubCategory
+        {
+          Id = new Guid("71895946-0B7C-40F9-97E0-9195D7BDC5E2"),
+          CategoryId = categories[4].Id,
+          Name = "pH Balancing",
+          Description = "Products to maintain the skin's natural pH."
+        },
+        new SubCategory
+        {
+          Id = new Guid("9AD8FBB8-DB09-4842-95B3-590F3728ED42"),
+          CategoryId = categories[4].Id,
+          Name = "Soothing Solutions",
+          Description = "Calm and reduce irritation for balanced skin."
+        },
 
-            // Protection (Category 6)
-            new SubCategory
-            {
-                Id = new Guid("C4A28A94-14DA-452D-96EB-1B01D4892C84"),
-                CategoryId = categories[5].Id,
-                Name = "Environmental Shields",
-                Description = "Defend skin against pollution and external stressors."
-            },
-            new SubCategory
-            {
-                Id = new Guid("39783437-38B8-480A-B9A5-4814E9920C36"),
-                CategoryId = categories[5].Id,
-                Name = "SPF Essentials",
-                Description = "Sunscreens and UV protective formulations."
-            },
+        // Protection (Category 6)
+        new SubCategory
+        {
+          Id = new Guid("C4A28A94-14DA-452D-96EB-1B01D4892C84"),
+          CategoryId = categories[5].Id,
+          Name = "Environmental Shields",
+          Description = "Defend skin against pollution and external stressors."
+        },
+        new SubCategory
+        {
+          Id = new Guid("39783437-38B8-480A-B9A5-4814E9920C36"),
+          CategoryId = categories[5].Id,
+          Name = "SPF Essentials",
+          Description = "Sunscreens and UV protective formulations."
+        },
 
-            // Specialized Care (Category 7)
-            new SubCategory
-            {
-                Id = new Guid("7B314245-8C44-4E8D-B763-155291ED57C8"),
-                CategoryId = categories[6].Id,
-                Name = "Targeted Remedies",
-                Description = "Specific solutions for defined skin issues."
-            },
-            new SubCategory
-            {
-                Id = new Guid("646E7856-BF86-46FB-A71A-799FDAC30F82"),
-                CategoryId = categories[6].Id,
-                Name = "Delicate Area Care",
-                Description = "Gentle products for sensitive areas like eyes and lips."
-            },
+        // Specialized Care (Category 7)
+        new SubCategory
+        {
+          Id = new Guid("7B314245-8C44-4E8D-B763-155291ED57C8"),
+          CategoryId = categories[6].Id,
+          Name = "Targeted Remedies",
+          Description = "Specific solutions for defined skin issues."
+        },
+        new SubCategory
+        {
+          Id = new Guid("646E7856-BF86-46FB-A71A-799FDAC30F82"),
+          CategoryId = categories[6].Id,
+          Name = "Delicate Area Care",
+          Description = "Gentle products for sensitive areas like eyes and lips."
+        },
 
-            // Masking (Category 8)
-            new SubCategory
-            {
-                Id = new Guid("93894942-ADB7-4D19-ABBF-1AA6620B5BCB"),
-                CategoryId = categories[7].Id,
-                Name = "Sheet Masks",
-                Description = "Single-use masks for an instant boost."
-            },
-            new SubCategory
-            {
-                Id = new Guid("DADC109E-FA2E-4BE0-A5E2-29FC46F54826"),
-                CategoryId = categories[7].Id,
-                Name = "Overnight Masks",
-                Description = "Leave-on treatments for intensive overnight care."
-            }
-        };
+        // Masking (Category 8)
+        new SubCategory
+        {
+          Id = new Guid("93894942-ADB7-4D19-ABBF-1AA6620B5BCB"),
+          CategoryId = categories[7].Id,
+          Name = "Sheet Masks",
+          Description = "Single-use masks for an instant boost."
+        },
+        new SubCategory
+        {
+          Id = new Guid("DADC109E-FA2E-4BE0-A5E2-29FC46F54826"),
+          CategoryId = categories[7].Id,
+          Name = "Overnight Masks",
+          Description = "Leave-on treatments for intensive overnight care."
+        }
+      };
 
       await context.SubCategories.AddRangeAsync(InitialData.SubCategories);
       await context.SaveChangesAsync();

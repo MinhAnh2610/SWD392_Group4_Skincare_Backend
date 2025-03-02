@@ -4,24 +4,24 @@ namespace CleanArchitecture.Application.Strategies.ReportGenerateStrategy.Report
 {
   public class RevenueReportStrategy : IReportTypeStrategy
   {
-    public async Task<List<CosmeticSoldDto>> GenerateListAsync(GenerateReportRequest request, IQueryable<Order> orderQuery, IQueryable<OrderItem> orderItemQuery, IQueryable<Cosmetic> cosmeticQuery)
+    public async Task<List<CosmeticSoldDto>> GenerateListAsync(GenerateReportRequest request,
+      ReportQueries reportQueries)
     {
-      var cosmeticSales = await (
-        from orders in orderQuery
-        join orderItem in orderItemQuery on orders.Id equals orderItem.OrderId
-        join cosmetics in cosmeticQuery on orderItem.CosmeticId equals cosmetics.Id
-        where orders.OrderDate >= request.FromDate && orders.OrderDate <= request.ToDate
-        group new { orderItem, cosmetics } by new { cosmetics.Id, cosmetics.Name, cosmetics.Price}
-        into g
-        select new CosmeticSoldDto()
-        {
-          CosmeticId = g.Key.Id,
-          CosmeticName = g.Key.Name,
-          NumberOfSales = g.Sum(x => x.orderItem.Quantity),
-          Revenue = g.Sum(x => x.orderItem.Quantity) * g.Key.Price
-        }
-      ).ToListAsync();
-      return cosmeticSales;
+      var items = await
+        (from order in reportQueries.orderQuery
+          join orderItem in reportQueries.orderItemQuery on order.Id equals orderItem.OrderId
+          join cosmetic in reportQueries.cosmeticQuery on orderItem.CosmeticId equals cosmetic.Id
+          where order.OrderDate >= request.FromDate && order.OrderDate <= request.ToDate
+          group new { orderItem, cosmetic } by new { cosmetic.Id, cosmetic.Name, orderItem }
+          into g
+          select new CosmeticSoldDto
+          {
+            CosmeticId = g.Key.Id,
+            CosmeticName = g.Key.Name,
+            NumberOfSales = g.Sum(x => x.orderItem.Quantity),
+            Revenue = g.Sum(x => x.orderItem.SellingPrice)
+          }).ToListAsync();
+      return items;
     }
   }
 }

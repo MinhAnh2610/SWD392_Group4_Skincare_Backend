@@ -41,7 +41,7 @@ public class Result<T>
   /// <returns></returns>
   public static Result<T> Success(T data, int status) => new Result<T>(true, new List<Error>(), data, status);
 
-  
+
   /// <summary>
   /// This function create a Result with a list of errors and isSuccess is set to false.
   /// </summary>
@@ -49,6 +49,7 @@ public class Result<T>
   /// <param name="status">Status code of the Result.</param>
   /// <returns></returns>
   public static Result<T> Failure(List<Error> errors, int status) => new Result<T>(false, errors, default, status);
+
   /// <summary>
   /// This function returns the Results of the API according to the success of the Result, the status code of the Result, and its errors
   /// </summary>
@@ -56,9 +57,6 @@ public class Result<T>
   /// <returns>API Results</returns>
   public IResult Match(string message)
   {
-    var response = IsSuccess
-      ? ApiResponse<T>.SuccessResponse(Data!, message)
-      : ApiResponse<T>.FailureResponse(Errors, message);
     if (Errors.Count > 0)
     {
       StringBuilder stringBuilder = new StringBuilder();
@@ -66,9 +64,13 @@ public class Result<T>
       {
         stringBuilder.AppendLine(error.Description);
       }
+
       message = stringBuilder.ToString();
     }
 
+    var response = IsSuccess
+      ? ApiResponse<T>.SuccessResponse(Data, message)
+      : ApiResponse<T>.FailureResponse(Errors, message);
     return Status switch
     {
       StatusCodes.Status200OK => Results.Ok(response),
@@ -76,6 +78,7 @@ public class Result<T>
       StatusCodes.Status401Unauthorized => Results.Unauthorized(),
       StatusCodes.Status409Conflict => Results.Conflict(response),
       StatusCodes.Status404NotFound => Results.NotFound(response),
+      StatusCodes.Status201Created => Results.Created(),
       _ => Results.StatusCode(StatusCodes.Status500InternalServerError)
     };
   }

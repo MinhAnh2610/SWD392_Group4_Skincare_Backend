@@ -86,8 +86,9 @@ namespace CleanArchitecture.Application.Services
 
       // Recalculate the cart's total price.
       // Here, we assume that if the Cosmetic is not loaded in the CartItem, we fallback to the cosmetic's current price.
-      cart.TotalPrice = cart.CartItems.Sum(ci =>
-          ci.Quantity * (ci.Cosmetic?.Price ?? cosmetic.Price));
+      //TODO: PRICE
+      // cart.TotalPrice = cart.CartItems.Sum(ci =>
+      //     ci.Quantity * (ci.Cosmetic?.Price ?? cosmetic.Price));
 
       await _unitOfWork.CompleteAsync();
 
@@ -120,7 +121,8 @@ namespace CleanArchitecture.Application.Services
       cart.CartItems.Remove(cartItem);
 
       // Recalculate the total price after removal
-      cart.TotalPrice = cart.CartItems.Sum(ci => ci.Quantity * (ci.Cosmetic?.Price ?? 0));
+      //TODO: PRICE
+      // cart.TotalPrice = cart.CartItems.Sum(ci => ci.Quantity * (ci.Cosmetic?.Price ?? 0));
 
       await _unitOfWork.CompleteAsync();
 
@@ -232,7 +234,8 @@ namespace CleanArchitecture.Application.Services
           CosmeticName = ci.Cosmetic?.Name ?? string.Empty,
           // Select only the first image URL to avoid circular references:
           CosmeticImage = ci.Cosmetic?.CosmeticImages.FirstOrDefault()?.ImageUrl ?? string.Empty,
-          Price = ci.Cosmetic?.Price ?? 0,
+          //TODO: PRICE
+          // Price = ci.Cosmetic?.Price ?? 0,
           Quantity = ci.Quantity,
           Height = ci.Cosmetic?.Height ?? 0,   // Use null-conditional operator
           Length = ci.Cosmetic?.Length ?? 0,

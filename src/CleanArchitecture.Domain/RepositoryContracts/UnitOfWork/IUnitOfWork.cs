@@ -13,9 +13,11 @@ public interface IUnitOfWork : IDisposable
   ICompanyInformationRepository CompanyInformation { get; }
   ICosmeticImageRepository CosmeticImages { get; }
   ICosmeticRepository Cosmetics { get; }
+  ICosmeticPriceRepository CosmeticPrices { get; }
   ICosmeticSubCategoryRepository CosmeticSubCategories { get; }
   ICosmeticTypeRepository CosmeticTypes { get; }
   ICouponRepository Coupons { get; }
+  IEventRepository Events { get; }
   IFAQRepository FAQs { get; }
   IFeedbackRepository Feedbacks { get; }
   IOrderItemRepository OrderItems { get; }

@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CleanArchitecture.Infrastructure.Repositories.UnitOfWork;
 
-public class UnitOfWork : IUnitOfWork 
+public class UnitOfWork : IUnitOfWork
 {
   private readonly ApplicationDbContext _context;
   private IDbContextTransaction _transaction;
@@ -26,9 +26,11 @@ public class UnitOfWork : IUnitOfWork
   public ICompanyInformationRepository CompanyInformation => new CompanyInformationRepository(_context);
   public ICosmeticImageRepository CosmeticImages => new CosmeticImageRepository(_context);
   public ICosmeticRepository Cosmetics => new CosmeticRepository(_context);
+  public ICosmeticPriceRepository CosmeticPrices => new CosmeticPriceRepository(_context);
   public ICosmeticSubCategoryRepository CosmeticSubCategories => new CosmeticSubCategoryRepository(_context);
   public ICosmeticTypeRepository CosmeticTypes => new CosmeticTypeRepository(_context);
   public ICouponRepository Coupons => new CouponRepository(_context);
+  public IEventRepository Events => new EventRepository(_context);
   public IFAQRepository FAQs => new FAQRepository(_context);
   public IFeedbackRepository Feedbacks => new FeedbackRepository(_context);
   public IOrderItemRepository OrderItems => new OrderItemRepository(_context);
@@ -70,10 +72,7 @@ public class UnitOfWork : IUnitOfWork
   {
     try
     {
-      var linesChanged = await _context.SaveChangesAsync();
-      if (linesChanged <= 0)
-        return false;
-
+      await _context.SaveChangesAsync();
       await _transaction.CommitAsync();
       return true;
     }

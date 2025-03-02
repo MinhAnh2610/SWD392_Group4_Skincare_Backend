@@ -89,7 +89,8 @@ public static class DependencyInjection
     services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
     services.AddScoped<ITagRepository, TagRepository>();
     services.AddScoped<ITestimonialRepository, TestimonialRepository>();
-
+    services.AddScoped<IEventRepository, EventRepository>();
+    services.AddScoped<ICosmeticPriceRepository, CosmeticPriceRepository>();
     #endregion
 
     // Register Redis Caching

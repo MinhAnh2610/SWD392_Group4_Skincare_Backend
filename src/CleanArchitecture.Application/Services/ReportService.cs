@@ -25,11 +25,12 @@ namespace CleanArchitecture.Application.Services
     public async Task<Result<byte[]>> GenerateReportAsync(GenerateReportRequest request)
     {
       byte[] reportFile = [];
-
+      //TODO: HERE
       var orderQuery = _unitOfWork.Orders.GetQueryable();
       var orderItemQuery = _unitOfWork.OrderItems.GetQueryable();
       var cosmeticQuery = _unitOfWork.Cosmetics.GetQueryable();
-
+      var cosmeticPriceQuery = _unitOfWork.CosmeticPrices.GetQueryable();
+      ReportQueries reportQueries = new ReportQueries(orderQuery, orderItemQuery, cosmeticQuery, cosmeticPriceQuery);
       var isValidDates = IsValidTimePeriod(request.FromDate, request.ToDate);
       if (!isValidDates)
       {
@@ -45,7 +46,7 @@ namespace CleanArchitecture.Application.Services
         var nameOfStrat = strategy.GetType().Name;
         if (nameOfStrat.Contains(reportType, StringComparison.OrdinalIgnoreCase))
         {
-          cosmeticSales = await strategy.GenerateListAsync(request, orderQuery, orderItemQuery, cosmeticQuery);
+          cosmeticSales = await strategy.GenerateListAsync(request, reportQueries);
           totalRevenue = cosmeticSales.Sum(x => x.Revenue);
           break;
         }

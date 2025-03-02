@@ -29,6 +29,8 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>, IApplic
   public DbSet<Category> Categories => Set<Category>();
   public DbSet<CompanyInformation> CompanyInformation => Set<CompanyInformation>();
   public DbSet<Cosmetic> Cosmetics => Set<Cosmetic>();
+  public DbSet<CosmeticPrice> CosmeticPrices => Set<CosmeticPrice>();
+  public DbSet<Event> Events => Set<Event>();
   public DbSet<CosmeticImage> CosmeticsImages => Set<CosmeticImage>();
   public DbSet<CosmeticSubCategory> CosmeticSubCategories => Set<CosmeticSubCategory>();
   public DbSet<CosmeticType> CosmeticTypes => Set<CosmeticType>();

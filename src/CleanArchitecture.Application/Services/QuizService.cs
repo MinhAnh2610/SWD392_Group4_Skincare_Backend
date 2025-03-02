@@ -199,7 +199,6 @@ public class QuizService : IQuizService
         CosmeticId = routineStep.CosmeticId,
         CosmeticName = routineStep.Cosmetic.Name,
         CosmeticNotice = routineStep.Cosmetic.Notice,
-        CosmeticPrice = routineStep.Cosmetic.Price,
         StepNumber = routineStep.StepNumber,
       }).ToList(),
     }).ToList(), StatusCodes.Status200OK);

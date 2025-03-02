@@ -4,6 +4,8 @@ namespace CleanArchitecture.Application.Strategies.ReportGenerateStrategy.Report
 {
   public interface IReportTypeStrategy
   {
-    Task<List<CosmeticSoldDto>> GenerateListAsync(GenerateReportRequest request, IQueryable<Order> orderQuery, IQueryable<OrderItem> orderItemQuery, IQueryable<Cosmetic> cosmeticQuery);
+    Task<List<CosmeticSoldDto>> GenerateListAsync(GenerateReportRequest request, ReportQueries reportQueries);
   }
+
+  public record ReportQueries(IQueryable<Order> orderQuery, IQueryable<OrderItem> orderItemQuery, IQueryable<Cosmetic> cosmeticQuery, IQueryable<CosmeticPrice> cosmeticPriceQuery);
 }

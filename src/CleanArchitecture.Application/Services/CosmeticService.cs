@@ -133,9 +133,11 @@ namespace CleanArchitecture.Application.Services
       {
         return Result<CosmeticResponse>.Failure([CosmeticErrors.CosmeticNotFound], StatusCodes.Status404NotFound);
       }
-
+      //TODO: HERE
+      // var cosmeticPrice = _unitOfWork.CosmeticPrices.GetByIdAsync()
       // Only update if the new value is NOT null
-      existcosmetic.Price = cosmetic.Price != default ? cosmetic.Price : existcosmetic.Price;
+      // existcosmetic.Price = cosmetic.Price != default ? cosmetic.Price : existcosmetic.Price;
+      
       existcosmetic.MainUsage =
         !string.IsNullOrWhiteSpace(cosmetic.MainUsage) ? cosmetic.MainUsage : existcosmetic.MainUsage;
       existcosmetic.Instructions = !string.IsNullOrWhiteSpace(cosmetic.Instructions)
