@@ -125,7 +125,7 @@ public class BlogService : IBlogService
       return Result<BlogResponse>.Failure([error.err], error.statusCode);
     }
 
-    return Result<BlogResponse>.Success(blog.Adapt<BlogResponse>(), StatusCodes.Status200OK);
+    return Result<BlogResponse>.Success(blog.Adapt<BlogResponse>(), StatusCodes.Status201Created);
   }
 
   public async Task<Result<BlogResponse>> UpdateBlogAsync(Guid id, UpdateBlogRequest request)

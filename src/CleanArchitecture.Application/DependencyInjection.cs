@@ -59,6 +59,7 @@ public static class DependencyInjection
     services.AddScoped<IVnPayIntegrationService, VnPayIntegrationService>();
     services.AddScoped<IErrorFactory, ErrorFactory>();
     services.AddScoped<IReportService, ReportService>();
+    services.AddScoped<IEventService, EventService>();
 
     // Add HttpClient for GHNService
     services.AddHttpClient<IGHNService, GHNService>();

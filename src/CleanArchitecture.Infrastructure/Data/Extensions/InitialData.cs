@@ -22,7 +22,7 @@ internal class InitialData
       UserName = "MinhAnh2610",
       Email = "minhanh26102004@gmail.com",
       EmailConfirmed = true,
-      BirthDate = new DateOnly(2000,1,1),
+      BirthDate = new DateOnly(2000, 1, 1),
       FirstName = "Pham",
       LastName = "Anh",
       Gender = true,
@@ -193,6 +193,7 @@ internal class InitialData
           ExpirationDate = new DateOnly(2027, 3, 15),
         });
       }
+
       return batches;
     }
   }
@@ -209,7 +210,8 @@ internal class InitialData
           Id = new Guid("CB64A508-526E-4156-A512-1D1BF7A5A032"),
           StaffId = staffs[3].Id,
           Title = "Skincare Education: Master the Basics",
-          Content = "Discover essential skincare tips, tutorials, and best practices to keep your skin healthy and radiant. Our experts share insights on proper cleansing, moisturizing, and sun protection to help you build a solid skincare foundation.",
+          Content =
+            "Discover essential skincare tips, tutorials, and best practices to keep your skin healthy and radiant. Our experts share insights on proper cleansing, moisturizing, and sun protection to help you build a solid skincare foundation.",
           BlogTags = new List<BlogTag>()
         },
         new Blog
@@ -217,7 +219,8 @@ internal class InitialData
           Id = new Guid("C9DED966-A2F7-4328-B899-8201508D5476"),
           StaffId = staffs[3].Id,
           Title = "Routine Building & Ingredient Guide for Every Skin Concern",
-          Content = "Building your perfect skincare routine is easier than ever. Learn how to select the right ingredients for your unique skin concerns and get expert advice on customizing a regimen to combat dryness, oiliness, and signs of aging.",
+          Content =
+            "Building your perfect skincare routine is easier than ever. Learn how to select the right ingredients for your unique skin concerns and get expert advice on customizing a regimen to combat dryness, oiliness, and signs of aging.",
           BlogTags = new List<BlogTag>()
         },
         new Blog
@@ -225,7 +228,8 @@ internal class InitialData
           Id = new Guid("BAADC4E3-EE7A-44BB-9942-33B3C63B8DA4"),
           StaffId = staffs[3].Id,
           Title = "Deep Dive into Active Ingredients: Vitamin C & Retinol",
-          Content = "Explore the benefits and science behind active ingredients like Vitamin C and Retinol. This post details how these potent ingredients can transform your skincare routine and improve overall skin health.",
+          Content =
+            "Explore the benefits and science behind active ingredients like Vitamin C and Retinol. This post details how these potent ingredients can transform your skincare routine and improve overall skin health.",
           BlogTags = new List<BlogTag>()
         },
         new Blog
@@ -233,7 +237,8 @@ internal class InitialData
           Id = new Guid("7E15DA89-51F2-4F64-9603-84065B2757C0"),
           StaffId = staffs[3].Id,
           Title = "How to Build a Customized Skincare Routine",
-          Content = "Every skin is unique. Learn a step-by-step approach to creating a personalized skincare routine that meets your skin’s specific needs, including product recommendations and application techniques.",
+          Content =
+            "Every skin is unique. Learn a step-by-step approach to creating a personalized skincare routine that meets your skin’s specific needs, including product recommendations and application techniques.",
           BlogTags = new List<BlogTag>()
         },
         new Blog
@@ -241,7 +246,8 @@ internal class InitialData
           Id = new Guid("384D9D37-F554-4EA1-8443-6C4054F3DFB8"),
           StaffId = staffs[3].Id,
           Title = "Managing Acne and Other Skin Concerns",
-          Content = "From acne to hyperpigmentation, this post offers actionable strategies and product tips to address common skin concerns. Learn how to choose the right treatments to restore balance and clarity.",
+          Content =
+            "From acne to hyperpigmentation, this post offers actionable strategies and product tips to address common skin concerns. Learn how to choose the right treatments to restore balance and clarity.",
           BlogTags = new List<BlogTag>()
         },
         new Blog
@@ -249,7 +255,8 @@ internal class InitialData
           Id = new Guid("F0632A67-8571-4E6A-A6F0-E22704D1FC42"),
           StaffId = staffs[3].Id,
           Title = "Expert Advice: Dermatologist Tips for Healthy Skin",
-          Content = "Get professional advice straight from dermatologists. This post covers the latest treatments, daily routines, and lifestyle tips to maintain healthy, glowing skin.",
+          Content =
+            "Get professional advice straight from dermatologists. This post covers the latest treatments, daily routines, and lifestyle tips to maintain healthy, glowing skin.",
           BlogTags = new List<BlogTag>()
         },
         new Blog
@@ -257,7 +264,8 @@ internal class InitialData
           Id = new Guid("55555555-5555-5555-5555-555555555555"),
           StaffId = staffs[3].Id,
           Title = "The Ultimate Guide to Sunscreen Application",
-          Content = "Sunscreen is your best defense against UV damage. Learn how to choose the right SPF, application techniques, and tips for keeping your skin protected throughout the day.",
+          Content =
+            "Sunscreen is your best defense against UV damage. Learn how to choose the right SPF, application techniques, and tips for keeping your skin protected throughout the day.",
           BlogTags = new List<BlogTag>()
         },
         new Blog
@@ -265,7 +273,8 @@ internal class InitialData
           Id = new Guid("178FB57C-508C-4877-80F3-3607856CF786"),
           StaffId = staffs[3].Id,
           Title = "DIY Skincare: Natural Ingredients for a Radiant Glow",
-          Content = "Discover how to incorporate natural, kitchen-based ingredients into your skincare routine. This post shares easy DIY recipes and tips for achieving a healthy, radiant glow.",
+          Content =
+            "Discover how to incorporate natural, kitchen-based ingredients into your skincare routine. This post shares easy DIY recipes and tips for achieving a healthy, radiant glow.",
           BlogTags = new List<BlogTag>()
         },
         new Blog
@@ -273,7 +282,8 @@ internal class InitialData
           Id = new Guid("5E421C87-9AA8-4CC0-A03F-C0F658609241"),
           StaffId = staffs[3].Id,
           Title = "Seasonal Skincare: Adjusting Your Routine for Summer",
-          Content = "Summer can be harsh on your skin. Learn how to adapt your skincare routine for hot weather with tips on hydration, sun protection, and lightweight product recommendations.",
+          Content =
+            "Summer can be harsh on your skin. Learn how to adapt your skincare routine for hot weather with tips on hydration, sun protection, and lightweight product recommendations.",
           BlogTags = new List<BlogTag>()
         },
         new Blog
@@ -281,7 +291,8 @@ internal class InitialData
           Id = new Guid("53292157-7960-4927-9F81-232A0B566F8E"),
           StaffId = staffs[3].Id,
           Title = "Nighttime Skincare: Repair and Rejuvenate Your Skin",
-          Content = "Nighttime is the perfect time for skin repair. Discover the best products and practices to help your skin recover from daily stress and rejuvenate while you sleep.",
+          Content =
+            "Nighttime is the perfect time for skin repair. Discover the best products and practices to help your skin recover from daily stress and rejuvenate while you sleep.",
           BlogTags = new List<BlogTag>()
         }
       };
@@ -298,82 +309,73 @@ internal class InitialData
       return new List<BlogTag>
       {
         // Blog 1: "Skincare Education: Master the Basics" → Skincare Education
-        new BlogTag
-        {
-          BlogId = blogs[0].Id,
-          TagId = tags.First(t => t.Name == "Skincare Education").Id,
-        },
+        new BlogTag { BlogId = blogs[0].Id, TagId = tags.First(t => t.Name == "Skincare Education").Id, },
         // Blog 2: "Routine Building & Ingredient Guide for Every Skin Concern" → Routine Building
-        new BlogTag
-        {
-          BlogId = blogs[1].Id,
-          TagId = tags.First(t => t.Name == "Routine Building").Id,
-        },
+        new BlogTag { BlogId = blogs[1].Id, TagId = tags.First(t => t.Name == "Routine Building").Id, },
         // Blog 2: "Routine Building & Ingredient Guide for Every Skin Concern" → Ingredient Guide
-        new BlogTag
-        {
-          BlogId = blogs[1].Id,
-          TagId = tags.First(t => t.Name == "Ingredient Guide").Id,
-        },
+        new BlogTag { BlogId = blogs[1].Id, TagId = tags.First(t => t.Name == "Ingredient Guide").Id, },
         // Blog 3: "Deep Dive into Active Ingredients: Vitamin C & Retinol" → Ingredient Guide
-        new BlogTag
-        {
-          BlogId = blogs[2].Id,
-          TagId = tags.First(t => t.Name == "Ingredient Guide").Id,
-        },
+        new BlogTag { BlogId = blogs[2].Id, TagId = tags.First(t => t.Name == "Ingredient Guide").Id, },
         // Blog 4: "How to Build a Customized Skincare Routine" → Routine Building
-        new BlogTag
-        {
-          BlogId = blogs[3].Id,
-          TagId = tags.First(t => t.Name == "Routine Building").Id,
-        },
+        new BlogTag { BlogId = blogs[3].Id, TagId = tags.First(t => t.Name == "Routine Building").Id, },
         // Blog 5: "Managing Acne and Other Skin Concerns" → Skin Concerns
-        new BlogTag
-        {
-          BlogId = blogs[4].Id,
-          TagId = tags.First(t => t.Name == "Skin Concerns").Id,
-        },
+        new BlogTag { BlogId = blogs[4].Id, TagId = tags.First(t => t.Name == "Skin Concerns").Id, },
         // Blog 6: "Expert Advice: Dermatologist Tips for Healthy Skin" → Expert Advice
-        new BlogTag
-        {
-          BlogId = blogs[5].Id,
-          TagId = tags.First(t => t.Name == "Expert Advice").Id,
-        },
+        new BlogTag { BlogId = blogs[5].Id, TagId = tags.First(t => t.Name == "Expert Advice").Id, },
         // Blog 7: "The Ultimate Guide to Sunscreen Application" → Skincare Education
-        new BlogTag
-        {
-          BlogId = blogs[6].Id,
-          TagId = tags.First(t => t.Name == "Skincare Education").Id,
-        },
+        new BlogTag { BlogId = blogs[6].Id, TagId = tags.First(t => t.Name == "Skincare Education").Id, },
         // Blog 8: "DIY Skincare: Natural Ingredients for a Radiant Glow" → Ingredient Guide
-        new BlogTag
-        {
-          BlogId = blogs[7].Id,
-          TagId = tags.First(t => t.Name == "Ingredient Guide").Id,
-        },
+        new BlogTag { BlogId = blogs[7].Id, TagId = tags.First(t => t.Name == "Ingredient Guide").Id, },
         // Blog 9: "Seasonal Skincare: Adjusting Your Routine for Summer" → Routine Building
-        new BlogTag
-        {
-          BlogId = blogs[8].Id,
-          TagId = tags.First(t => t.Name == "Routine Building").Id,
-        },
+        new BlogTag { BlogId = blogs[8].Id, TagId = tags.First(t => t.Name == "Routine Building").Id, },
         // Blog 10: "Nighttime Skincare: Repair and Rejuvenate Your Skin" → Skincare Education
-        new BlogTag
-        {
-          BlogId = blogs[9].Id,
-          TagId = tags.First(t => t.Name == "Skincare Education").Id,
-        }
+        new BlogTag { BlogId = blogs[9].Id, TagId = tags.First(t => t.Name == "Skincare Education").Id, }
       };
     }
   }
 
   public static IEnumerable<Brand> Brands => new List<Brand>
   {
-    new Brand { Id = new Guid("9286DAB7-CCA8-4C04-9D2D-FF1072A1746A"), Name = "L'Oreal", Description = "Global beauty brand", WebsiteUrl = "https://www.loreal.com", LogoUrl = "https://example.com/loreal-logo.png" },
-    new Brand { Id = new Guid("A6ACE76F-5DA7-4EEB-A909-49B0390F34A2"), Name = "Clinique", Description = "Fragrance-free skincare products", WebsiteUrl = "https://www.clinique.com", LogoUrl = "https://example.com/clinique-logo.png" },
-    new Brand { Id = new Guid("735B21D1-AB56-45BD-8404-7722112AE8E2"), Name = "Neutrogena", Description = "Dermatologist-recommended skincare", WebsiteUrl = "https://www.neutrogena.com", LogoUrl = "https://example.com/neutrogena-logo.png" },
-    new Brand { Id = new Guid("B4D858D8-28D6-476A-9BDF-B9265DA3E160"), Name = "CeraVe", Description = "Skincare with essential ceramides", WebsiteUrl = "https://www.cerave.com", LogoUrl = "https://example.com/cerave-logo.png" },
-    new Brand { Id = new Guid("0F7ABD8F-0905-4EDE-A573-C46B6EF86267"), Name = "The Ordinary", Description = "Clinical formulations with integrity", WebsiteUrl = "https://www.theordinary.com", LogoUrl = "https://example.com/theordinary-logo.png" }
+    new Brand
+    {
+      Id = new Guid("9286DAB7-CCA8-4C04-9D2D-FF1072A1746A"),
+      Name = "L'Oreal",
+      Description = "Global beauty brand",
+      WebsiteUrl = "https://www.loreal.com",
+      LogoUrl = "https://example.com/loreal-logo.png"
+    },
+    new Brand
+    {
+      Id = new Guid("A6ACE76F-5DA7-4EEB-A909-49B0390F34A2"),
+      Name = "Clinique",
+      Description = "Fragrance-free skincare products",
+      WebsiteUrl = "https://www.clinique.com",
+      LogoUrl = "https://example.com/clinique-logo.png"
+    },
+    new Brand
+    {
+      Id = new Guid("735B21D1-AB56-45BD-8404-7722112AE8E2"),
+      Name = "Neutrogena",
+      Description = "Dermatologist-recommended skincare",
+      WebsiteUrl = "https://www.neutrogena.com",
+      LogoUrl = "https://example.com/neutrogena-logo.png"
+    },
+    new Brand
+    {
+      Id = new Guid("B4D858D8-28D6-476A-9BDF-B9265DA3E160"),
+      Name = "CeraVe",
+      Description = "Skincare with essential ceramides",
+      WebsiteUrl = "https://www.cerave.com",
+      LogoUrl = "https://example.com/cerave-logo.png"
+    },
+    new Brand
+    {
+      Id = new Guid("0F7ABD8F-0905-4EDE-A573-C46B6EF86267"),
+      Name = "The Ordinary",
+      Description = "Clinical formulations with integrity",
+      WebsiteUrl = "https://www.theordinary.com",
+      LogoUrl = "https://example.com/theordinary-logo.png"
+    }
   };
 
   public static IEnumerable<Cart> Carts
@@ -385,9 +387,7 @@ internal class InitialData
       {
         new Cart
         {
-          Id = new Guid("A5D8471E-7C24-48D9-8233-CD598E6DD1C3"),
-          CustomerId = customers[5].Id,
-          TotalPrice = 89.97m
+          Id = new Guid("A5D8471E-7C24-48D9-8233-CD598E6DD1C3"), CustomerId = customers[5].Id, TotalPrice = 89.97m
         }
       };
     }
@@ -401,18 +401,8 @@ internal class InitialData
       var cosmetics = Cosmetics.ToList();
       return new List<CartItem>
       {
-        new CartItem
-        {
-          CartId = carts[0].Id,
-          CosmeticId = cosmetics[0].Id,
-          Quantity = 2
-        },
-        new CartItem
-        {
-          CartId = carts[0].Id,
-          CosmeticId = cosmetics[1].Id,
-          Quantity = 1
-        }
+        new CartItem { CartId = carts[0].Id, CosmeticId = cosmetics[0].Id, Quantity = 2 },
+        new CartItem { CartId = carts[0].Id, CosmeticId = cosmetics[1].Id, Quantity = 1 }
       };
     }
   }
@@ -631,7 +621,7 @@ internal class InitialData
         new Guid("A75C3A77-DADF-4B22-9333-C750B0259A3D"), // Cleanser
         new Guid("6B6F4F10-A1BB-4603-8A4B-6207D78BC17C"), // Moisturizer
         new Guid("B86F428E-5641-4D92-9D78-14592EFA5B8B"), // Sunscreen
-        new Guid("EE853A4D-F553-483B-885F-97F4D404BDCE")  // Retinoid
+        new Guid("EE853A4D-F553-483B-885F-97F4D404BDCE") // Retinoid
       };
 
       var rand = new Random();
@@ -655,7 +645,6 @@ internal class InitialData
           BrandId = brands[cleanserBrandIndex].Id,
           SkinTypeId = skin.Id,
           CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Cleansers").Id,
-          Price = 15.99m,
           Gender = true,
           Notice = "A gentle cleanser to prepare the skin.",
           Ingredients = "Water, Mild Surfactants, Herbal Extracts",
@@ -678,7 +667,6 @@ internal class InitialData
           BrandId = brands[moisturizerBrandIndex].Id,
           SkinTypeId = skin.Id,
           CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Moisturizers").Id,
-          Price = 25.99m,
           Gender = true,
           Notice = "Hydrates and nourishes the skin.",
           Ingredients = "Hyaluronic Acid, Glycerin, Ceramides",
@@ -701,7 +689,6 @@ internal class InitialData
           BrandId = brands[sunscreenBrandIndex].Id,
           SkinTypeId = skin.Id,
           CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Sunscreens").Id,
-          Price = 19.99m,
           Gender = true,
           Notice = "Provides broad-spectrum protection.",
           Ingredients = "Zinc Oxide, Titanium Dioxide",
@@ -724,7 +711,6 @@ internal class InitialData
           BrandId = brands[retinoidBrandIndex].Id,
           SkinTypeId = skin.Id,
           CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Serums").Id,
-          Price = 39.99m,
           Gender = true,
           Notice = "Helps reduce wrinkles and improve skin texture.",
           Ingredients = "Retinol, Hyaluronic Acid",
@@ -749,7 +735,6 @@ internal class InitialData
           BrandId = brands[0].Id,
           SkinTypeId = skinTypes[0].Id,
           CosmeticTypeId = cosmeticTypes[0].Id,
-          Price = 34.99m,
           Gender = true,
           Notice = "Apply twice daily for best results.",
           Ingredients = "Water, Hyaluronic Acid, Glycerin",
@@ -757,10 +742,10 @@ internal class InitialData
           Texture = "Cream",
           Origin = "France",
           Instructions = "Apply on a cleansed face in the morning and at night.",
-          Weight = rand.Next(50, 500), 
-          Length = rand.Next(5, 20),   
-          Width = rand.Next(5, 20),    
-          Height = rand.Next(5, 20),   
+          Weight = rand.Next(50, 500),
+          Length = rand.Next(5, 20),
+          Width = rand.Next(5, 20),
+          Height = rand.Next(5, 20),
           VolumeUnit = (VolumeUnit)0
         },
         new Cosmetic
@@ -770,7 +755,6 @@ internal class InitialData
           BrandId = brands[2].Id,
           SkinTypeId = skinTypes[1].Id,
           CosmeticTypeId = cosmeticTypes[1].Id,
-          Price = 19.99m,
           Gender = true,
           Notice = "Suitable for daily use.",
           Ingredients = "Salicylic Acid, Chamomile Extract",
@@ -778,10 +762,10 @@ internal class InitialData
           Texture = "Gel",
           Origin = "USA",
           Instructions = "Massage onto wet skin and rinse thoroughly.",
-          Weight = rand.Next(50, 500), 
-          Length = rand.Next(5, 20),   
-          Width = rand.Next(5, 20),    
-          Height = rand.Next(5, 20),   
+          Weight = rand.Next(50, 500),
+          Length = rand.Next(5, 20),
+          Width = rand.Next(5, 20),
+          Height = rand.Next(5, 20),
           VolumeUnit = (VolumeUnit)0
         },
         new Cosmetic
@@ -791,7 +775,6 @@ internal class InitialData
           BrandId = brands[3].Id,
           SkinTypeId = skinTypes[1].Id,
           CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Serums").Id,
-          Price = 34.99m,
           Gender = true,
           Notice = "Apply a few drops after cleansing.",
           Ingredients = "Hyaluronic Acid, Vitamin C, Peptides",
@@ -799,10 +782,10 @@ internal class InitialData
           Texture = "Light Gel",
           Origin = "France",
           Instructions = "Apply 2-3 drops on cleansed skin, morning and night.",
-          Weight = rand.Next(50, 500), 
-          Length = rand.Next(5, 20),   
-          Width = rand.Next(5, 20),    
-          Height = rand.Next(5, 20),   
+          Weight = rand.Next(50, 500),
+          Length = rand.Next(5, 20),
+          Width = rand.Next(5, 20),
+          Height = rand.Next(5, 20),
           VolumeUnit = (VolumeUnit)0
         },
         new Cosmetic
@@ -812,7 +795,6 @@ internal class InitialData
           BrandId = brands[4].Id,
           SkinTypeId = skinTypes[2].Id,
           CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Moisturizers").Id,
-          Price = 29.99m,
           Gender = true,
           Notice = "Locks in moisture for all-day hydration.",
           Ingredients = "Glycerin, Hyaluronic Acid, Ceramides",
@@ -820,10 +802,10 @@ internal class InitialData
           Texture = "Cream",
           Origin = "Germany",
           Instructions = "Apply evenly to face and neck after cleansing.",
-          Weight = rand.Next(50, 500), 
-          Length = rand.Next(5, 20),   
-          Width = rand.Next(5, 20),    
-          Height = rand.Next(5, 20),   
+          Weight = rand.Next(50, 500),
+          Length = rand.Next(5, 20),
+          Width = rand.Next(5, 20),
+          Height = rand.Next(5, 20),
           VolumeUnit = (VolumeUnit)0
         },
         new Cosmetic
@@ -833,7 +815,6 @@ internal class InitialData
           BrandId = brands[1].Id,
           SkinTypeId = skinTypes[0].Id,
           CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Toners").Id,
-          Price = 14.99m,
           Gender = true,
           Notice = "Balances skin pH and preps skin for moisturizer.",
           Ingredients = "Witch Hazel, Aloe Vera, Glycerin",
@@ -841,10 +822,10 @@ internal class InitialData
           Texture = "Liquid",
           Origin = "USA",
           Instructions = "Apply with a cotton pad after cleansing.",
-          Weight = rand.Next(50, 500), 
-          Length = rand.Next(5, 20),   
-          Width = rand.Next(5, 20),    
-          Height = rand.Next(5, 20),   
+          Weight = rand.Next(50, 500),
+          Length = rand.Next(5, 20),
+          Width = rand.Next(5, 20),
+          Height = rand.Next(5, 20),
           VolumeUnit = (VolumeUnit)0
         },
         new Cosmetic
@@ -854,7 +835,6 @@ internal class InitialData
           BrandId = brands[0].Id,
           SkinTypeId = skinTypes[0].Id,
           CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Exfoliators").Id,
-          Price = 24.99m,
           Gender = true,
           Notice = "Use 2-3 times a week for smooth skin.",
           Ingredients = "Sugar, Jojoba Beads, Natural Extracts",
@@ -862,10 +842,10 @@ internal class InitialData
           Texture = "Scrub",
           Origin = "USA",
           Instructions = "Gently massage on damp skin and rinse off.",
-          Weight = rand.Next(50, 500), 
-          Length = rand.Next(5, 20),   
-          Width = rand.Next(5, 20),    
-          Height = rand.Next(5, 20),   
+          Weight = rand.Next(50, 500),
+          Length = rand.Next(5, 20),
+          Width = rand.Next(5, 20),
+          Height = rand.Next(5, 20),
           VolumeUnit = (VolumeUnit)1
         },
         new Cosmetic
@@ -875,7 +855,6 @@ internal class InitialData
           BrandId = brands[1].Id,
           SkinTypeId = skinTypes[2].Id,
           CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Moisturizers").Id,
-          Price = 39.99m,
           Gender = true,
           Notice = "For overnight skin repair and nourishment.",
           Ingredients = "Peptides, Antioxidants, Hyaluronic Acid",
@@ -883,11 +862,11 @@ internal class InitialData
           Texture = "Rich Cream",
           Origin = "Italy",
           Instructions = "Apply evenly to clean skin before bed.",
-          Weight = rand.Next(50, 500), 
-          Length = rand.Next(5, 20),   
-          Width = rand.Next(5, 20),    
-          Height = rand.Next(5, 20),   
-          VolumeUnit = (VolumeUnit) 0
+          Weight = rand.Next(50, 500),
+          Length = rand.Next(5, 20),
+          Width = rand.Next(5, 20),
+          Height = rand.Next(5, 20),
+          VolumeUnit = (VolumeUnit)0
         },
         new Cosmetic
         {
@@ -896,7 +875,6 @@ internal class InitialData
           BrandId = brands[4].Id,
           SkinTypeId = skinTypes[0].Id,
           CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Eye Creams").Id,
-          Price = 27.99m,
           Gender = true,
           Notice = "Reduces dark circles and puffiness.",
           Ingredients = "Caffeine, Vitamin E, Peptides",
@@ -904,11 +882,11 @@ internal class InitialData
           Texture = "Gel-Cream",
           Origin = "France",
           Instructions = "Gently tap around the eye area using your ring finger.",
-          Weight = rand.Next(50, 500), 
-          Length = rand.Next(5, 20),   
-          Width = rand.Next(5, 20),    
-          Height = rand.Next(5, 20),   
-          VolumeUnit = (VolumeUnit) 0
+          Weight = rand.Next(50, 500),
+          Length = rand.Next(5, 20),
+          Width = rand.Next(5, 20),
+          Height = rand.Next(5, 20),
+          VolumeUnit = (VolumeUnit)0
         },
         new Cosmetic
         {
@@ -917,7 +895,6 @@ internal class InitialData
           BrandId = brands[1].Id,
           SkinTypeId = skinTypes[2].Id,
           CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Sunscreens").Id,
-          Price = 21.99m,
           Gender = true,
           Notice = "Broad spectrum SPF 50 for daily protection.",
           Ingredients = "Zinc Oxide, Titanium Dioxide, Vitamin E",
@@ -925,11 +902,11 @@ internal class InitialData
           Texture = "Lotion",
           Origin = "USA",
           Instructions = "Apply generously 15 minutes before sun exposure.",
-          Weight = rand.Next(50, 500), 
-          Length = rand.Next(5, 20),   
-          Width = rand.Next(5, 20),    
-          Height = rand.Next(5, 20),   
-          VolumeUnit = (VolumeUnit) 0
+          Weight = rand.Next(50, 500),
+          Length = rand.Next(5, 20),
+          Width = rand.Next(5, 20),
+          Height = rand.Next(5, 20),
+          VolumeUnit = (VolumeUnit)0
         },
         new Cosmetic
         {
@@ -938,7 +915,6 @@ internal class InitialData
           BrandId = brands[0].Id,
           SkinTypeId = skinTypes[0].Id,
           CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Lip Care Products").Id,
-          Price = 9.99m,
           Gender = true,
           Notice = "Keeps lips moisturized and smooth.",
           Ingredients = "Beeswax, Shea Butter, Vitamin E",
@@ -946,11 +922,11 @@ internal class InitialData
           Texture = "Balm",
           Origin = "USA",
           Instructions = "Apply to lips as needed throughout the day.",
-          Weight = rand.Next(50, 500), 
-          Length = rand.Next(5, 20),   
-          Width = rand.Next(5, 20),    
-          Height = rand.Next(5, 20),   
-          VolumeUnit = (VolumeUnit) 2
+          Weight = rand.Next(50, 500),
+          Length = rand.Next(5, 20),
+          Width = rand.Next(5, 20),
+          Height = rand.Next(5, 20),
+          VolumeUnit = (VolumeUnit)2
         },
         new Cosmetic
         {
@@ -959,7 +935,6 @@ internal class InitialData
           BrandId = brands[1].Id,
           SkinTypeId = skinTypes[2].Id,
           CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Face Masks").Id,
-          Price = 16.99m,
           Gender = true,
           Notice = "Instant hydration boost.",
           Ingredients = "Aloe, Hyaluronic Acid, Vitamins",
@@ -967,11 +942,11 @@ internal class InitialData
           Texture = "Sheet Mask",
           Origin = "South Korea",
           Instructions = "Apply for 15-20 minutes, then remove and pat remaining essence.",
-          Weight = rand.Next(50, 500), 
-          Length = rand.Next(5, 20),   
-          Width = rand.Next(5, 20),    
-          Height = rand.Next(5, 20),   
-          VolumeUnit = (VolumeUnit) 2
+          Weight = rand.Next(50, 500),
+          Length = rand.Next(5, 20),
+          Width = rand.Next(5, 20),
+          Height = rand.Next(5, 20),
+          VolumeUnit = (VolumeUnit)2
         },
         new Cosmetic
         {
@@ -980,7 +955,6 @@ internal class InitialData
           BrandId = brands[3].Id,
           SkinTypeId = skinTypes[3].Id,
           CosmeticTypeId = cosmeticTypes.First(ct => ct.Name == "Serums").Id,
-          Price = 39.99m,
           Gender = true,
           Notice = "Apply at night.",
           Ingredients = "Retinol, Hyaluronic Acid",
@@ -988,14 +962,93 @@ internal class InitialData
           Texture = "Cream",
           Origin = "USA",
           Instructions = "Apply a pea-sized amount to cleansed skin at night.",
-          Weight = rand.Next(50, 500), 
-          Length = rand.Next(5, 20),   
-          Width = rand.Next(5, 20),    
-          Height = rand.Next(5, 20),   
-          VolumeUnit = (VolumeUnit) 0
+          Weight = rand.Next(50, 500),
+          Length = rand.Next(5, 20),
+          Width = rand.Next(5, 20),
+          Height = rand.Next(5, 20),
+          VolumeUnit = (VolumeUnit)0
         }
       });
       return cosmetics;
+    }
+  }
+
+  public static IEnumerable<CosmeticPrice> CosmeticPrices
+  {
+    get
+    {
+      var cosmeticPrices = new List<CosmeticPrice>();
+      var rand = new Random();
+      foreach (var cosmetic in Cosmetics)
+      {
+        cosmeticPrices.Add(
+          new CosmeticPrice
+          {
+            Id = Guid.NewGuid(),
+            CosmeticId = cosmetic.Id,
+            EventId = Events.ElementAt(rand.Next(0, 4)).Id,
+            StartDate = new DateTime(2025, 01, 01),
+            OriginalPrice = rand.Next(50, 500)
+          }
+        );
+      }
+
+      return cosmeticPrices;
+    }
+  }
+
+  public static IEnumerable<Event> Events
+  {
+    get
+    {
+      var guids = new List<Guid>()
+      {
+        new Guid("d4a353a0-3e30-4e01-8fac-9baaf7a45dc7"),
+        new Guid("8664fa11-1a47-48b2-aabd-3062345d930d"),
+        new Guid("5a4455e5-c39e-4b75-b64d-660366deabf2"),
+        new Guid("edabede4-1fac-46ba-b6d2-6d1b06d0096c"),
+        new Guid("57934496-4d7c-4e21-aaf6-f42c023033ae")
+      };
+
+      var events = new List<Event>() { 
+        new Event() {
+        Id = guids[0],
+        Name = "Black Friday",
+        Description = "Last friday of November",
+        DiscountPercentage = 30
+        } ,
+        
+        new Event()
+        {
+          Id = guids[1],
+          Name = "New Year Sale",
+          Description = "Discount for new years",
+          DiscountPercentage = 15
+        },
+        new Event()
+        {
+          Id = guids[2],
+          Name = "World skin health day",
+          Description = "Discount world skin health day on 8th July",
+          DiscountPercentage = 20 
+        },
+        new Event()
+        {
+          Id = guids[3],
+          Name = "Flash Sale",
+          Description = "Quick discount",
+          DiscountPercentage = 35
+        },
+        new Event()
+        {
+          Id = guids[4],
+          Name = "None",
+          Description = "None",
+          DiscountPercentage = 0
+        }
+      };
+
+      return events;
     }
   }
 
@@ -1042,11 +1095,7 @@ internal class InitialData
           var sub = subCategories.FirstOrDefault(s => s.Name == "Deep Cleansing");
           if (sub != null)
           {
-            mappings.Add(new CosmeticSubCategory
-            {
-              CosmeticId = cosmetic.Id,
-              SubCategoryId = sub.Id,
-            });
+            mappings.Add(new CosmeticSubCategory { CosmeticId = cosmetic.Id, SubCategoryId = sub.Id, });
           }
         }
         // Map moisturizers and face creams to "Nourishing Creams" under Hydration.
@@ -1055,11 +1104,7 @@ internal class InitialData
           var sub = subCategories.FirstOrDefault(s => s.Name == "Nourishing Creams");
           if (sub != null)
           {
-            mappings.Add(new CosmeticSubCategory
-            {
-              CosmeticId = cosmetic.Id,
-              SubCategoryId = sub.Id,
-            });
+            mappings.Add(new CosmeticSubCategory { CosmeticId = cosmetic.Id, SubCategoryId = sub.Id, });
           }
         }
         // Map sunscreens to "SPF Essentials" under Protection.
@@ -1068,11 +1113,7 @@ internal class InitialData
           var sub = subCategories.FirstOrDefault(s => s.Name == "SPF Essentials");
           if (sub != null)
           {
-            mappings.Add(new CosmeticSubCategory
-            {
-              CosmeticId = cosmetic.Id,
-              SubCategoryId = sub.Id,
-            });
+            mappings.Add(new CosmeticSubCategory { CosmeticId = cosmetic.Id, SubCategoryId = sub.Id, });
           }
         }
         // Map retinoids to "Age-Defying Treatments" under Rejuvenation.
@@ -1081,11 +1122,7 @@ internal class InitialData
           var sub = subCategories.FirstOrDefault(s => s.Name == "Age-Defying Treatments");
           if (sub != null)
           {
-            mappings.Add(new CosmeticSubCategory
-            {
-              CosmeticId = cosmetic.Id,
-              SubCategoryId = sub.Id,
-            });
+            mappings.Add(new CosmeticSubCategory { CosmeticId = cosmetic.Id, SubCategoryId = sub.Id, });
           }
         }
         // Map toners to "Soothing Solutions" under Balance.
@@ -1094,11 +1131,7 @@ internal class InitialData
           var sub = subCategories.FirstOrDefault(s => s.Name == "Soothing Solutions");
           if (sub != null)
           {
-            mappings.Add(new CosmeticSubCategory
-            {
-              CosmeticId = cosmetic.Id,
-              SubCategoryId = sub.Id,
-            });
+            mappings.Add(new CosmeticSubCategory { CosmeticId = cosmetic.Id, SubCategoryId = sub.Id, });
           }
         }
         // Map scrubs to "Detox & Clarify" under Purity.
@@ -1107,11 +1140,7 @@ internal class InitialData
           var sub = subCategories.FirstOrDefault(s => s.Name == "Detox & Clarify");
           if (sub != null)
           {
-            mappings.Add(new CosmeticSubCategory
-            {
-              CosmeticId = cosmetic.Id,
-              SubCategoryId = sub.Id,
-            });
+            mappings.Add(new CosmeticSubCategory { CosmeticId = cosmetic.Id, SubCategoryId = sub.Id, });
           }
         }
         // Map eye creams to "Illuminators" under Radiance.
@@ -1120,11 +1149,7 @@ internal class InitialData
           var sub = subCategories.FirstOrDefault(s => s.Name == "Illuminators");
           if (sub != null)
           {
-            mappings.Add(new CosmeticSubCategory
-            {
-              CosmeticId = cosmetic.Id,
-              SubCategoryId = sub.Id,
-            });
+            mappings.Add(new CosmeticSubCategory { CosmeticId = cosmetic.Id, SubCategoryId = sub.Id, });
           }
         }
         // Map lip balms to "Delicate Area Care" under Specialized Care.
@@ -1133,11 +1158,7 @@ internal class InitialData
           var sub = subCategories.FirstOrDefault(s => s.Name == "Delicate Area Care");
           if (sub != null)
           {
-            mappings.Add(new CosmeticSubCategory
-            {
-              CosmeticId = cosmetic.Id,
-              SubCategoryId = sub.Id,
-            });
+            mappings.Add(new CosmeticSubCategory { CosmeticId = cosmetic.Id, SubCategoryId = sub.Id, });
           }
         }
         // Map face masks to "Sheet Masks" under Masking.
@@ -1146,11 +1167,7 @@ internal class InitialData
           var sub = subCategories.FirstOrDefault(s => s.Name == "Sheet Masks");
           if (sub != null)
           {
-            mappings.Add(new CosmeticSubCategory
-            {
-              CosmeticId = cosmetic.Id,
-              SubCategoryId = sub.Id,
-            });
+            mappings.Add(new CosmeticSubCategory { CosmeticId = cosmetic.Id, SubCategoryId = sub.Id, });
           }
         }
       }
@@ -1188,8 +1205,18 @@ internal class InitialData
 
   public static IEnumerable<FAQ> FAQs => new List<FAQ>
   {
-    new FAQ { Id = new Guid("2B4AE24C-EED6-4EBC-AFD9-5DA8E22037F3"), Question = "How do I reset my password?", Answer = "You can reset your password in the settings page." },
-    new FAQ { Id = new Guid("21AE2A57-761C-4A36-B5FF-62488BF8F4FB"), Question = "Where can I contact support?", Answer = "You can contact support at support@example.com." }
+    new FAQ
+    {
+      Id = new Guid("2B4AE24C-EED6-4EBC-AFD9-5DA8E22037F3"),
+      Question = "How do I reset my password?",
+      Answer = "You can reset your password in the settings page."
+    },
+    new FAQ
+    {
+      Id = new Guid("21AE2A57-761C-4A36-B5FF-62488BF8F4FB"),
+      Question = "Where can I contact support?",
+      Answer = "You can contact support at support@example.com."
+    }
   };
 
   public static IEnumerable<Feedback> Feedbacks
@@ -1280,22 +1307,24 @@ internal class InitialData
 
   public static IEnumerable<Policy> Policies => new List<Policy>
   {
-    new Policy { Id = new Guid("70B1B2A8-8361-468C-A602-04E1A815495E"), Title = "Privacy Policy", Content = "This is the privacy policy content." },
-    new Policy { Id = new Guid("EC19577C-8D19-4497-801A-11B66E55666D"), Title = "Terms of Service", Content = "These are the terms of service." }
+    new Policy
+    {
+      Id = new Guid("70B1B2A8-8361-468C-A602-04E1A815495E"),
+      Title = "Privacy Policy",
+      Content = "This is the privacy policy content."
+    },
+    new Policy
+    {
+      Id = new Guid("EC19577C-8D19-4497-801A-11B66E55666D"),
+      Title = "Terms of Service",
+      Content = "These are the terms of service."
+    }
   };
 
   public static IEnumerable<QuestionType> QuestionsTypes => new List<QuestionType>
   {
-    new QuestionType()
-    {
-      Id = new Guid("AAAC424F-B3E1-4E13-8E3F-F06C7AD1A141"),
-      Name = "SingleChoice",
-    },
-    new QuestionType()
-    {
-      Id = new Guid("7F9D392B-1673-4227-A3A4-ACDCD6E1ACF5"),
-      Name = "MultipleChoice",
-    },
+    new QuestionType() { Id = new Guid("AAAC424F-B3E1-4E13-8E3F-F06C7AD1A141"), Name = "SingleChoice", },
+    new QuestionType() { Id = new Guid("7F9D392B-1673-4227-A3A4-ACDCD6E1ACF5"), Name = "MultipleChoice", },
   };
 
   public static Quiz Quiz
@@ -1308,7 +1337,8 @@ internal class InitialData
       {
         Id = new Guid("4330503E-4488-4272-80D5-34B25D5A8677"),
         Title = "Which of the 16 Baumann Skin Types® Are You?",
-        Description = "Take the 3 minute skin type quiz now and build a skin care routine with medical grade skin care brands. You will be amazed by how great your skin will look!",
+        Description =
+          "Take the 3 minute skin type quiz now and build a skin care routine with medical grade skin care brands. You will be amazed by how great your skin will look!",
         TargetAgeFrom = 18,
         TargetAgeTo = 65,
         Questions = new List<Question>
@@ -1319,7 +1349,8 @@ internal class InitialData
             Id = new Guid("6273C0C4-FDF1-416C-A5ED-4E89C071BF90"),
             QuizId = new Guid("A184BF67-B94A-4787-A78D-9C35EE913451"),
             Title = "Assess your skin moisturization needs",
-            Description = "Please check what is true about how often you must use a moisturizer for your skin to feel hydrated.",
+            Description =
+              "Please check what is true about how often you must use a moisturizer for your skin to feel hydrated.",
             Instruction = "(Multiple answers allowed)",
             Section = "Oiliness",
             QuestionTypeId = questionTypes[1].Id,
@@ -1424,38 +1455,38 @@ internal class InitialData
             {
               new QuestionOption
               {
-                  Id = new Guid("738CE3A0-0E2E-4913-8CE6-5E942A1C2CDB"),
-                  QuestionId = new Guid("0370A764-93FB-4458-993F-F92D242A876E"),
-                  Content = "Acne (pimples)",
-                  Score = 1,
+                Id = new Guid("738CE3A0-0E2E-4913-8CE6-5E942A1C2CDB"),
+                QuestionId = new Guid("0370A764-93FB-4458-993F-F92D242A876E"),
+                Content = "Acne (pimples)",
+                Score = 1,
               },
               new QuestionOption
               {
-                  Id = new Guid("FFE74667-33BD-4ACC-9904-5274C5985005"),
-                  QuestionId = new Guid("5A2D5237-F1BA-4508-BB19-F30C89EC05A9"),
-                  Content = "Facial redness and/or flushing",
-                  Score = 1,
+                Id = new Guid("FFE74667-33BD-4ACC-9904-5274C5985005"),
+                QuestionId = new Guid("5A2D5237-F1BA-4508-BB19-F30C89EC05A9"),
+                Content = "Facial redness and/or flushing",
+                Score = 1,
               },
               new QuestionOption
               {
-                  Id = new Guid("D7F8E751-8C8C-403D-BEFE-9C048176AC8B"),
-                  QuestionId = new Guid("8136C736-F111-40C3-992D-B11AEDB84863"),
-                  Content = "Stinging or burning",
-                  Score = 1,
+                Id = new Guid("D7F8E751-8C8C-403D-BEFE-9C048176AC8B"),
+                QuestionId = new Guid("8136C736-F111-40C3-992D-B11AEDB84863"),
+                Content = "Stinging or burning",
+                Score = 1,
               },
               new QuestionOption
               {
-                  Id = new Guid("D3724236-B2C3-4374-8C53-C312DF4F71E8"),
-                  QuestionId = new Guid("18F0763B-3F7A-4FCB-B43D-D6D19B53E842"),
-                  Content = "A rash with itching, scaling and redness",
-                  Score = 1,
+                Id = new Guid("D3724236-B2C3-4374-8C53-C312DF4F71E8"),
+                QuestionId = new Guid("18F0763B-3F7A-4FCB-B43D-D6D19B53E842"),
+                Content = "A rash with itching, scaling and redness",
+                Score = 1,
               },
               new QuestionOption
               {
-                  Id = new Guid("104B5D59-7634-4EA3-AFDB-26C9E267DE6B"),
-                  QuestionId = new Guid("8DF17F50-9702-4897-A145-AD1EB2D42C2D"),
-                  Content = "Irritation from shaving the face",
-                  Score = 1,
+                Id = new Guid("104B5D59-7634-4EA3-AFDB-26C9E267DE6B"),
+                QuestionId = new Guid("8DF17F50-9702-4897-A145-AD1EB2D42C2D"),
+                Content = "Irritation from shaving the face",
+                Score = 1,
               },
             }
           },
@@ -1473,24 +1504,24 @@ internal class InitialData
             {
               new QuestionOption
               {
-                  Id = new Guid("EB06FC0F-BA5A-45B3-8779-92553D53EC0F"),
-                  QuestionId = new Guid("2E7CD29A-DD8C-4112-9353-F32542B4D34E"),
-                  Content = "My skin pigment is uneven AND I want to lighten darker areas on my face",
-                  Score= 1,
+                Id = new Guid("EB06FC0F-BA5A-45B3-8779-92553D53EC0F"),
+                QuestionId = new Guid("2E7CD29A-DD8C-4112-9353-F32542B4D34E"),
+                Content = "My skin pigment is uneven AND I want to lighten darker areas on my face",
+                Score = 1,
               },
               new QuestionOption
               {
-                  Id = new Guid("666FFAEA-0A76-46F5-9544-6B45BF0641E6"),
-                  QuestionId = new Guid("CF714571-92F5-4594-84D7-FE7CFF500D25"),
-                  Content = "My skin pigment is even AND I have no dark spots or darker areas",
-                  Score = -1,
+                Id = new Guid("666FFAEA-0A76-46F5-9544-6B45BF0641E6"),
+                QuestionId = new Guid("CF714571-92F5-4594-84D7-FE7CFF500D25"),
+                Content = "My skin pigment is even AND I have no dark spots or darker areas",
+                Score = -1,
               },
               new QuestionOption
               {
-                  Id = new Guid("2911A59A-D1A6-46CA-896B-6F1B944F005B"),
-                  QuestionId = new Guid("0EE02D34-41EA-493C-B53E-D2C19BB64E18"),
-                  Content = "I have freckles or dark spots AND I do not want to remove",
-                  Score = 0,
+                Id = new Guid("2911A59A-D1A6-46CA-896B-6F1B944F005B"),
+                QuestionId = new Guid("0EE02D34-41EA-493C-B53E-D2C19BB64E18"),
+                Content = "I have freckles or dark spots AND I do not want to remove",
+                Score = 0,
               },
             }
           },
@@ -1508,66 +1539,66 @@ internal class InitialData
             {
               new QuestionOption
               {
-                  Id = new Guid("B9367A38-C8E9-482E-A962-37D6F9ED4BCE"),
-                  QuestionId = new Guid("E6CFD235-84F9-4A34-A3B7-D90A940AE619"),
-                  Content = "I have smoked over 50 cigarettes or cigars in my life.",
-                  Score = -2
+                Id = new Guid("B9367A38-C8E9-482E-A962-37D6F9ED4BCE"),
+                QuestionId = new Guid("E6CFD235-84F9-4A34-A3B7-D90A940AE619"),
+                Content = "I have smoked over 50 cigarettes or cigars in my life.",
+                Score = -2
               },
               new QuestionOption
               {
-                  Id = new Guid("9C070F77-3962-45CF-A47D-537E087863FA"),
-                  QuestionId = new Guid("0D767C75-8295-45A6-8DB2-122325EEC395"),
-                  Content = "I am exposed to second hand smoke on a weekly basis.",
-                  Score = -1,
+                Id = new Guid("9C070F77-3962-45CF-A47D-537E087863FA"),
+                QuestionId = new Guid("0D767C75-8295-45A6-8DB2-122325EEC395"),
+                Content = "I am exposed to second hand smoke on a weekly basis.",
+                Score = -1,
               },
               new QuestionOption
               {
-                  Id = new Guid("DF98BB35-3350-44BE-A1EA-12BD4557A7EC"),
-                  QuestionId = new Guid("19FE99F7-324F-4ABB-BBE3-435668C5D015"),
-                  Content = "I currently smoke cigarettes or cigars",
-                  Score = -2,
+                Id = new Guid("DF98BB35-3350-44BE-A1EA-12BD4557A7EC"),
+                QuestionId = new Guid("19FE99F7-324F-4ABB-BBE3-435668C5D015"),
+                Content = "I currently smoke cigarettes or cigars",
+                Score = -2,
               },
               new QuestionOption
               {
-                  Id = new Guid("28CA8B91-34B5-4AFD-A2F7-8AC3E5EE71B4"),
-                  QuestionId = new Guid("7CE65305-8848-4987-9D86-B748A643C4A0"),
-                  Content = "I often get less than 7 hours of sleep a night.",
-                  Score = 2,
+                Id = new Guid("28CA8B91-34B5-4AFD-A2F7-8AC3E5EE71B4"),
+                QuestionId = new Guid("7CE65305-8848-4987-9D86-B748A643C4A0"),
+                Content = "I often get less than 7 hours of sleep a night.",
+                Score = 2,
               },
               new QuestionOption
               {
-                  Id = new Guid("B2CE0FF3-FE77-442B-B77D-3445433F38F9"),
-                  QuestionId = new Guid("D4E68CEA-4204-473C-B200-D1085A937BCC"),
-                  Content = "I feel stress at least 2 hours a day.",
-                  Score = 2,
+                Id = new Guid("B2CE0FF3-FE77-442B-B77D-3445433F38F9"),
+                QuestionId = new Guid("D4E68CEA-4204-473C-B200-D1085A937BCC"),
+                Content = "I feel stress at least 2 hours a day.",
+                Score = 2,
               },
               new QuestionOption
               {
-                  Id = new Guid("242A9DAB-CDFE-498D-B6A2-D4FD3CC3BDE2"),
-                  QuestionId = new Guid("70127183-BBF5-4B30-891B-552552E0D3DE"),
-                  Content = "Are you exposed to pollution or bad air quality more than 3 times a week?",
-                  Score = 2,
+                Id = new Guid("242A9DAB-CDFE-498D-B6A2-D4FD3CC3BDE2"),
+                QuestionId = new Guid("70127183-BBF5-4B30-891B-552552E0D3DE"),
+                Content = "Are you exposed to pollution or bad air quality more than 3 times a week?",
+                Score = 2,
               },
               new QuestionOption
               {
-                  Id = new Guid("D5F4C05E-59D3-4DC7-B73C-D5971A890BEE"),
-                  QuestionId = new Guid("5745A1C7-4E8C-4E40-8473-DEFC062C4555"),
-                  Content = "I eat sugary foods over 3 times a week.",
-                  Score = 1,
+                Id = new Guid("D5F4C05E-59D3-4DC7-B73C-D5971A890BEE"),
+                QuestionId = new Guid("5745A1C7-4E8C-4E40-8473-DEFC062C4555"),
+                Content = "I eat sugary foods over 3 times a week.",
+                Score = 1,
               },
               new QuestionOption
               {
-                  Id = new Guid("03991A2E-D887-4967-B3B8-8D1E78AFAC53"),
-                  QuestionId = new Guid("878035E2-E137-4BF2-ABEF-EFEDF41E9D2F"),
-                  Content = "I exercise less than 3 hours a week.",
-                  Score = 1,
+                Id = new Guid("03991A2E-D887-4967-B3B8-8D1E78AFAC53"),
+                QuestionId = new Guid("878035E2-E137-4BF2-ABEF-EFEDF41E9D2F"),
+                Content = "I exercise less than 3 hours a week.",
+                Score = 1,
               },
               new QuestionOption
               {
-                  Id = new Guid("825D7C7D-C003-484E-81B0-B866BD019DB0"),
-                  QuestionId = new Guid("7D50D71D-2715-4FF5-AD13-EE82F21D1771"),
-                  Content = "I do not eat fruit or vegetables every day.",
-                  Score = 1,
+                Id = new Guid("825D7C7D-C003-484E-81B0-B866BD019DB0"),
+                QuestionId = new Guid("7D50D71D-2715-4FF5-AD13-EE82F21D1771"),
+                Content = "I do not eat fruit or vegetables every day.",
+                Score = 1,
               },
             }
           }
@@ -1656,27 +1687,18 @@ internal class InitialData
         // Morning Routine for this skin type
         var morningRoutine = new Routine
         {
-          Id = guids[guidIndex++],
-          SkinTypeId = skin.Id,
-          Title = $"{skin.Name} Morning Routine",
-          Period = "Morning",
+          Id = guids[guidIndex++], SkinTypeId = skin.Id, Title = $"{skin.Name} Morning Routine", Period = "Morning",
         };
 
         // Evening Routine for this skin type
         var eveningRoutine = new Routine
         {
-          Id = guids[guidIndex++],
-          SkinTypeId = skin.Id,
-          Title = $"{skin.Name} Evening Routine",
-          Period = "Evening",
+          Id = guids[guidIndex++], SkinTypeId = skin.Id, Title = $"{skin.Name} Evening Routine", Period = "Evening",
         };
         // Night Routine for this skin type
         var nightRoutine = new Routine
         {
-          Id = Guid.NewGuid(),
-          SkinTypeId = skin.Id,
-          Title = $"{skin.Name} Night Routine",
-          Period = "Night",
+          Id = Guid.NewGuid(), SkinTypeId = skin.Id, Title = $"{skin.Name} Night Routine", Period = "Night",
         };
         // Add to the list
         routines.Add(morningRoutine);
@@ -1708,7 +1730,6 @@ internal class InitialData
         new Guid("CE341DC2-0034-4FAC-A1F8-2CDE6A5A067D"),
         new Guid("4D9C741B-E5FE-4549-A6AD-FF3D56F0A808"),
         new Guid("FEA73374-1994-4323-BD35-9A2FF438CA6E"),
-
         new Guid("9E76622F-8B7D-42F5-868C-89A5A54AE63F"),
         new Guid("B7511B29-116B-4F6C-BB50-BD3D348B73F3"),
         new Guid("80D36224-463D-46A2-902D-637362A7915C"),
@@ -1719,7 +1740,6 @@ internal class InitialData
         new Guid("237FD265-960D-4ECA-8575-C025842C5437"),
         new Guid("95D5FA81-D889-4A43-BDB3-17D99F2D5DC7"),
         new Guid("4A38A900-8D3E-489E-814C-802C670F0BA3"),
-
         new Guid("8543F178-FCC2-477A-9AB8-A6DD8300B13A"),
         new Guid("679F0120-D758-46BD-9D72-080658A4EFA6"),
         new Guid("D1953F4F-B0F8-47B0-9DF1-52283AEF2FA8"),
@@ -1730,7 +1750,6 @@ internal class InitialData
         new Guid("03BE768B-5989-4050-BCFC-C80FFE8C4447"),
         new Guid("589F3724-DEA5-4BDD-B01C-19A9CA2C7DB6"),
         new Guid("578B466E-4346-434C-A97E-F1B80130441C"),
-
         new Guid("7E999A1A-2D59-472B-BFA0-CF6086103B64"),
         new Guid("A90B5740-EABD-4124-800B-E28065D9DE06"),
         new Guid("99FA0490-B67C-4D00-AE49-6B21624F7153"),
@@ -1741,7 +1760,6 @@ internal class InitialData
         new Guid("8911F7CA-2ECA-4DD9-8754-63DCEC67B4D2"),
         new Guid("071B8888-8059-47CD-9376-866CE705CE61"),
         new Guid("0E837974-A472-4EF5-8A97-CD39C188ADB3"),
-
         new Guid("0C76812A-DDED-4EA2-B711-9B005631385D"),
         new Guid("FB08B60A-8924-4A2A-8690-61C135398F20"),
         new Guid("258DB312-DB68-4972-B274-57A44E78553E"),
@@ -1752,7 +1770,6 @@ internal class InitialData
         new Guid("AB4A6D35-B286-4D74-BF60-4E08959FC18B"),
         new Guid("EA3224BA-7E09-491E-B4E1-655301641182"),
         new Guid("0C9947ED-588C-434F-AB57-9AB61F901644"),
-
         new Guid("09CDF083-E677-445A-B7CA-EDEAF4AFE718"),
         new Guid("2F3A67D1-3189-4B6D-A348-70515FA73121"),
         new Guid("632EBD5E-B494-4A49-8C47-31B536FAA113"),
@@ -1763,7 +1780,6 @@ internal class InitialData
         new Guid("8B901E9C-F163-4890-8D76-D1DE47E797BC"),
         new Guid("4D5C9D8B-A474-45EF-BCF5-5CE7D6C88A35"),
         new Guid("747916EB-8D49-45DB-B7F3-1736CD33DDCE"),
-
         new Guid("C98B2559-011B-4990-8607-C8AFE3D09904"),
         new Guid("5FE52826-FE55-4CF8-AF8A-247F32232874"),
         new Guid("86A8669F-EBF3-4057-90EE-5A0C3F9036AD"),
@@ -1774,7 +1790,6 @@ internal class InitialData
         new Guid("87344DB2-0D7E-4C56-9702-7FD10B7C0145"),
         new Guid("3F2F9985-B0B3-4772-A4A7-347BA8F87756"),
         new Guid("52B08AB8-BC82-46F2-91BB-C0479CF7DBD2"),
-
         new Guid("7DE1D870-DA0F-4F5D-819F-FB1EFEFF57EA"),
         new Guid("BEC1A622-C617-4420-9263-E33CF4C619FF"),
         new Guid("6078D1A2-A926-4CC5-87EF-375C2E0F6EEC"),
@@ -1785,7 +1800,6 @@ internal class InitialData
         new Guid("AB3DBB18-9B79-495B-AF11-3347171EF201"),
         new Guid("5A45E4BC-7C4B-49AD-9808-BB33846A0E0D"),
         new Guid("05329EFD-367C-4154-96B9-53F9BF0724DE"),
-
         new Guid("6C904BE0-7C44-43CB-90A1-A70C494B1603"),
         new Guid("21EAEE83-6F3C-4E05-A14B-7A190B1A7F52"),
         new Guid("64698C5A-3AB2-4511-83AC-EA483660AF42"),
@@ -1796,7 +1810,6 @@ internal class InitialData
         new Guid("89CB248B-4E09-4D84-9628-A04EDBEAE882"),
         new Guid("D809D9A5-69CF-4B86-8C9D-B8A1B4D9AB61"),
         new Guid("14DA23B7-AEC6-48B5-A2E8-24794B6F4B25"),
-
         new Guid("1969C7A5-6947-40B4-80A8-18221DF9573E"),
         new Guid("3B0C6A72-CB68-436A-B1AF-3F748E6BE34B"),
         new Guid("FDC3B33C-AC82-4B28-9D7C-895D46D6F182"),
@@ -1807,7 +1820,6 @@ internal class InitialData
         new Guid("C7C889BC-B1D6-42B4-93E1-910FAAE7D329"),
         new Guid("FE04E7BF-ED42-4CB8-B020-D1C76A116F4F"),
         new Guid("0059F32A-B85A-4B60-96D0-61DAAD0B87F9"),
-
         new Guid("5ABA4084-3C68-4D02-B8EA-F9A55141B450"),
         new Guid("115F2C56-2E2A-45DF-8AA6-239D4AE44822"),
         new Guid("5CAC0790-1055-4872-BF0B-DFAF65C93C08"),
@@ -1818,7 +1830,6 @@ internal class InitialData
         new Guid("B203BAAB-66B5-4644-8A96-429C0061BF40"),
         new Guid("DE31AEDA-FEE5-4527-8053-42D08317DB0F"),
         new Guid("DCA7B2FE-E51F-4A39-8652-0540291D56BB"),
-
         new Guid("5E8C5AEB-6E40-491A-A9AB-6F31571E5397"),
         new Guid("20584DE0-EC21-40F4-8292-4BCBF2FB95A5"),
         new Guid("332D74C8-455A-44FE-AC55-295148AC2623"),
@@ -1829,7 +1840,6 @@ internal class InitialData
         new Guid("784754C2-0097-4173-84DA-F1AC8CC4BA03"),
         new Guid("924F637E-1FEE-4B4C-ACE1-ED2264DA295A"),
         new Guid("3F32756C-1DE1-4C1B-AF4F-C8CC22D04E13"),
-
         new Guid("EF42F0A5-3D80-4F3C-9804-5CE8B1C24512"),
         new Guid("550E9DA1-BDED-4423-B62E-C6984D389244"),
         new Guid("48AF1863-5C78-4A81-B05E-1B1702AB7B15"),
@@ -1840,7 +1850,6 @@ internal class InitialData
         new Guid("282B36CD-0CA5-4682-8C8C-E4E9FFD63982"),
         new Guid("11048F34-8044-40B6-B241-DF75E9BEED63"),
         new Guid("2671FA9A-7C22-45C8-A3E2-D50B44A2738F"),
-
         new Guid("450A6B25-B1DB-4BFA-B161-3B7705855106"),
         new Guid("18DC983C-20E8-4D24-B81A-F0DA159F977B"),
         new Guid("2EE4BB29-8C52-4901-B3E4-F2C9BF42D934"),
@@ -1851,7 +1860,6 @@ internal class InitialData
         new Guid("701BE5D4-7BF0-4DB5-B7A5-DA869B8BB79C"),
         new Guid("3D1BD2AD-4236-43CC-9CB8-527BF8CE5E0C"),
         new Guid("7CD17E51-68D8-40C7-89C4-1B20CD389AE2"),
-
         new Guid("F36B091E-5589-49D5-9EEC-E6F175F6FD74"),
         new Guid("AAC2501E-C2F9-4D3C-B391-A3D4BDFED0DC"),
         new Guid("FDF13EF7-99E8-449C-94BD-1ADA8C9B82FE"),
@@ -1862,7 +1870,6 @@ internal class InitialData
         new Guid("D92E08D5-8E79-4FE4-842D-C5B59D813EDB"),
         new Guid("78B19C55-D7F8-4CB6-A5C9-97F53D417B6E"),
         new Guid("1C4C25EA-25C6-43F1-A73C-126685100C70"),
-
         new Guid("C11C2D3E-7AA0-4E0B-99A3-7E370C715784"),
         new Guid("64F1DF34-C313-414F-895D-45F670816CDF"),
         new Guid("EBA8E12C-0C97-499F-969A-A7E9627C0AA9"),
@@ -1873,7 +1880,6 @@ internal class InitialData
         new Guid("E8E47B37-3C99-4D13-A5F1-A0BB9D02B6D6"),
         new Guid("13434667-B642-4BDA-BE2C-23C664A901EA"),
         new Guid("6B3CB178-AB4D-460A-8C64-814C19CA8271"),
-
         new Guid("0FCCAE59-B2DB-4937-88F3-F04E30BBB6AD"),
         new Guid("3E925CAF-0A79-4D57-A0D7-1BD2CD77B262"),
         new Guid("D6E86B67-F94A-4477-A91C-B415F7050FBA"),
@@ -1884,7 +1890,6 @@ internal class InitialData
         new Guid("9FA23C9A-3A89-4B07-96CB-6A1C1F5BAA0C"),
         new Guid("D157A9DA-2B86-42A5-BB93-933D500D76D0"),
         new Guid("99CA0118-0A6B-4D28-A6CA-4F21E3B5F732"),
-
         new Guid("731E691A-B408-41F2-AB92-4CAB0E4B4B42"),
         new Guid("65F5AAA6-6070-47E4-854C-9937054FD6AF"),
         new Guid("C07C0F40-9503-4AF6-8140-3899148CE3FF"),
@@ -1895,7 +1900,6 @@ internal class InitialData
         new Guid("44BF728C-91C3-4E27-AEFD-98C76A2CC4DD"),
         new Guid("924A5D17-2963-452A-A793-50BBE05164E8"),
         new Guid("8DD444E0-A229-4FCE-8F18-8D16C56F5D91"),
-
         new Guid("9EDCFB8B-A7A5-456C-B1DB-E6D6CBBDF586"),
         new Guid("FCD1F255-77B1-4D11-A931-FF10EBBE7366"),
         new Guid("ED07A49E-19C6-4E06-B600-DFBF27737352"),
@@ -1906,7 +1910,6 @@ internal class InitialData
         new Guid("5BBE879F-90C4-4C77-868A-760D65613FF3"),
         new Guid("D4E0C5A2-5F99-4CCA-987E-7B34A3FCBA2A"),
         new Guid("8EB0A324-1A54-4CBA-979A-254632BFBC8F"),
-
         new Guid("631DDF90-5987-485D-ADAB-17C9561C26FB"),
         new Guid("2F1F2102-57F6-4744-93B0-5A0CAFCAE1D9"),
         new Guid("CFAF1037-0A9D-4CF9-9099-16C9F80D6286"),
@@ -1919,19 +1922,20 @@ internal class InitialData
 
       foreach (var routine in routines)
       {
-        var cleanser = cosmetics.FirstOrDefault(c => c.Name.Contains("cleanser", StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
-        var moisturizer = cosmetics.FirstOrDefault(c => c.Name.Contains("moisturizer", StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
-        var sunscreen = cosmetics.FirstOrDefault(c => c.Name.Contains("sunscreen", StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
-        var retinoid = cosmetics.FirstOrDefault(c => c.Name.Contains("retinoid", StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
+        var cleanser = cosmetics.FirstOrDefault(c =>
+          c.Name.Contains("cleanser", StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
+        var moisturizer = cosmetics.FirstOrDefault(c =>
+          c.Name.Contains("moisturizer", StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
+        var sunscreen = cosmetics.FirstOrDefault(c =>
+          c.Name.Contains("sunscreen", StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
+        var retinoid = cosmetics.FirstOrDefault(c =>
+          c.Name.Contains("retinoid", StringComparison.OrdinalIgnoreCase) && c.SkinTypeId == routine.SkinTypeId);
         if (routine.Period.Equals("Morning", StringComparison.OrdinalIgnoreCase))
         {
           // Morning Routine Steps
           steps.Add(new RoutineStep
           {
-            Id = guids[guidIndex++],
-            RoutineId = routine.Id,
-            CosmeticId = cleanser?.Id ?? Guid.Empty,
-            StepNumber = 1
+            Id = guids[guidIndex++], RoutineId = routine.Id, CosmeticId = cleanser?.Id ?? Guid.Empty, StepNumber = 1
           });
           steps.Add(new RoutineStep
           {
@@ -1942,10 +1946,7 @@ internal class InitialData
           });
           steps.Add(new RoutineStep
           {
-            Id = guids[guidIndex++],
-            RoutineId = routine.Id,
-            CosmeticId = sunscreen?.Id ?? Guid.Empty,
-            StepNumber = 3
+            Id = guids[guidIndex++], RoutineId = routine.Id, CosmeticId = sunscreen?.Id ?? Guid.Empty, StepNumber = 3
           });
         }
         else if (routine.Period.Equals("Evening", StringComparison.OrdinalIgnoreCase))
@@ -1953,10 +1954,7 @@ internal class InitialData
           // Evening Routine Steps
           steps.Add(new RoutineStep
           {
-            Id = guids[guidIndex++],
-            RoutineId = routine.Id,
-            CosmeticId = cleanser?.Id ?? Guid.Empty,
-            StepNumber = 1
+            Id = guids[guidIndex++], RoutineId = routine.Id, CosmeticId = cleanser?.Id ?? Guid.Empty, StepNumber = 1
           });
           steps.Add(new RoutineStep
           {
@@ -1967,35 +1965,177 @@ internal class InitialData
           });
           steps.Add(new RoutineStep
           {
-            Id = guids[guidIndex++],
-            RoutineId = routine.Id,
-            CosmeticId = retinoid?.Id ?? Guid.Empty,
-            StepNumber = 3
+            Id = guids[guidIndex++], RoutineId = routine.Id, CosmeticId = retinoid?.Id ?? Guid.Empty, StepNumber = 3
           });
         }
       }
+
       return steps;
     }
   }
 
   public static IEnumerable<SkinType> SkinTypes => new List<SkinType>
   {
-    new SkinType { Id = new Guid("F73B3596-D3F0-4DA9-BA46-0E75D332658B"), Name = "OSPW", Description = "Oily, Sensitive, Pigmented, Wrinkle-Prone", IsDry = false, IsSensitive = true, IsUneven = true, IsWrinkle = true },
-    new SkinType { Id = new Guid("D7BCD97E-BE00-4CFC-83DE-1BCCE52F2CE3"), Name = "OSPT", Description = "Oily, Sensitive, Pigmented, Tight", IsDry = false, IsSensitive = true, IsUneven = true, IsWrinkle = false },
-    new SkinType { Id = new Guid("20B72075-FE5F-429E-A75B-2C3DDF705A9C"), Name = "OSNW", Description = "Oily, Sensitive, Non-Pigmented, Wrinkle-Prone", IsDry = false, IsSensitive = true, IsUneven = false, IsWrinkle = true },
-    new SkinType { Id = new Guid("E9307F73-A099-4930-8A76-1214F0E006DC"), Name = "OSNT", Description = "Oily, Sensitive, Non-Pigmented, Tight", IsDry = false, IsSensitive = true, IsUneven = false, IsWrinkle = false },
-    new SkinType { Id = new Guid("F20DFE0E-3C5B-463A-8C28-7E54B3B62CCB"), Name = "ORPW", Description = "Oily, Resistant, Pigmented, Wrinkle-Prone", IsDry = false, IsSensitive = false, IsUneven = true, IsWrinkle = true },
-    new SkinType { Id = new Guid("90700FA6-65DF-4D5D-93CF-1D5A6E9DA668"), Name = "ORPT", Description = "Oily, Resistant, Pigmented, Tight", IsDry = false, IsSensitive = false, IsUneven = true, IsWrinkle = false },
-    new SkinType { Id = new Guid("210E8376-E992-4981-ACB8-C396B5DE20A3"), Name = "ORNW", Description = "Oily, Resistant, Non-Pigmented, Wrinkle-Prone", IsDry = false, IsSensitive = false, IsUneven = false, IsWrinkle = true },
-    new SkinType { Id = new Guid("331EC094-8847-436B-9C79-A7B2D28F4B42"), Name = "ORNT", Description = "Oily, Resistant, Non-Pigmented, Tight", IsDry = false, IsSensitive = false, IsUneven = false, IsWrinkle = false },
-    new SkinType { Id = new Guid("D412BC64-2134-40AD-9556-54F31B87A96E"), Name = "DSPW", Description = "Dry, Sensitive, Pigmented, Wrinkle-Prone", IsDry = true, IsSensitive = true, IsUneven = true, IsWrinkle = true },
-    new SkinType { Id = new Guid("FEE794FC-41B9-4741-8774-21116EC8B3D3"), Name = "DSPT", Description = "Dry, Sensitive, Pigmented, Tight", IsDry = true, IsSensitive = true, IsUneven = true, IsWrinkle = false },
-    new SkinType { Id = new Guid("63B38920-67FF-43E2-A9DD-95B989D064B4"), Name = "DSNW", Description = "Dry, Sensitive, Non-Pigmented, Wrinkle-Prone", IsDry = true, IsSensitive = true, IsUneven = false, IsWrinkle = true },
-    new SkinType { Id = new Guid("7AC046BE-36EC-4DCF-AF8E-88DEFEE5023A"), Name = "DSNT", Description = "Dry, Sensitive, Non-Pigmented, Tight", IsDry = true, IsSensitive = true, IsUneven = false, IsWrinkle = false },
-    new SkinType { Id = new Guid("2FC2B67E-D050-422D-BAE2-318A243FADDA"), Name = "DRPW", Description = "Dry, Resistant, Pigmented, Wrinkle-Prone", IsDry = true, IsSensitive = false, IsUneven = true, IsWrinkle = true },
-    new SkinType { Id = new Guid("63E671F4-E686-4C46-B4DE-EB9B19319916"), Name = "DRPT", Description = "Dry, Resistant, Pigmented, Tight", IsDry = true, IsSensitive = false, IsUneven = true, IsWrinkle = false },
-    new SkinType { Id = new Guid("13310480-17DA-405D-B4B4-ACBAED5A5E7A"), Name = "DRNW", Description = "Dry, Resistant, Non-Pigmented, Wrinkle-Prone", IsDry = true, IsSensitive = false, IsUneven = false, IsWrinkle = true },
-    new SkinType { Id = new Guid("F585889E-076E-434A-A47F-AC952736712C"), Name = "DRNT", Description = "Dry, Resistant, Non-Pigmented, Tight", IsDry = true, IsSensitive = false, IsUneven = false, IsWrinkle = false }
+    new SkinType
+    {
+      Id = new Guid("F73B3596-D3F0-4DA9-BA46-0E75D332658B"),
+      Name = "OSPW",
+      Description = "Oily, Sensitive, Pigmented, Wrinkle-Prone",
+      IsDry = false,
+      IsSensitive = true,
+      IsUneven = true,
+      IsWrinkle = true
+    },
+    new SkinType
+    {
+      Id = new Guid("D7BCD97E-BE00-4CFC-83DE-1BCCE52F2CE3"),
+      Name = "OSPT",
+      Description = "Oily, Sensitive, Pigmented, Tight",
+      IsDry = false,
+      IsSensitive = true,
+      IsUneven = true,
+      IsWrinkle = false
+    },
+    new SkinType
+    {
+      Id = new Guid("20B72075-FE5F-429E-A75B-2C3DDF705A9C"),
+      Name = "OSNW",
+      Description = "Oily, Sensitive, Non-Pigmented, Wrinkle-Prone",
+      IsDry = false,
+      IsSensitive = true,
+      IsUneven = false,
+      IsWrinkle = true
+    },
+    new SkinType
+    {
+      Id = new Guid("E9307F73-A099-4930-8A76-1214F0E006DC"),
+      Name = "OSNT",
+      Description = "Oily, Sensitive, Non-Pigmented, Tight",
+      IsDry = false,
+      IsSensitive = true,
+      IsUneven = false,
+      IsWrinkle = false
+    },
+    new SkinType
+    {
+      Id = new Guid("F20DFE0E-3C5B-463A-8C28-7E54B3B62CCB"),
+      Name = "ORPW",
+      Description = "Oily, Resistant, Pigmented, Wrinkle-Prone",
+      IsDry = false,
+      IsSensitive = false,
+      IsUneven = true,
+      IsWrinkle = true
+    },
+    new SkinType
+    {
+      Id = new Guid("90700FA6-65DF-4D5D-93CF-1D5A6E9DA668"),
+      Name = "ORPT",
+      Description = "Oily, Resistant, Pigmented, Tight",
+      IsDry = false,
+      IsSensitive = false,
+      IsUneven = true,
+      IsWrinkle = false
+    },
+    new SkinType
+    {
+      Id = new Guid("210E8376-E992-4981-ACB8-C396B5DE20A3"),
+      Name = "ORNW",
+      Description = "Oily, Resistant, Non-Pigmented, Wrinkle-Prone",
+      IsDry = false,
+      IsSensitive = false,
+      IsUneven = false,
+      IsWrinkle = true
+    },
+    new SkinType
+    {
+      Id = new Guid("331EC094-8847-436B-9C79-A7B2D28F4B42"),
+      Name = "ORNT",
+      Description = "Oily, Resistant, Non-Pigmented, Tight",
+      IsDry = false,
+      IsSensitive = false,
+      IsUneven = false,
+      IsWrinkle = false
+    },
+    new SkinType
+    {
+      Id = new Guid("D412BC64-2134-40AD-9556-54F31B87A96E"),
+      Name = "DSPW",
+      Description = "Dry, Sensitive, Pigmented, Wrinkle-Prone",
+      IsDry = true,
+      IsSensitive = true,
+      IsUneven = true,
+      IsWrinkle = true
+    },
+    new SkinType
+    {
+      Id = new Guid("FEE794FC-41B9-4741-8774-21116EC8B3D3"),
+      Name = "DSPT",
+      Description = "Dry, Sensitive, Pigmented, Tight",
+      IsDry = true,
+      IsSensitive = true,
+      IsUneven = true,
+      IsWrinkle = false
+    },
+    new SkinType
+    {
+      Id = new Guid("63B38920-67FF-43E2-A9DD-95B989D064B4"),
+      Name = "DSNW",
+      Description = "Dry, Sensitive, Non-Pigmented, Wrinkle-Prone",
+      IsDry = true,
+      IsSensitive = true,
+      IsUneven = false,
+      IsWrinkle = true
+    },
+    new SkinType
+    {
+      Id = new Guid("7AC046BE-36EC-4DCF-AF8E-88DEFEE5023A"),
+      Name = "DSNT",
+      Description = "Dry, Sensitive, Non-Pigmented, Tight",
+      IsDry = true,
+      IsSensitive = true,
+      IsUneven = false,
+      IsWrinkle = false
+    },
+    new SkinType
+    {
+      Id = new Guid("2FC2B67E-D050-422D-BAE2-318A243FADDA"),
+      Name = "DRPW",
+      Description = "Dry, Resistant, Pigmented, Wrinkle-Prone",
+      IsDry = true,
+      IsSensitive = false,
+      IsUneven = true,
+      IsWrinkle = true
+    },
+    new SkinType
+    {
+      Id = new Guid("63E671F4-E686-4C46-B4DE-EB9B19319916"),
+      Name = "DRPT",
+      Description = "Dry, Resistant, Pigmented, Tight",
+      IsDry = true,
+      IsSensitive = false,
+      IsUneven = true,
+      IsWrinkle = false
+    },
+    new SkinType
+    {
+      Id = new Guid("13310480-17DA-405D-B4B4-ACBAED5A5E7A"),
+      Name = "DRNW",
+      Description = "Dry, Resistant, Non-Pigmented, Wrinkle-Prone",
+      IsDry = true,
+      IsSensitive = false,
+      IsUneven = false,
+      IsWrinkle = true
+    },
+    new SkinType
+    {
+      Id = new Guid("F585889E-076E-434A-A47F-AC952736712C"),
+      Name = "DRNT",
+      Description = "Dry, Resistant, Non-Pigmented, Tight",
+      IsDry = true,
+      IsSensitive = false,
+      IsUneven = false,
+      IsWrinkle = false
+    }
   };
 
   public static IEnumerable<SubCategory> SubCategories
@@ -2090,7 +2230,6 @@ internal class InitialData
           Name = "Hydrating Essentials",
           Description = "Fundamental products for daily hydration."
         },
-
         new SubCategory
         {
           Id = new Guid("C6A71C5D-A067-4BB6-8D9C-3CA3F180ADFD"),
@@ -2168,11 +2307,36 @@ internal class InitialData
 
   public static IEnumerable<Tag> Tags => new List<Tag>
   {
-    new Tag { Id = new Guid("4C592F29-29A6-49F7-B9FF-1EC76D36826A"), Name = "Skincare Education", Description = "Posts focused on skincare tips, tutorials, and educational content." },
-    new Tag { Id = new Guid("555B8613-1FC3-465C-8020-2C1E6E8D4668"), Name = "Ingredient Guide", Description = "Posts exploring skincare ingredients, their benefits, and usage." },
-    new Tag { Id = new Guid("0DD9E52B-443F-4512-B44C-BC79E90B36CE"), Name = "Routine Building", Description = "Posts dedicated to building and optimizing skincare routines." },
-    new Tag { Id = new Guid("4ACB26EF-6046-4396-A16A-473756BD2EB0"), Name = "Skin Concerns", Description = "Posts addressing common skin concerns and potential solutions." },
-    new Tag { Id = new Guid("EED76A4E-A40A-4472-841A-A351D01EA588"), Name = "Expert Advice", Description = "Posts offering professional insights and expert advice on skincare." }
+    new Tag
+    {
+      Id = new Guid("4C592F29-29A6-49F7-B9FF-1EC76D36826A"),
+      Name = "Skincare Education",
+      Description = "Posts focused on skincare tips, tutorials, and educational content."
+    },
+    new Tag
+    {
+      Id = new Guid("555B8613-1FC3-465C-8020-2C1E6E8D4668"),
+      Name = "Ingredient Guide",
+      Description = "Posts exploring skincare ingredients, their benefits, and usage."
+    },
+    new Tag
+    {
+      Id = new Guid("0DD9E52B-443F-4512-B44C-BC79E90B36CE"),
+      Name = "Routine Building",
+      Description = "Posts dedicated to building and optimizing skincare routines."
+    },
+    new Tag
+    {
+      Id = new Guid("4ACB26EF-6046-4396-A16A-473756BD2EB0"),
+      Name = "Skin Concerns",
+      Description = "Posts addressing common skin concerns and potential solutions."
+    },
+    new Tag
+    {
+      Id = new Guid("EED76A4E-A40A-4472-841A-A351D01EA588"),
+      Name = "Expert Advice",
+      Description = "Posts offering professional insights and expert advice on skincare."
+    }
   };
 
   public static IEnumerable<Testimonial> Testimonials => new List<Testimonial>

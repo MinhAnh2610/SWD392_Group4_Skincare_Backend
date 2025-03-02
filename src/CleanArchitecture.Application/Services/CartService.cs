@@ -73,10 +73,10 @@ namespace CleanArchitecture.Application.Services
         };
         cart.CartItems.Add(cartItem);
       }
-
+      //TODO: HERE
       // Recalculate TotalPrice for the cart
-      cart.TotalPrice = cart.CartItems.Sum(ci =>
-          ci.Quantity * (ci.Cosmetic?.Price ?? cosmetic.Price)); // Use cosmetic.Price if not loaded
+      // cart.TotalPrice = cart.CartItems.Sum(ci =>
+      //     ci.Quantity * (ci.Cosmetic?.Price ?? cosmetic.Price)); // Use cosmetic.Price if not loaded
 
       await _unitOfWork.CompleteAsync();
 
@@ -107,8 +107,9 @@ namespace CleanArchitecture.Application.Services
 
       cart.CartItems.Remove(cartItem);
 
+      //TODO: HERE
       // Recalculate the total price after removal
-      cart.TotalPrice = cart.CartItems.Sum(ci => ci.Quantity * (ci.Cosmetic?.Price ?? 0));
+      // cart.TotalPrice = cart.CartItems.Sum(ci => ci.Quantity * (ci.Cosmetic?.Price ?? 0));
 
       await _unitOfWork.CompleteAsync();
 
@@ -222,7 +223,8 @@ namespace CleanArchitecture.Application.Services
           CosmeticName = ci.Cosmetic?.Name ?? string.Empty,
           // Select only the first image URL to avoid circular references:
           CosmeticImage = ci.Cosmetic?.CosmeticImages.FirstOrDefault()?.ImageUrl ?? string.Empty,
-          Price = ci.Cosmetic?.Price ?? 0,
+          //TODO: HERE
+          // Price = ci.Cosmetic?.Price ?? 0,
           Quantity = ci.Quantity,
           Height = ci.Cosmetic.Height,
           Length = ci.Cosmetic.Length,

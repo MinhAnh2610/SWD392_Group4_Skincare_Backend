@@ -7,4 +7,5 @@ public class OrderItem
   public Guid CosmeticId { get; set; }
   public Cosmetic Cosmetic { get; set; } = default!;
   public int Quantity { get; set; }
+  public decimal SellingPrice { get; set; }
 }

@@ -3,6 +3,7 @@ using System;
 using CleanArchitecture.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CleanArchitecture.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250302112546_add-price-table")]
+    partial class addpricetable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -434,13 +437,16 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Property<string>("CreatedBy")
                         .HasColumnType("text");
 
+                    b.Property<int>("DiscountPercentage")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("EndDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                    b.Property<Guid>("EventId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("Event")
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -464,8 +470,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CosmeticId");
-
-                    b.HasIndex("EventId");
 
                     b.ToTable("CosmeticPrices", (string)null);
                 });
@@ -561,41 +565,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Coupons");
-                });
-
-            modelBuilder.Entity("CleanArchitecture.Domain.Entities.Event", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("CreateAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<decimal?>("DiscountPercentage")
-                        .HasColumnType("numeric");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Events", (string)null);
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.FAQ", b =>
@@ -755,9 +724,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
-
-                    b.Property<decimal>("SellingPrice")
-                        .HasColumnType("numeric");
 
                     b.HasKey("OrderId", "CosmeticId");
 
@@ -1756,20 +1722,12 @@ namespace CleanArchitecture.Infrastructure.Migrations
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.CosmeticPrice", b =>
                 {
                     b.HasOne("CleanArchitecture.Domain.Entities.Cosmetic", "Cosmetic")
-                        .WithMany("CosmeticPrices")
+                        .WithMany()
                         .HasForeignKey("CosmeticId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CleanArchitecture.Domain.Entities.Event", "Event")
-                        .WithMany("CosmeticPrices")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Cosmetic");
-
-                    b.Navigation("Event");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.CosmeticSubCategory", b =>
@@ -2138,8 +2096,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
 
                     b.Navigation("CosmeticImages");
 
-                    b.Navigation("CosmeticPrices");
-
                     b.Navigation("CosmeticSubcategories");
 
                     b.Navigation("Feedbacks");
@@ -2159,11 +2115,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Coupon", b =>
                 {
                     b.Navigation("Orders");
-                });
-
-            modelBuilder.Entity("CleanArchitecture.Domain.Entities.Event", b =>
-                {
-                    b.Navigation("CosmeticPrices");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Order", b =>
