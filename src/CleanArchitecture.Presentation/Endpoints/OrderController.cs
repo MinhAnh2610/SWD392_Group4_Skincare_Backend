@@ -32,7 +32,7 @@ public class OrderController : ICarterModule
         ));
       }
 
-      return Results.StatusCode(result.Status);
+      return result.Match(Message.SUCCESSFUL_CREATED(nameof(result)));
     })
     .WithName("CreateOrder")
     .Produces<ApiResponse<CreateOrderResponse>>(StatusCodes.Status200OK)
@@ -82,7 +82,10 @@ public class OrderController : ICarterModule
     .ProducesProblem(StatusCodes.Status500InternalServerError)
     .WithSummary("GetAllOrders")
     .WithDescription("Get All Order")
-    .RequireAuthorization(policy => policy.RequireRole("Admin"));
+    .RequireAuthorization(new AuthorizeAttribute
+    {
+      Roles = "Manager"
+    });
 
     // 4. Get Orders for the Current User
     group.MapGet("/my", async (IOrderService orderService, IClaimsService claimsService) =>
@@ -125,7 +128,10 @@ public class OrderController : ICarterModule
     .ProducesProblem(StatusCodes.Status404NotFound)
     .WithSummary("Update Order Status")
     .WithDescription("Update Order Status")
-    .RequireAuthorization(policy => policy.RequireRole("Admin"));
+    .RequireAuthorization(new AuthorizeAttribute
+    {
+      Roles = "Manager"
+    });
 
     // 6. Delete Order (Admin)
     group.MapDelete("/{orderId}", async (
@@ -147,6 +153,9 @@ public class OrderController : ICarterModule
     .ProducesProblem(StatusCodes.Status404NotFound)
     .WithSummary("DeleteOrder")
     .WithDescription("Delete Order")
-    .RequireAuthorization(policy => policy.RequireRole("Admin"));
+    .RequireAuthorization(new AuthorizeAttribute
+    {
+      Roles = "Manager"
+    });
   }
 }

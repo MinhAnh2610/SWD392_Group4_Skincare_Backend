@@ -80,8 +80,8 @@ public class GHNService : IGHNService
   public Task<Result<List<ShippingOrderStatus>>> ChangeShippingOrderStatus(SwitchShippingOrdersStatusRequest request, string status) =>
       SendRequestAsync<List<ShippingOrderStatus>>(CreateRequest(HttpMethod.Post, $"v2/switch-status/{status}", request));
 
-  public Task<Result<List<StoreData>>> GetStoreInformationAsync(object queryData) =>
-      SendRequestAsync<List<StoreData>>(CreateRequest(HttpMethod.Post, "v2/shop/all", queryData));
+  public Task<Result<StoreData>> GetStoreInformationAsync() =>
+      SendRequestAsync<StoreData>(CreateRequest(HttpMethod.Post, "v2/shop/all", new { }));
 
   public Task<Result<List<DistrictData>>> GetDistrictAsync(GetDistrictRequest request) =>
       SendRequestAsync<List<DistrictData>>(CreateRequest(HttpMethod.Post, "master-data/district", request));

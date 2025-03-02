@@ -387,7 +387,7 @@ internal class InitialData
       {
         new Cart
         {
-          Id = new Guid("A5D8471E-7C24-48D9-8233-CD598E6DD1C3"), CustomerId = customers[5].Id, TotalPrice = 89.97m
+          Id = new Guid("A5D8471E-7C24-48D9-8233-CD598E6DD1C3"), CustomerId = customers[5].Id, TotalPrice = 299000
         }
       };
     }

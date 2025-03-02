@@ -1,9 +1,13 @@
-﻿using CleanArchitecture.Application.Constants;
+﻿using Abp.AutoMapper;
+using CleanArchitecture.Application.Constants;
+using CleanArchitecture.Application.DTOs.GHN.Request;
+using CleanArchitecture.Application.DTOs.GHN.Response;
 using CleanArchitecture.Application.DTOs.Order;
 using CleanArchitecture.Application.DTOs.OrderDto;
 using CleanArchitecture.Application.DTOs.VnPay;
 using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Application.Strategies.InvoiceGenerateStrategy;
+using CleanArchitecture.Application.Validators.Auth;
 using Microsoft.AspNetCore.Http;
 
 public class OrderService : IOrderService
@@ -16,6 +20,7 @@ public class OrderService : IOrderService
   private readonly ITimeZoneService _timeZoneService;
   private readonly IVnPayIntegrationService _vnPayIntegrationService;
   private readonly IHttpContextAccessor _httpContextAccessor;
+  private readonly IValidator<CreateOrderRequest> _createOrderRequestValidator;
 
   // Exchange rate from USD to VND - should ideally come from a service
   private const decimal USD_TO_VND_RATE = 24850;
@@ -27,7 +32,8 @@ public class OrderService : IOrderService
       IGHNService ghnService,
       ITimeZoneService timeZoneService,
       IVnPayIntegrationService vnPayIntegrationService,
-      IHttpContextAccessor httpContextAccessor)
+      IHttpContextAccessor httpContextAccessor,
+      IValidator<CreateOrderRequest> createOrderRequestValidator)
   {
     _unitOfWork = unitOfWork;
     _errorFactory = errorFactory;
@@ -36,6 +42,7 @@ public class OrderService : IOrderService
     _timeZoneService = timeZoneService;
     _vnPayIntegrationService = vnPayIntegrationService;
     _httpContextAccessor = httpContextAccessor;
+    _createOrderRequestValidator = createOrderRequestValidator;
   }
 
   // 1. Initiate Order (First step of checkout)
@@ -43,6 +50,16 @@ public class OrderService : IOrderService
   {
     try
     {
+      var validationResult = await _createOrderRequestValidator.ValidateAsync(request);
+      if (!validationResult.IsValid)
+      {
+        var errors = validationResult.Errors
+            .Select(e => new Error("ValidationError", e.ErrorMessage))
+            .ToList();
+
+        return Result<OrderResponse>.Failure(errors, StatusCodes.Status400BadRequest);
+      }
+
       // Validate cart and user
       var cartValidationResult = await ValidateOrderRequest(request);
       if (!cartValidationResult.IsSuccess)
@@ -85,6 +102,30 @@ public class OrderService : IOrderService
       {
         return Result<OrderResponse>.Failure(
             [new Error("Order.Create", "Failed to save order")],
+            StatusCodes.Status500InternalServerError);
+      }
+
+      // Get Shop Info for Create a Shipping Order
+      var shopInfo = await _ghnService.GetStoreInformationAsync();
+
+      // Create Shipping Order in GHN
+      var ghnOrderResult = await _ghnService.CreateShippingOrderAsync(MapToCreateShippingOrderRequest(order, shopInfo.Data!, request, shippingDetails));
+      if (!ghnOrderResult.IsSuccess)
+      {
+        return Result<OrderResponse>.Failure(
+            [new Error("Order.Shipping", "Failed to create shipping order")],
+            StatusCodes.Status500InternalServerError);
+      }
+
+      // Save GHN Order ID & Tracking Number
+      order.TrackingNumber = ghnOrderResult.Data!.OrderCode;
+
+      _unitOfWork.Orders.Update(order);
+      var updated = await _unitOfWork.CompleteAsync();
+      if (!updated)
+      {
+        return Result<OrderResponse>.Failure(
+            [new Error("Order.Update", "Failed to save shipping details")],
             StatusCodes.Status500InternalServerError);
       }
 
@@ -496,6 +537,62 @@ public class OrderService : IOrderService
       LastModified = order.LastModified,
       LastModifiedBy = order.LastModifiedBy
     };
+  }
+
+  public static CreateGHNOrderRequest MapToCreateShippingOrderRequest(Order order, StoreData shopInfo, CreateOrderRequest orderRequest, ShippingDetails details)
+  {
+    var request = new CreateGHNOrderRequest
+    {
+      PaymentTypeId = 2, // Default value or map from Order.Payment if applicable
+      Note = "Handle With Care", // Custom note
+      RequiredNote = "CHOXEMHANGKHONGTHU", // Default required note
+      FromName = shopInfo.Shops[1].Name, // Default sender name
+      FromPhone = shopInfo.Shops[1].Phone, // Default sender phone
+      FromAddress = shopInfo.Shops[1].Address, // Default sender address
+      FromWardName = "Thao Dien", // Default ward name
+      FromDistrictName = "Thanh Pho Thu Duc", // Default district name
+      FromProvinceName = "Ho Chi Minh", // Default province name
+      ReturnPhone = "", // Use customer's phone as return phone
+      ReturnAddress = "", // Use billing address as return address
+      ReturnDistrictId = null, // Set to null or map if applicable
+      ReturnWardCode = "", // Set to empty or map if applicable
+      ClientOrderCode = "", // Use Order ID as client order code
+      ToName = order.Customer.FirstName + order.Customer.LastName, // Use customer's name as recipient name
+      ToPhone = order.Customer.PhoneNumber, // Use customer's phone as recipient phone
+      ToAddress = order.ShippingAddress, // Use shipping address as recipient address
+      ToWardCode = orderRequest.WardCode, // Default ward code or map if applicable
+      ToDistrictId = orderRequest.DistrictId, // Default district ID or map if applicable
+      CodAmount = (int)order.TotalPrice, // Use total price as COD amount
+      Content = "Order from De Fleur", // Custom content
+      Weight = details.Weight, // Calculate total weight
+      Length = details.Length, // Default length or map if applicable
+      Width = details.Width, // Default width or map if applicable
+      Height = details.Height, // Default height or map if applicable
+      PickStationId = 0, // Default pick station ID or map if applicable
+      DeliverStationId = null, // Set to null or map if applicable
+      InsuranceValue = (int)order.TotalPrice, // Use total price as insurance value
+      ServiceId = 0, // Default service ID or map if applicable
+      ServiceTypeId = 2, // Default service type ID or map if applicable
+      Coupon = null, // Use coupon code if available
+      PickShift = new List<int> { 1, 2 }, // Default pick shift or map if applicable
+      Items = MapOrderItemsToGHNItems(order.OrderItems) // Map order items to GHN items
+    };
+
+    return request;
+  }
+  private static List<GHNOrderItem> MapOrderItemsToGHNItems(List<OrderItem> orderItems)
+  {
+    return orderItems.Select(item => new GHNOrderItem
+    {
+      Name = item.Cosmetic.Name, // Use cosmetic name as item name
+      Code = item.CosmeticId.ToString(), // Use cosmetic ID as item code
+      Quantity = item.Quantity, // Map quantity
+      Price = (int)item.SellingPrice, // Map selling price
+      Length = item.Cosmetic.Length, // Default length or map if applicable
+      Width = item.Cosmetic.Width, // Default width or map if applicable
+      Height = item.Cosmetic.Height, // Default height or map if applicable
+      Weight = item.Cosmetic.Weight // Default weight or map if applicable
+    }).ToList();
   }
 }
 

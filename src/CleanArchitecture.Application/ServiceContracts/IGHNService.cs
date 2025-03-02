@@ -9,7 +9,7 @@ public interface IGHNService
   Task<Result<ShippingFeeData>> CreateShippingOrderAsync(CreateGHNOrderRequest request);
   Task<Result<ShippingOrderData>> GetOrderTrackingAsync(GetShippingOrderRequest request);
   Task<Result<FeeData>> GetShippingFeeAsync(CalculateShippingFeeRequest request);
-  Task<Result<List<StoreData>>> GetStoreInformationAsync(object queryData);
+  Task<Result<StoreData>> GetStoreInformationAsync();
   Task<Result<List<DistrictData>>> GetDistrictAsync(GetDistrictRequest request);
   Task<Result<List<WardData>>> GetWardAsync(GetWardRequest request);
   Task<Result<List<ProvinceData>>> GetProvinceAsync();
