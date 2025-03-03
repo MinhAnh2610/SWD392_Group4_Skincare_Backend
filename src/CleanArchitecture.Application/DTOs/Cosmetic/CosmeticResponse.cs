@@ -4,8 +4,6 @@ using CleanArchitecture.Application.DTOs.CosmeticImageDto;
 using CleanArchitecture.Application.DTOs.CosmeticSubcategory;
 using CleanArchitecture.Application.DTOs.CosmeticTypeDto;
 using CleanArchitecture.Application.DTOs.FeedbackDto;
-using CleanArchitecture.Application.DTOs.RefundItem;
-using CleanArchitecture.Application.DTOs.RoutineStepDto;
 using CleanArchitecture.Application.DTOs.SkinTypeDto;
 using System.Text.Json.Serialization;
 namespace CleanArchitecture.Application.DTOs.Cosmetic

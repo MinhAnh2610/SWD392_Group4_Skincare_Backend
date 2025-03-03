@@ -60,7 +60,7 @@ public class UnitOfWork : IUnitOfWork
     _context = context;
     _logger = logger;
     _timeZoneService = timeZoneService;
-    _transaction = _context.Database.BeginTransaction();
+    //_transaction = _context.Database.BeginTransaction();
   }
 
   public async Task RollBackAsync()

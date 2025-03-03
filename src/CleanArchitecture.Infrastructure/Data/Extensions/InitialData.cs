@@ -988,7 +988,7 @@ internal class InitialData
             CosmeticId = cosmetic.Id,
             EventId = Events.ElementAt(rand.Next(0, 4)).Id,
             StartDate = new DateTime(2025, 01, 01),
-            OriginalPrice = rand.Next(50, 500) * 1000
+            OriginalPrice = rand.Next(1, 40) * 100000
           }
         );
       }

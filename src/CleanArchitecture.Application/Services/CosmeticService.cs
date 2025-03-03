@@ -43,12 +43,19 @@ namespace CleanArchitecture.Application.Services
 
     public async Task<Result<List<CosmeticResponse>>> GetAllCosmetics()
     {
-      var cosmetic = await _unitOfWork.Cosmetics.GetAllAsync();
-      if (cosmetic != null)
+      var cosmetics = await _unitOfWork.Cosmetics.GetAllAsync();
+      if (cosmetics != null)
       {
-        var cosmeticsReponse = cosmetic.Adapt<List<CosmeticResponse>>();
+        var cosmeticsResponse = cosmetics.Adapt<List<CosmeticResponse>>();
 
-        return Result<List<CosmeticResponse>>.Success(cosmeticsReponse, StatusCodes.Status200OK);
+        // Set price for each cosmetic
+        foreach (var response in cosmeticsResponse)
+        {
+          var cosmetic = cosmetics.First(c => c.Id == response.Id);
+          response.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
+        }
+
+        return Result<List<CosmeticResponse>>.Success(cosmeticsResponse, StatusCodes.Status200OK);
       }
       else
       {
@@ -62,6 +69,9 @@ namespace CleanArchitecture.Application.Services
       if (cosmetic != null)
       {
         var cosmeticResponse = cosmetic.Adapt<CosmeticResponse>();
+
+        cosmeticResponse.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
+
         return Result<CosmeticResponse>.Success(cosmeticResponse, StatusCodes.Status200OK);
       }
       else
@@ -72,11 +82,19 @@ namespace CleanArchitecture.Application.Services
 
     public async Task<Result<List<CosmeticResponse>>> GetCosmeticsByBrandId(Guid brandId)
     {
-      var cosmetic = await _unitOfWork.Cosmetics.GetListByAnyId(e => e.BrandId == brandId);
-      if (cosmetic != null)
+      var cosmetics = await _unitOfWork.Cosmetics.GetListByAnyId(e => e.BrandId == brandId);
+      if (cosmetics != null)
       {
-        var cosmeticResponse = cosmetic.Adapt<List<CosmeticResponse>>();
-        return Result<List<CosmeticResponse>>.Success(cosmeticResponse, StatusCodes.Status200OK);
+        var cosmeticsResponse = cosmetics.Adapt<List<CosmeticResponse>>();
+
+        // Set price for each cosmetic
+        foreach (var response in cosmeticsResponse)
+        {
+          var cosmetic = cosmetics.First(c => c.Id == response.Id);
+          response.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
+        }
+
+        return Result<List<CosmeticResponse>>.Success(cosmeticsResponse, StatusCodes.Status200OK);
       }
       else
       {
@@ -86,11 +104,19 @@ namespace CleanArchitecture.Application.Services
 
     public async Task<Result<List<CosmeticResponse>>> GetCosmeticsByName(string name)
     {
-      var cosmetic = await _unitOfWork.Cosmetics.GetListByAnyId(e => e.Name == name);
-      if (cosmetic != null)
+      var cosmetics = await _unitOfWork.Cosmetics.GetListByAnyId(e => e.Name == name);
+      if (cosmetics != null)
       {
-        var cosmeticResponse = cosmetic.Adapt<List<CosmeticResponse>>();
-        return Result<List<CosmeticResponse>>.Success(cosmeticResponse, StatusCodes.Status200OK);
+        var cosmeticsResponse = cosmetics.Adapt<List<CosmeticResponse>>();
+
+        // Set price for each cosmetic
+        foreach (var response in cosmeticsResponse)
+        {
+          var cosmetic = cosmetics.First(c => c.Id == response.Id);
+          response.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
+        }
+
+        return Result<List<CosmeticResponse>>.Success(cosmeticsResponse, StatusCodes.Status200OK);
       }
       else
       {
@@ -100,11 +126,19 @@ namespace CleanArchitecture.Application.Services
 
     public async Task<Result<List<CosmeticResponse>>> GetCosmeticsBySkinTypeId(Guid skinTypeId)
     {
-      var cosmetic = await _unitOfWork.Cosmetics.GetListByAnyId(e => e.SkinTypeId == skinTypeId);
-      if (cosmetic != null)
+      var cosmetics = await _unitOfWork.Cosmetics.GetListByAnyId(e => e.SkinTypeId == skinTypeId);
+      if (cosmetics != null)
       {
-        var cosmeticResponse = cosmetic.Adapt<List<CosmeticResponse>>();
-        return Result<List<CosmeticResponse>>.Success(cosmeticResponse, StatusCodes.Status200OK);
+        var cosmeticsResponse = cosmetics.Adapt<List<CosmeticResponse>>();
+
+        // Set price for each cosmetic
+        foreach (var response in cosmeticsResponse)
+        {
+          var cosmetic = cosmetics.First(c => c.Id == response.Id);
+          response.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
+        }
+
+        return Result<List<CosmeticResponse>>.Success(cosmeticsResponse, StatusCodes.Status200OK);
       }
       else
       {
@@ -114,11 +148,19 @@ namespace CleanArchitecture.Application.Services
 
     public async Task<Result<List<CosmeticResponse>>> GetCosmeticsByTypeId(Guid typeId)
     {
-      var cosmetic = await _unitOfWork.Cosmetics.GetListByAnyId(e => e.CosmeticTypeId == typeId);
-      if (cosmetic != null)
+      var cosmetics = await _unitOfWork.Cosmetics.GetListByAnyId(e => e.CosmeticTypeId == typeId);
+      if (cosmetics != null)
       {
-        var cosmeticResponse = cosmetic.Adapt<List<CosmeticResponse>>();
-        return Result<List<CosmeticResponse>>.Success(cosmeticResponse, StatusCodes.Status200OK);
+        var cosmeticsResponse = cosmetics.Adapt<List<CosmeticResponse>>();
+
+        // Set price for each cosmetic
+        foreach (var response in cosmeticsResponse)
+        {
+          var cosmetic = cosmetics.First(c => c.Id == response.Id);
+          response.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
+        }
+
+        return Result<List<CosmeticResponse>>.Success(cosmeticsResponse, StatusCodes.Status200OK);
       }
       else
       {
@@ -155,6 +197,8 @@ namespace CleanArchitecture.Application.Services
 
       var output = existcosmetic.Adapt<CosmeticResponse>();
 
+      output.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(existcosmetic);
+
       return Result<CosmeticResponse>.Success(output, StatusCodes.Status200OK);
     }
 
@@ -174,6 +218,9 @@ namespace CleanArchitecture.Application.Services
         return Result<CosmeticResponse>.Failure([error.err], error.statusCode);
       }
       var output = existcosmetic.Adapt<CosmeticResponse>();
+
+      output.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(existcosmetic);
+
       return Result<CosmeticResponse>.Success(output, StatusCodes.Status200OK);
     }
 
@@ -209,9 +256,16 @@ namespace CleanArchitecture.Application.Services
         );
       }
 
-      var cosmeticResponse = filteredResults.Adapt<List<CosmeticResponse>>();
+      var cosmeticsResponse = filteredResults.Adapt<List<CosmeticResponse>>();
+
+      foreach (var response in cosmeticsResponse)
+      {
+        var cosmetic = filteredResults.First(c => c.Id == response.Id);
+        response.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
+      }
+
       return Result<List<CosmeticResponse>>.Success(
-        cosmeticResponse,
+        cosmeticsResponse,
         StatusCodes.Status200OK
       );
     }
