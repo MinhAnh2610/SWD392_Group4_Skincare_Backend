@@ -1,8 +1,11 @@
-﻿using CleanArchitecture.Application.Services;
+﻿using Azure.Storage.Blobs;
+using CleanArchitecture.Application.ServiceContracts;
+using CleanArchitecture.Application.Services;
 using CleanArchitecture.Domain.RepositoryContracts;
 using CleanArchitecture.Domain.RepositoryContracts.Base;
 using CleanArchitecture.Domain.RepositoryContracts.UnitOfWork;
 using CleanArchitecture.Infrastructure.Auth;
+using CleanArchitecture.Infrastructure.AzureBlobService;
 using CleanArchitecture.Infrastructure.Data.Interceptors;
 using CleanArchitecture.Infrastructure.Redis;
 using CleanArchitecture.Infrastructure.Repositories;
@@ -42,7 +45,10 @@ public static class DependencyInjection
       // options.UseInMemoryDatabase("database");
       options.UseNpgsql(connectionString);
     });
-
+    
+    services.AddSingleton(x => new BlobServiceClient(configuration.GetConnectionString("AzureBlob")));
+    services.AddSingleton<IBlobService, BlobService>();
+    
     services.AddStackExchangeRedisCache(options =>
     {
       options.Configuration = configuration.GetConnectionString("Redis");

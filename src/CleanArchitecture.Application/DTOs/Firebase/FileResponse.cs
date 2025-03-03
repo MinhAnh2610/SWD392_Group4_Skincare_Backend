@@ -1,4 +1,4 @@
 namespace CleanArchitecture.Application.DTOs.Firebase
 {
-  public record FileResponse();
+  public record FileResponse(string? fileName, string? fileUrl);
 }

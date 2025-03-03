@@ -43,6 +43,8 @@ namespace CleanArchitecture.Infrastructure.Data.Configuration
 
       builder.HasMany(cosmetic => cosmetic.RefundItems)
         .WithOne(orderItem => orderItem.Cosmetic);
+
+      builder.Property(cosmetic => cosmetic.ThumbnailUrl).IsRequired(false);
     }
   }
 }
