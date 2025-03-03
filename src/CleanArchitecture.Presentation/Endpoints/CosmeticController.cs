@@ -8,7 +8,7 @@ public class CosmeticController : ICarterModule
 {
   public void AddRoutes(IEndpointRouteBuilder app)
   {
-    var group = app.MapGroup("api/cosmetic").WithTags("Cosmetics Management");
+    var group = app.MapGroup("api/cosmetics").WithTags("Cosmetics Management");
 
     #region Get Cosmetics API
     group.MapGet("/", async (ICosmeticService service) =>
@@ -83,7 +83,7 @@ public class CosmeticController : ICarterModule
     #endregion
 
     #region Create Cosmetic By Id API
-    group.MapPost("/create", async (ICosmeticService service, CreateCosmetic cosmetic) =>
+    group.MapPost("/", async (ICosmeticService service, [FromForm] CreateCosmetic cosmetic) =>
     {
       var result = await service.CreateCosmetic(cosmetic);
       if (result != null)
@@ -97,7 +97,8 @@ public class CosmeticController : ICarterModule
     .Produces<ApiResponse<CosmeticResponse>>(StatusCodes.Status200OK)
     .ProducesProblem(StatusCodes.Status500InternalServerError)
     .WithSummary("CreateCosmeticById")
-    .WithDescription("CreateCosmetic By Id");
+    .WithDescription("CreateCosmetic By Id")
+    .DisableAntiforgery();
     #endregion
 
     #region Filter Cosmetic  API
@@ -116,6 +117,14 @@ public class CosmeticController : ICarterModule
     .ProducesProblem(StatusCodes.Status500InternalServerError)
     .WithSummary("FilterCosmetic")
     .WithDescription("FilterCosmetic");
+    #endregion
+    #region Upload Cosmetic Thumbnail API
+
+    // group.MapPost("/{cosmeticId}/images/thumbnail", async (ICosmeticImageService service, IFormFile) =>
+    // {
+    //   
+    // });
+
     #endregion
   }
 }
