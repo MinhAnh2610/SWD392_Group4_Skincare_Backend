@@ -3,6 +3,7 @@ using CleanArchitecture.Application.DTOs.CartItem;
 using CleanArchitecture.Application.DTOs.UserDto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using System.Linq;
 
 namespace CleanArchitecture.Application.Services
 {
@@ -87,8 +88,7 @@ namespace CleanArchitecture.Application.Services
       // Recalculate the cart's total price.
       // Here, we assume that if the Cosmetic is not loaded in the CartItem, we fallback to the cosmetic's current price.
       //TODO: PRICE
-      // cart.TotalPrice = cart.CartItems.Sum(ci =>
-      //     ci.Quantity * (ci.Cosmetic?.Price ?? cosmetic.Price));
+       cart.TotalPrice += await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic) * addProductRequest.Quantity;
 
       await _unitOfWork.CompleteAsync();
 

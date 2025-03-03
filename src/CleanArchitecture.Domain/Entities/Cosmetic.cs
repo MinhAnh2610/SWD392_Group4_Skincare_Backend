@@ -22,6 +22,7 @@ public class Cosmetic : Entity<Guid>
   public int Length { get; set; }
   public int Width { get; set; }
   public int Height { get; set; }
+
   public VolumeUnit VolumeUnit { get; set; }
   public List<CosmeticSubCategory> CosmeticSubcategories { get; set; } = new List<CosmeticSubCategory>();
   public List<CosmeticImage> CosmeticImages { get; set; } = new List<CosmeticImage>();
@@ -31,7 +32,6 @@ public class Cosmetic : Entity<Guid>
   public List<RoutineStep> RoutineSteps { get; set; } = new List<RoutineStep>();
   public List<Feedback> Feedbacks { get; set; } = new List<Feedback>();
   public List<RefundItem> RefundItems { get; set; } = new List<RefundItem>();
-  public List<CosmeticPrice> CosmeticPrices { get; set; } = new List<CosmeticPrice>();
   
 
 }

@@ -16,9 +16,9 @@ namespace CleanArchitecture.Infrastructure.Data.Configuration
 
       builder.HasOne(cp => cp.Cosmetic);
 
-      builder.HasOne(cp => cp.Cosmetic)
-        .WithMany(c => c.CosmeticPrices)
-        .HasForeignKey(cp => cp.CosmeticId);
+      //builder.HasOne(cp => cp.Cosmetic)
+      //  .WithMany(c => c.CosmeticPrices)
+      //  .HasForeignKey(cp => cp.CosmeticId);
 
       builder.HasOne(cp => cp.Event)
         .WithMany(e => e.CosmeticPrices)

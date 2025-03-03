@@ -9,6 +9,7 @@ using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Application.Strategies.InvoiceGenerateStrategy;
 using CleanArchitecture.Application.Validators.Auth;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 
 public class OrderService : IOrderService
 {
@@ -21,6 +22,7 @@ public class OrderService : IOrderService
   private readonly IVnPayIntegrationService _vnPayIntegrationService;
   private readonly IHttpContextAccessor _httpContextAccessor;
   private readonly IValidator<CreateOrderRequest> _createOrderRequestValidator;
+  private readonly UserManager<User> _userManager;
 
   // Exchange rate from USD to VND - should ideally come from a service
   private const decimal USD_TO_VND_RATE = 24850;
@@ -33,7 +35,8 @@ public class OrderService : IOrderService
       ITimeZoneService timeZoneService,
       IVnPayIntegrationService vnPayIntegrationService,
       IHttpContextAccessor httpContextAccessor,
-      IValidator<CreateOrderRequest> createOrderRequestValidator)
+      IValidator<CreateOrderRequest> createOrderRequestValidator,
+      UserManager<User> userManager)
   {
     _unitOfWork = unitOfWork;
     _errorFactory = errorFactory;
@@ -43,6 +46,7 @@ public class OrderService : IOrderService
     _vnPayIntegrationService = vnPayIntegrationService;
     _httpContextAccessor = httpContextAccessor;
     _createOrderRequestValidator = createOrderRequestValidator;
+    _userManager = userManager;
   }
 
   // 1. Initiate Order (First step of checkout)
@@ -91,9 +95,31 @@ public class OrderService : IOrderService
         totalPrice = ConvertUsdToVnd(totalPrice);
       }
 
+      var customer = await _userManager.FindByIdAsync(_claimsService.CurrentUserId.ToString());
+
       // Create order
       var order = CreateOrderEntity(request, cart, totalPrice);
 
+    
+
+      // Get Shop Info for Create a Shipping Order
+      var shopInfo = await _ghnService.GetStoreInformationAsync();
+
+      // Create Shipping Order in GHN
+      var ghnOrderResult = await _ghnService.CreateShippingOrderAsync(MapToCreateShippingOrderRequest(order, shopInfo.Data!, request, shippingDetails, customer));
+      if (!ghnOrderResult.IsSuccess)
+      {
+        return Result<OrderResponse>.Failure(ghnOrderResult.Errors,ghnOrderResult.Status);
+      }
+
+      // Save GHN Order ID & Tracking Number
+      order.TrackingNumber = ghnOrderResult.Data!.OrderCode;
+
+      // Generate order response
+      var orderResponse = MapToOrderResponse(order);
+
+      // Handle payment method specific logic
+      await HandlePaymentMethod(request.PaymentMethod, order, orderResponse);
       // Save order to database
       _unitOfWork.Orders.Create(order);
       var saved = await _unitOfWork.CompleteAsync();
@@ -104,37 +130,6 @@ public class OrderService : IOrderService
             [new Error("Order.Create", "Failed to save order")],
             StatusCodes.Status500InternalServerError);
       }
-
-      // Get Shop Info for Create a Shipping Order
-      var shopInfo = await _ghnService.GetStoreInformationAsync();
-
-      // Create Shipping Order in GHN
-      var ghnOrderResult = await _ghnService.CreateShippingOrderAsync(MapToCreateShippingOrderRequest(order, shopInfo.Data!, request, shippingDetails));
-      if (!ghnOrderResult.IsSuccess)
-      {
-        return Result<OrderResponse>.Failure(
-            [new Error("Order.Shipping", "Failed to create shipping order")],
-            StatusCodes.Status500InternalServerError);
-      }
-
-      // Save GHN Order ID & Tracking Number
-      order.TrackingNumber = ghnOrderResult.Data!.OrderCode;
-
-      _unitOfWork.Orders.Update(order);
-      var updated = await _unitOfWork.CompleteAsync();
-      if (!updated)
-      {
-        return Result<OrderResponse>.Failure(
-            [new Error("Order.Update", "Failed to save shipping details")],
-            StatusCodes.Status500InternalServerError);
-      }
-
-      // Generate order response
-      var orderResponse = MapToOrderResponse(order);
-
-      // Handle payment method specific logic
-      await HandlePaymentMethod(request.PaymentMethod, order, orderResponse);
-
       return Result<OrderResponse>.Success(
           orderResponse,
           StatusCodes.Status200OK);
@@ -145,7 +140,7 @@ public class OrderService : IOrderService
           [new Error("Order.Create", ex.Message)],
           StatusCodes.Status500InternalServerError);
     }
-  }
+    }
 
   private async Task<Result<Cart>> ValidateOrderRequest(CreateOrderRequest request)
   {
@@ -279,6 +274,7 @@ public class OrderService : IOrderService
       LastModifiedBy = cart.Customer.UserName,
       OrderItems = cart.CartItems.Select(ci => new OrderItem
       {
+        Cosmetic = ci.Cosmetic,
         CosmeticId = ci.CosmeticId,
         Quantity = ci.Quantity
       }).ToList(),
@@ -539,7 +535,7 @@ public class OrderService : IOrderService
     };
   }
 
-  public static CreateGHNOrderRequest MapToCreateShippingOrderRequest(Order order, StoreData shopInfo, CreateOrderRequest orderRequest, ShippingDetails details)
+  public static CreateGHNOrderRequest MapToCreateShippingOrderRequest(Order order, StoreData shopInfo, CreateOrderRequest orderRequest, ShippingDetails details, User customer)
   {
     var request = new CreateGHNOrderRequest
     {
@@ -557,8 +553,8 @@ public class OrderService : IOrderService
       ReturnDistrictId = null, // Set to null or map if applicable
       ReturnWardCode = "", // Set to empty or map if applicable
       ClientOrderCode = "", // Use Order ID as client order code
-      ToName = order.Customer.FirstName + order.Customer.LastName, // Use customer's name as recipient name
-      ToPhone = order.Customer.PhoneNumber, // Use customer's phone as recipient phone
+      ToName = customer.FirstName + customer.LastName, // Use customer's name as recipient name
+      ToPhone = customer.PhoneNumber, // Use customer's phone as recipient phone
       ToAddress = order.ShippingAddress, // Use shipping address as recipient address
       ToWardCode = orderRequest.WardCode, // Default ward code or map if applicable
       ToDistrictId = orderRequest.DistrictId, // Default district ID or map if applicable

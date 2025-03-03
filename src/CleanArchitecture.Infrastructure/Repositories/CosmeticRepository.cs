@@ -47,5 +47,16 @@ public class CosmeticRepository : GenericRepository<Cosmetic>, ICosmeticReposito
 
   }
 
+  public async Task<decimal> GetCosmeticPrice(Cosmetic cosmetic)
+  {
+    var price = await(
+      from cosmeticPrice in _context.CosmeticPrices
+      join events in _context.Events on cosmeticPrice.EventId equals events.Id
+      where cosmeticPrice.CosmeticId == cosmetic.Id
+      select (cosmeticPrice.OriginalPrice * (100 - events.DiscountPercentage)) / 100
+      ).FirstOrDefaultAsync();
+
+    return (decimal)price;
+  }
 
 }

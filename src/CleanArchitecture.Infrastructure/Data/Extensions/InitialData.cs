@@ -14,7 +14,7 @@ internal class InitialData
       FirstName = "John",
       LastName = "Doe",
       Gender = true,
-      PhoneNumber = "1234567890"
+      PhoneNumber = "0901234567"
     },
     new()
     {
@@ -26,7 +26,7 @@ internal class InitialData
       FirstName = "Pham",
       LastName = "Anh",
       Gender = true,
-      PhoneNumber = "1234567890"
+      PhoneNumber = "0903234967"
     },
     new User
     {
@@ -37,7 +37,7 @@ internal class InitialData
       BirthDate = new DateOnly(1985, 6, 15),
       Gender = true,
       Email = "alice.johnson@example.com",
-      PhoneNumber = "1234567890"
+      PhoneNumber = "0921234297"
     },
     new User
     {
@@ -48,7 +48,7 @@ internal class InitialData
       BirthDate = new DateOnly(1990, 3, 22),
       Gender = true,
       Email = "bob.smith@example.com",
-      PhoneNumber = "1234567890"
+      PhoneNumber = "0901534067"
     },
     new User
     {
@@ -59,7 +59,7 @@ internal class InitialData
       BirthDate = new DateOnly(1988, 9, 10),
       Gender = true,
       Email = "charlie.davis@example.com",
-      PhoneNumber = "1234567890"
+      PhoneNumber = "0981122334"
     },
     new User
     {
@@ -70,7 +70,7 @@ internal class InitialData
       BirthDate = new DateOnly(1995, 12, 5),
       Gender = false,
       Email = "emma.williams@example.com",
-      PhoneNumber = "1234567890"
+      PhoneNumber = "0798899001"
     },
     new User
     {
@@ -81,7 +81,7 @@ internal class InitialData
       BirthDate = new DateOnly(2000, 7, 19),
       Gender = true,
       Email = "daniel.brown@example.com",
-      PhoneNumber = "1234567890"
+      PhoneNumber = "0934567890"
     }
   };
 
@@ -988,7 +988,7 @@ internal class InitialData
             CosmeticId = cosmetic.Id,
             EventId = Events.ElementAt(rand.Next(0, 4)).Id,
             StartDate = new DateTime(2025, 01, 01),
-            OriginalPrice = rand.Next(50, 500)
+            OriginalPrice = rand.Next(50, 500) * 1000
           }
         );
       }
