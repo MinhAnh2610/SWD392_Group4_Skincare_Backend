@@ -170,23 +170,23 @@ public static class DatabaseExtensions
     if (!await context.Carts.AnyAsync())
     {
       // Retrieve existing customers from the database
-      var customers = await context.Users.ToListAsync();
+      //var customers = await context.Users.ToListAsync();
 
       // Ensure that there are enough customers
-      if (customers.Count < 6)
-      {
-        throw new Exception("Not enough customers have been seeded.");
-      }
+      //if (customers.Count < 6)
+      //{
+      //  throw new Exception("Not enough customers have been seeded.");
+      //}
 
-      var carts = new List<Cart>
-      {
-        new Cart
-        {
-          Id = new Guid("A5D8471E-7C24-48D9-8233-CD598E6DD1C3"), CustomerId = customers[5].Id, TotalPrice = 89.97m
-        }
-      };
+      //var carts = new List<Cart>
+      //{
+      //  new Cart
+      //  {
+      //    Id = new Guid("A5D8471E-7C24-48D9-8233-CD598E6DD1C3"), CustomerId = customers[5].Id
+      //  }
+      //};
 
-      await context.Carts.AddRangeAsync(carts);
+      await context.Carts.AddRangeAsync(InitialData.Carts);
       await context.SaveChangesAsync();
     }
   }
