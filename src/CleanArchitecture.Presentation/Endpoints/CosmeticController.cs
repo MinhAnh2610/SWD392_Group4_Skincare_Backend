@@ -118,6 +118,7 @@ public class CosmeticController : ICarterModule
     .WithSummary("FilterCosmetic")
     .WithDescription("FilterCosmetic");
     #endregion
+
     #region Upload Cosmetic Thumbnail API
 
     // group.MapPost("/{cosmeticId}/images/thumbnail", async (ICosmeticImageService service, IFormFile) =>
@@ -125,6 +126,21 @@ public class CosmeticController : ICarterModule
     //   
     // });
 
+    #endregion
+
+    #region Upload Cosmetic Images API
+    group.MapPut("/images", async (ICosmeticService service, [FromForm] CosmeticImagesUploadRequest request) =>
+    {
+      var result = await service.UploadCosmeticImages(request);
+
+      return result.Match(Message.SUCCESSFUL_CREATED(nameof(result)));
+    })
+    .WithName("UploadCosmeticImages")
+    .Produces<ApiResponse<CosmeticResponse>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status400BadRequest)
+    .ProducesProblem(StatusCodes.Status500InternalServerError)
+    .WithSummary("UploadCosmeticImages")
+    .WithDescription("Upload Cosmetic Images");
     #endregion
   }
 }
