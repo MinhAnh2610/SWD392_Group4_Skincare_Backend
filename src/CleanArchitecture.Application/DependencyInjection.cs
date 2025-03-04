@@ -1,3 +1,4 @@
+using CleanArchitecture.Application.Factories.FilePathFactory;
 using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Application.Services;
 using CleanArchitecture.Application.Strategies;
@@ -80,6 +81,9 @@ public static class DependencyInjection
     services.AddSingleton<IInvoiceGenerateStrategy, OnlineInvoiceStrategy>();
     #endregion
 
+    #region Add Factories 
+    services.AddScoped<IFilePathFactory, FilePathFactory>();
+    #endregion
 
     services.AddScoped<IClaimsService, ClaimsService>();
     return services;
