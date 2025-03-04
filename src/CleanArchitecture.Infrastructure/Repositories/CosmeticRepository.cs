@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Application.DTOs.Cosmetic;
+﻿using CleanArchitecture.Application.DTOs.CartItem;
+using CleanArchitecture.Application.DTOs.Cosmetic;
 using CleanArchitecture.Domain.RepositoryContracts;
 using Mapster;
 using System.Linq.Expressions;
@@ -59,4 +60,31 @@ public class CosmeticRepository : GenericRepository<Cosmetic>, ICosmeticReposito
     return (decimal)price;
   }
 
+  public async Task<decimal> GetCartItemPriceByCart(Cart cart)
+  {
+    var price = await (
+      from carts in _context.Carts
+      join cartItems in _context.CartItems on carts.Id equals cartItems.CartId
+      join cosmeticPrices in _context.CosmeticPrices on cartItems.CosmeticId equals cosmeticPrices.CosmeticId
+      join events in _context.Events on cosmeticPrices.EventId equals events.Id
+      where carts.Id == cart.Id
+      group new { carts, cartItems, cosmeticPrices, events } by new { cartItems.CosmeticId, events.Name, cosmeticPrices, events }
+      into g
+      select g.Sum(x => x.cosmeticPrices.OriginalPrice * (100 - x.events.DiscountPercentage) / 100)
+      ).FirstOrDefaultAsync();
+    return (decimal)price;
+  }
+
+  public async Task<List<Cosmetic>> GetCosmeticsByCart(Cart cart)
+  {
+    var cosmeticList = await (
+      from carts in _context.Carts
+      join cartItems in _context.CartItems on carts.Id equals cartItems.CartId
+      join cosmetics in _context.Cosmetics on cartItems.CosmeticId equals cosmetics.Id
+      where carts.Id == cart.Id
+      select cosmetics
+      ).ToListAsync();
+
+    return cosmeticList;
+  }
 }

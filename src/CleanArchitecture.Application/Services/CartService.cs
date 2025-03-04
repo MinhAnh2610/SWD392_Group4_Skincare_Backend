@@ -74,7 +74,7 @@ namespace CleanArchitecture.Application.Services
       }
 
       // Check if the item is already in the cart; if so, update its quantity.
-      var existingCartItem = cart.CartItems.FirstOrDefault(ci => ci.CosmeticId == addProductRequest.CosmeticId);
+      var existingCartItem = cart.CartItems?.FirstOrDefault(ci => ci.CosmeticId == addProductRequest.CosmeticId);
       if (existingCartItem != null)
       {
         existingCartItem.Quantity += addProductRequest.Quantity;
@@ -87,7 +87,7 @@ namespace CleanArchitecture.Application.Services
           CosmeticId = addProductRequest.CosmeticId,
           Quantity = addProductRequest.Quantity
         };
-        cart.CartItems.Add(cartItem);
+        cart.CartItems?.Add(cartItem);
       }
 
       // Recalculate the cart's total price.
@@ -98,7 +98,12 @@ namespace CleanArchitecture.Application.Services
       await _unitOfWork.CompleteAsync();
 
       // Map the updated cart to a DTO.
-      var cartResponse = await MapCartToCartResponse(cart);
+      var cartResponse = MapCartToCartResponse(cart);
+      var cosmetics = await _unitOfWork.Cosmetics.GetCosmeticsByCart(cart);
+      foreach (var item in cartResponse.Items)
+      {
+        item.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetics.First(c => c.Id == item.CosmeticId));
+      }
       return Result<List<CartResponse>>.Success(new List<CartResponse> { cartResponse }, StatusCodes.Status200OK);
     }
 
@@ -114,7 +119,7 @@ namespace CleanArchitecture.Application.Services
         );
       }
 
-      var cartItem = cart.CartItems.FirstOrDefault(x => x.CosmeticId == removeProductRequest.CosmeticId);
+      var cartItem = cart.CartItems?.FirstOrDefault(x => x.CosmeticId == removeProductRequest.CosmeticId);
       if (cartItem == null)
       {
         return Result<List<CartResponse>>.Failure(
@@ -130,7 +135,7 @@ namespace CleanArchitecture.Application.Services
         cart.TotalPrice -= await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic) * cartItem.Quantity;
       }
 
-      cart.CartItems.Remove(cartItem);
+      cart.CartItems?.Remove(cartItem);
 
       // Recalculate the total price after removal
       //TODO: PRICE
@@ -138,7 +143,12 @@ namespace CleanArchitecture.Application.Services
 
       await _unitOfWork.CompleteAsync();
 
-      var cartResponse = await MapCartToCartResponse(cart);
+      var cartResponse = MapCartToCartResponse(cart);
+      var cosmetics = await _unitOfWork.Cosmetics.GetCosmeticsByCart(cart);
+      foreach (var item in cartResponse.Items)
+      {
+        item.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetics.First(c => c.Id == item.CosmeticId));
+      }
       return Result<List<CartResponse>>.Success(new List<CartResponse> { cartResponse }, StatusCodes.Status200OK);
     }
 
@@ -147,8 +157,16 @@ namespace CleanArchitecture.Application.Services
       try
       {
         var carts = await _unitOfWork.Carts.GetAllAsync();
-        var response = await Task.WhenAll(carts.Select(async cart => await MapCartToCartResponse(cart)));
-        return Result<List<CartResponse>>.Success(response.ToList(), StatusCodes.Status200OK);
+        var response = carts.Select(cart => MapCartToCartResponse(cart)).ToList();
+        foreach (var cart in response)
+        {
+          var cosmetics = await _unitOfWork.Cosmetics.GetCosmeticsByCart(carts.First(c => c.Id == cart.Id));
+          foreach (var item in cart.Items)
+          {
+            item.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetics.First(c => c.Id == item.CosmeticId));
+          }
+        }
+        return Result<List<CartResponse>>.Success(response, StatusCodes.Status200OK);
       }
       catch (Exception ex)
       {
@@ -171,7 +189,12 @@ namespace CleanArchitecture.Application.Services
               StatusCodes.Status404NotFound
           );
         }
-        var response = await MapCartToCartResponse(cart);
+        var response = MapCartToCartResponse(cart);
+        var cosmetics = await _unitOfWork.Cosmetics.GetCosmeticsByCart(cart);
+        foreach (var item in response.Items)
+        {
+          item.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetics.First(c => c.Id == item.CosmeticId));
+        }
         return Result<CartResponse>.Success(response, StatusCodes.Status200OK);
       }
       catch (Exception ex)
@@ -215,7 +238,12 @@ namespace CleanArchitecture.Application.Services
           await _unitOfWork.CompleteAsync();
         }
 
-        var response = await MapCartToCartResponse(cart);
+        var response = MapCartToCartResponse(cart);
+        var cosmetics = await _unitOfWork.Cosmetics.GetCosmeticsByCart(cart!);
+        foreach (var item in response.Items)
+        {
+          item.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetics.First(c => c.Id == item.CosmeticId));
+        }
         return Result<CartResponse>.Success(response, StatusCodes.Status200OK);
       }
       catch (Exception ex)
@@ -245,7 +273,7 @@ namespace CleanArchitecture.Application.Services
         );
       }
 
-      cart.CartItems.Clear();
+      cart.CartItems?.Clear();
       cart.TotalPrice = 0;
 
       foreach (var item in request.Items)
@@ -275,31 +303,35 @@ namespace CleanArchitecture.Application.Services
           Quantity = item.Quantity
         };
 
-        cart.CartItems.Add(cartItem);
+        cart.CartItems?.Add(cartItem);
         cart.TotalPrice += await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic) * item.Quantity;
       }
 
       await _unitOfWork.CompleteAsync();
 
       var existingCart = await _unitOfWork.Carts.GetByIdAsync(cart.Id);
-      var cartResponse = await MapCartToCartResponse(existingCart);
+      var cosmetics = await _unitOfWork.Cosmetics.GetCosmeticsByCart(existingCart!);
+      var cartResponse = MapCartToCartResponse(existingCart!);
+      foreach (var item in cartResponse.Items)
+      {
+        item.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetics.First(c => c.Id == item.CosmeticId));
+      }
       return Result<CartResponse>.Success(cartResponse, StatusCodes.Status200OK);
     }
 
     // Helper method to map a Cart (domain entity) to CartResponse (DTO)
-    private async Task<CartResponse> MapCartToCartResponse(Cart cart)
+    private CartResponse MapCartToCartResponse(Cart cart)
     {
       var response = new CartResponse
       {
         Id = cart.Id,
-        TotalPrice = cart.TotalPrice,
         Customer = new CustomerDto
         {
           Id = cart.CustomerId,
           UserName = cart.Customer?.FirstName ?? string.Empty,
           Email = cart.Customer?.Email ?? string.Empty
         },
-        Items = cart.CartItems.Select(ci => new CartItemDto
+        Items = cart.CartItems!.Select(ci => new CartItemDto
         {
           CosmeticId = ci.CosmeticId,
           CosmeticName = ci.Cosmetic?.Name ?? string.Empty,
@@ -314,12 +346,6 @@ namespace CleanArchitecture.Application.Services
           Width = ci.Cosmetic?.Width ?? 0
         }).ToList()
       };
-
-      foreach (var item in response.Items)
-      {
-        var cosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(item.CosmeticId);
-        item.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic!);
-      }
 
       return response;
     }

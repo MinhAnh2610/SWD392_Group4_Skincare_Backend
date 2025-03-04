@@ -18,6 +18,7 @@ public interface ICosmeticService
     Task<Result<CosmeticResponse>> CreateCosmetic(CreateCosmetic cosmetic);
     Task<Result<CosmeticResponse>> UpdateCosmetic(UpdateCosmetic cosmetic,Guid id);
     Task<Result<CosmeticResponse>> DeleteCosmetic(Guid id);
+    Task<Result<CosmeticResponse>> UploadCosmeticImages(CosmeticImagesUploadRequest request);
 
     Task<Result<List<CosmeticResponse>>> SearchCosmetics(FilterCosmeticRequest filter);
   }

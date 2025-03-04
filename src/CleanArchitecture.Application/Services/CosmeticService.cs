@@ -1,10 +1,10 @@
-﻿using Abp.Extensions;
+﻿using CleanArchitecture.Application.Common;
 using CleanArchitecture.Application.DTOs.Cosmetic;
 using CleanArchitecture.Application.Factories.FilePathFactory;
 using CleanArchitecture.Application.Interfaces;
+using CleanArchitecture.Domain.Entities;
 using Mapster;
 using Microsoft.AspNetCore.Http;
-using System.Collections;
 
 namespace CleanArchitecture.Application.Services
 {
@@ -13,15 +13,17 @@ namespace CleanArchitecture.Application.Services
     private readonly IUnitOfWork _unitOfWork;
     private readonly IErrorFactory _errorFactory;
     private readonly IBlobService _blobService;
-    private readonly IFilePathFactory _filePathFactory;
+    private readonly IValidator<CosmeticImagesUploadRequest> _cosmeticImagesUploadValidator;
     public CosmeticService(
       IUnitOfWork unitOfWork,
-      IErrorFactory errorFactory, IBlobService blobService, IFilePathFactory filePathFactory)
+      IErrorFactory errorFactory,
+      IBlobService blobService,
+      IValidator<CosmeticImagesUploadRequest> cosmeticImagesUploadValidator)
     {
       _unitOfWork = unitOfWork;
       _errorFactory = errorFactory;
       _blobService = blobService;
-      _filePathFactory = filePathFactory;
+      _cosmeticImagesUploadValidator = cosmeticImagesUploadValidator;
     }
 
     public async Task<Result<CosmeticResponse>> CreateCosmetic(CreateCosmetic request)
@@ -47,7 +49,7 @@ namespace CleanArchitecture.Application.Services
         var url = await _blobService.UploadBlobsAsync(filePath, [request.Thumbnail]);
         orgcosmetic.ThumbnailUrl = url;
       }
-      
+
       var isSaved = await _unitOfWork.CompleteAsync();
       if (!isSaved)
       {
@@ -287,6 +289,34 @@ namespace CleanArchitecture.Application.Services
         cosmeticsResponse,
         StatusCodes.Status200OK
       );
+    }
+
+    public async Task<Result<CosmeticResponse>> UploadCosmeticImages(CosmeticImagesUploadRequest request)
+    {
+      //if (request.Images == null || request.Images.Count == 0)
+      //  return Result<CosmeticResponse>.Failure("No images provided.");
+
+      //var uploadedUrls = await _blobService.UploadBlobsAsync(request.CosmeticId, request.Images);
+      //if (uploadedUrls == null || !uploadedUrls.Any())
+      //  return Result<CosmeticResponse>.Failure("Failed to upload images.");
+
+      //var cosmeticImages = uploadedUrls.Select(url => new CosmeticImage
+      //{
+      //  CosmeticId = cosmeticId,
+      //  ImageUrl = url
+      //}).ToList();
+
+      //await _unitOfWork.CosmeticImages.AddRangeAsync(cosmeticImages);
+
+      //var isSaved = await _unitOfWork.CompleteAsync();
+      //if (!isSaved)
+      //{
+      //  var error = _errorFactory.CreateDatabaseError("Cosmetic Images");
+      //  return Result<CosmeticResponse>.Failure([error.err], error.statusCode);
+      //}
+
+      //return Result<CosmeticResponse>.Success(StatusCodes.Status201Created);
+      throw new NotImplementedException();
     }
   }
 }

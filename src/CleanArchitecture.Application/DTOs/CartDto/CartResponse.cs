@@ -6,7 +6,7 @@ namespace CleanArchitecture.Application.DTOs.Cart
   public class CartResponse
   {
     public Guid Id { get; set; }
-    public decimal TotalPrice { get; set; }
+    public decimal TotalPrice => Items.Sum(ci => ci.Subtotal);
 
     // Customer info without circular references
     public CustomerDto Customer { get; set; } = default!;
