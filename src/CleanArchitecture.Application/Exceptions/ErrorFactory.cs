@@ -47,5 +47,10 @@ namespace CleanArchitecture.Application.Exceptions
     {
       return (new Error("Input.InvalidDates", "The dates inputed are invalid."), StatusCodes.Status400BadRequest);
     }
+
+    public (Error err, int statusCode) CreateInvalidFileError()
+    {
+      return new (new Error("Input.InvalidFile", "The file input is invalid."), StatusCodes.Status400BadRequest);
+    }
   }
 }

@@ -18,6 +18,7 @@ public class Cosmetic : Entity<Guid>
   public string Texture { get; set; } = default!;
   public string Origin { get; set; } = default!;
   public string Instructions { get; set; } = default!;
+  public string ThumbnailUrl { get; set; } = default!;
   public int Weight { get; set; }
   public int Length { get; set; }
   public int Width { get; set; }

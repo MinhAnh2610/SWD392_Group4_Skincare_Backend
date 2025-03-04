@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -36,5 +37,6 @@ namespace CleanArchitecture.Application.DTOs.Cosmetic
     public ushort Size { get; init; }
     [Required]
     public VolumeUnit VolumeUnit { get; set; }
+    public IFormFile? Thumbnail { get; init; } = default!;
   }
 }

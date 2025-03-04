@@ -35,6 +35,7 @@ namespace CleanArchitecture.Application.DTOs.Cosmetic
     public int Length { get; set; }
     public int Width { get; set; }
     public int Height { get; set; }
+    public string? ThumbnailUrl { get; set; }
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public VolumeUnit VolumeUnit { get; set; }
     public List<CosmeticSubcategoryResponse>? CosmeticSubcategories { get; set; }

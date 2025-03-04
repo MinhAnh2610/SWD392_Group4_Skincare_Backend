@@ -1,12 +1,16 @@
-﻿using CleanArchitecture.Application.Services;
+﻿using Azure.Storage.Blobs;
+using CleanArchitecture.Application.ServiceContracts;
+using CleanArchitecture.Application.Services;
 using CleanArchitecture.Domain.RepositoryContracts;
 using CleanArchitecture.Domain.RepositoryContracts.Base;
 using CleanArchitecture.Domain.RepositoryContracts.UnitOfWork;
 using CleanArchitecture.Infrastructure.Auth;
+using CleanArchitecture.Infrastructure.AzureBlobService;
 using CleanArchitecture.Infrastructure.Data.Interceptors;
 using CleanArchitecture.Infrastructure.Redis;
 using CleanArchitecture.Infrastructure.Repositories;
 using CleanArchitecture.Infrastructure.Repositories.UnitOfWork;
+using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
@@ -43,6 +47,16 @@ public static class DependencyInjection
       options.UseNpgsql(connectionString);
     });
 
+    // GUIDE: Put azure.env file in the CleanArchitecture.Presentation directory
+    Env.Load("azure.env");
+    string? azureBlobConnectionString = Environment.GetEnvironmentVariable("azureBlobConnectionString");
+    if (string.IsNullOrEmpty(azureBlobConnectionString))
+    {
+      azureBlobConnectionString = configuration["AzureBlobConnectionString"];
+    }
+    services.AddSingleton(x => new BlobServiceClient(azureBlobConnectionString));
+    services.AddSingleton<IBlobService, BlobService>();
+    
     services.AddStackExchangeRedisCache(options =>
     {
       options.Configuration = configuration.GetConnectionString("Redis");

@@ -1,7 +1,10 @@
-﻿using CleanArchitecture.Application.DTOs.Cosmetic;
+﻿using Abp.Extensions;
+using CleanArchitecture.Application.Constants.FirebasePath;
+using CleanArchitecture.Application.DTOs.Cosmetic;
 using CleanArchitecture.Application.Interfaces;
 using Mapster;
 using Microsoft.AspNetCore.Http;
+using System.Collections;
 
 namespace CleanArchitecture.Application.Services
 {
@@ -9,34 +12,46 @@ namespace CleanArchitecture.Application.Services
   {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IErrorFactory _errorFactory;
-
+    private readonly IBlobService _blobService;
     public CosmeticService(
       IUnitOfWork unitOfWork,
-      IErrorFactory errorFactory
-    )
+      IErrorFactory errorFactory, IBlobService blobService)
     {
       _unitOfWork = unitOfWork;
       _errorFactory = errorFactory;
+      _blobService = blobService;
     }
 
-    public async Task<Result<CosmeticResponse>> CreateCosmetic(CreateCosmetic cosmetic)
+    public async Task<Result<CosmeticResponse>> CreateCosmetic(CreateCosmetic request)
     {
-      var orgcosmetic = cosmetic.Adapt<Cosmetic>();
-      orgcosmetic.BrandId = cosmetic.BrandId;
-      orgcosmetic.SkinTypeId = cosmetic.SkinTypeId;
-      orgcosmetic.CosmeticTypeId = cosmetic.CosmeticTypeId;
+      var orgcosmetic = request.Adapt<Cosmetic>();
+      orgcosmetic.BrandId = request.BrandId;
+      orgcosmetic.SkinTypeId = request.SkinTypeId;
+      orgcosmetic.CosmeticTypeId = request.CosmeticTypeId;
 
       // Attach existing related entities to avoid re-adding them
-      orgcosmetic.Brand = new Brand { Id = cosmetic.BrandId };
-      orgcosmetic.SkinType = new SkinType { Id = cosmetic.SkinTypeId };
-      orgcosmetic.CosmeticType = new CosmeticType { Id = cosmetic.CosmeticTypeId };
+      orgcosmetic.Brand = new Brand { Id = request.BrandId };
+      orgcosmetic.SkinType = new SkinType { Id = request.SkinTypeId };
+      orgcosmetic.CosmeticType = new CosmeticType { Id = request.CosmeticTypeId };
 
       _unitOfWork.Brands.Attach(orgcosmetic.Brand);
       _unitOfWork.SkinTypes.Attach(orgcosmetic.SkinType);
       _unitOfWork.CosmeticTypes.Attach(orgcosmetic.CosmeticType);
-
       //What to bind Cossubcate and feedbacks ?
       await _unitOfWork.Cosmetics.CreateAsync(orgcosmetic);
+      if (request.Thumbnail is not null && request.Thumbnail.Length > 0)
+      {
+        var url = await _blobService.UploadBlobsAsync(orgcosmetic.Id.ToString(), [request.Thumbnail]);
+        orgcosmetic.ThumbnailUrl = url;
+      }
+      
+      var isSaved = await _unitOfWork.CompleteAsync();
+      if (!isSaved)
+      {
+        var error = _errorFactory.CreateDatabaseError("Cosmetic");
+        return Result<CosmeticResponse>.Failure([error.err], error.statusCode);
+      }
+
       var output = orgcosmetic.Adapt<CosmeticResponse>();
       return Result<CosmeticResponse>.Success(output, StatusCodes.Status201Created);
     }
@@ -179,7 +194,7 @@ namespace CleanArchitecture.Application.Services
       // var cosmeticPrice = _unitOfWork.CosmeticPrices.GetByIdAsync()
       // Only update if the new value is NOT null
       // existcosmetic.Price = cosmetic.Price != default ? cosmetic.Price : existcosmetic.Price;
-      
+
       existcosmetic.MainUsage =
         !string.IsNullOrWhiteSpace(cosmetic.MainUsage) ? cosmetic.MainUsage : existcosmetic.MainUsage;
       existcosmetic.Instructions = !string.IsNullOrWhiteSpace(cosmetic.Instructions)
@@ -217,6 +232,7 @@ namespace CleanArchitecture.Application.Services
         var error = _errorFactory.CreateDatabaseError("Cosmetic");
         return Result<CosmeticResponse>.Failure([error.err], error.statusCode);
       }
+
       var output = existcosmetic.Adapt<CosmeticResponse>();
 
       output.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(existcosmetic);
