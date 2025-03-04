@@ -1,5 +1,4 @@
 ﻿using CleanArchitecture.Application.DTOs.Cosmetic;
-using CleanArchitecture.Application.DTOs.CosmeticImageDto;
 using CleanArchitecture.Application.DTOs.FeedbackDto;
 using Mapster;
 namespace CleanArchitecture.Application.Mapper
@@ -14,8 +13,6 @@ namespace CleanArchitecture.Application.Mapper
       config.NewConfig<UpdateCosmetic, CosmeticResponse>();
       config.NewConfig<CreateCosmetic, CosmeticResponse>();
       config.NewConfig<Cosmetic, CreateCosmetic>();
-
-
     }
   }
 }

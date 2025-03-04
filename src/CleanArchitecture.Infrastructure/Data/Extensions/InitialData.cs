@@ -387,7 +387,7 @@ internal class InitialData
       {
         new Cart
         {
-          Id = new Guid("A5D8471E-7C24-48D9-8233-CD598E6DD1C3"), CustomerId = customers[5].Id, TotalPrice = 299000
+          Id = new Guid("A5D8471E-7C24-48D9-8233-CD598E6DD1C3"), CustomerId = customers[5].Id
         }
       };
     }
@@ -988,7 +988,7 @@ internal class InitialData
             CosmeticId = cosmetic.Id,
             EventId = Events.ElementAt(rand.Next(0, 4)).Id,
             StartDate = new DateTime(2025, 01, 01),
-            OriginalPrice = rand.Next(50, 500) * 1000
+            OriginalPrice = rand.Next(1, 40) * 100000
           }
         );
       }

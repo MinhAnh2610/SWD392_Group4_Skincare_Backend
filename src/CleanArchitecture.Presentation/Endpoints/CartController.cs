@@ -1,11 +1,5 @@
 ﻿using CleanArchitecture.Application.DTOs.Cart;
-using CleanArchitecture.Application.DTOs.Payment;
-using CleanArchitecture.Application.DTOs.CartItem;
-using CleanArchitecture.Application.Interfaces;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Server.IIS;
+using CleanArchitecture.Application.DTOs.CartDto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanArchitecture.Presentation.Endpoints
@@ -52,14 +46,30 @@ namespace CleanArchitecture.Presentation.Endpoints
           _ => Results.StatusCode(StatusCodes.Status500InternalServerError)
         };
       })
-.WithName("GetCartById")
-.Produces<ApiResponse<CartResponse>>(StatusCodes.Status200OK)
-.ProducesProblem(StatusCodes.Status401Unauthorized)
-.ProducesProblem(StatusCodes.Status500InternalServerError)
-.WithSummary("GetCartById")
-.WithDescription("Get Cart by ID")
-.RequireAuthorization();
+      .WithName("GetCartById")
+      .Produces<ApiResponse<CartResponse>>(StatusCodes.Status200OK)
+      .ProducesProblem(StatusCodes.Status401Unauthorized)
+      .ProducesProblem(StatusCodes.Status500InternalServerError)
+      .WithSummary("GetCartById")
+      .WithDescription("Get Cart by ID")
+      .RequireAuthorization();
 
+      #region Update Cart (Current User) API
+      // Instead of using a cartId from the route, we now use the current user (via IClaimsService) to get or create the cart.
+      group.MapPut("/me", async (ICartService cartService, [FromBody] UpdateCartRequest request) =>
+      {
+        var result = await cartService.UpdateCartAsync(request);
+        return result.Match("Updated cart successfully.");
+      })
+     .WithName("UpdateCartForCurrentUser")
+     .Produces<ApiResponse<CartResponse>>(StatusCodes.Status200OK)
+     .ProducesProblem(StatusCodes.Status400BadRequest)
+     .ProducesProblem(StatusCodes.Status401Unauthorized)
+     .ProducesProblem(StatusCodes.Status500InternalServerError)
+     .WithSummary("UpdateCartForCurrentUser")
+     .WithDescription("Update user's current cart")
+     .RequireAuthorization();
+      #endregion
 
       #region Add to Cart (Current User) API
       // Instead of using a cartId from the route, we now use the current user (via IClaimsService) to get or create the cart.
@@ -68,14 +78,13 @@ namespace CleanArchitecture.Presentation.Endpoints
         var result = await cartService.AddCartItemForCurrentUserAsync(addProductRequest);
         return result.Match("Item added to cart successfully.");
       })
- .WithName("AddCartItemForCurrentUser")
- .Produces<ApiResponse<List<CartResponse>>>(StatusCodes.Status200OK)
- .ProducesProblem(StatusCodes.Status401Unauthorized)
- .ProducesProblem(StatusCodes.Status500InternalServerError)
- .WithSummary("AddCartItem")
- .WithDescription("Add item to current user’s cart")
- .RequireAuthorization();
-
+     .WithName("AddCartItemForCurrentUser")
+     .Produces<ApiResponse<List<CartResponse>>>(StatusCodes.Status200OK)
+     .ProducesProblem(StatusCodes.Status401Unauthorized)
+     .ProducesProblem(StatusCodes.Status500InternalServerError)
+     .WithSummary("AddCartItem")
+     .WithDescription("Add item to current user’s cart")
+     .RequireAuthorization();
       #endregion
 
       #region Delete Item from Cart API

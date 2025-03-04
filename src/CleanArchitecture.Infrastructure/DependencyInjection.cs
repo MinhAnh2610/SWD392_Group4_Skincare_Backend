@@ -39,7 +39,7 @@ public static class DependencyInjection
       string? connectionString = Environment.GetEnvironmentVariable("databaseConnectionString");
       if (string.IsNullOrEmpty(connectionString))
         connectionString = configuration.GetConnectionString("DevDatabase");
-      // options.UseInMemoryDatabase("database");
+       //options.UseInMemoryDatabase("database");
       options.UseNpgsql(connectionString);
     });
 

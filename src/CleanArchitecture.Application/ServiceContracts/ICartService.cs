@@ -1,9 +1,5 @@
 ﻿using CleanArchitecture.Application.DTOs.Cart;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CleanArchitecture.Application.DTOs.CartDto;
 
 namespace CleanArchitecture.Application.ServiceContracts
 {
@@ -14,5 +10,6 @@ namespace CleanArchitecture.Application.ServiceContracts
     Task<Result<CartResponse>> GetByIdAsync(Guid id);
     Task<Result<List<CartResponse>>> DeletebyIdAsync(RemoveProductRequest removeProductRequest);
     Task<Result<CartResponse>> GetCartByUserIdAsync();
+    Task<Result<CartResponse>> UpdateCartAsync(UpdateCartRequest request);
   }
 }
