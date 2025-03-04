@@ -1,8 +1,8 @@
-﻿using CleanArchitecture.Application.Common;
+﻿using CleanArchitecture.Application.DTOs.Cart;
 using CleanArchitecture.Application.DTOs.Cosmetic;
 using CleanArchitecture.Application.Factories.FilePathFactory;
 using CleanArchitecture.Application.Interfaces;
-using CleanArchitecture.Domain.Entities;
+using CleanArchitecture.Application.Validators.Cart;
 using Mapster;
 using Microsoft.AspNetCore.Http;
 
@@ -14,16 +14,19 @@ namespace CleanArchitecture.Application.Services
     private readonly IErrorFactory _errorFactory;
     private readonly IBlobService _blobService;
     private readonly IValidator<CosmeticImagesUploadRequest> _cosmeticImagesUploadValidator;
+    private readonly IFilePathFactory _filePathFactory;
     public CosmeticService(
       IUnitOfWork unitOfWork,
       IErrorFactory errorFactory,
       IBlobService blobService,
-      IValidator<CosmeticImagesUploadRequest> cosmeticImagesUploadValidator)
+      IValidator<CosmeticImagesUploadRequest> cosmeticImagesUploadValidator,
+      IFilePathFactory filePathFactory)
     {
       _unitOfWork = unitOfWork;
       _errorFactory = errorFactory;
       _blobService = blobService;
       _cosmeticImagesUploadValidator = cosmeticImagesUploadValidator;
+      _filePathFactory = filePathFactory;
     }
 
     public async Task<Result<CosmeticResponse>> CreateCosmetic(CreateCosmetic request)
@@ -293,30 +296,42 @@ namespace CleanArchitecture.Application.Services
 
     public async Task<Result<CosmeticResponse>> UploadCosmeticImages(CosmeticImagesUploadRequest request)
     {
-      //if (request.Images == null || request.Images.Count == 0)
-      //  return Result<CosmeticResponse>.Failure("No images provided.");
+      var validationResult = await _cosmeticImagesUploadValidator.ValidateAsync(request);
+      if (!validationResult.IsValid)
+      {
+        var errors = _errorFactory.CreateValidationError("Cart", validationResult);
+        return Result<CosmeticResponse>.Failure(errors.errs, errors.statusCode);
+      }
 
-      //var uploadedUrls = await _blobService.UploadBlobsAsync(request.CosmeticId, request.Images);
-      //if (uploadedUrls == null || !uploadedUrls.Any())
-      //  return Result<CosmeticResponse>.Failure("Failed to upload images.");
+      var uploadedUrls = await _blobService.UploadBlobsAsync(request.CosmeticId.ToString(), request.Images);
+      if (uploadedUrls == null || !uploadedUrls.Any())
+      {
+        var errors = _errorFactory.CreateFileCreatedFailed(nameof(uploadedUrls));
+        return Result<CosmeticResponse>.Failure([errors.err], errors.statusCode);
+      }
 
-      //var cosmeticImages = uploadedUrls.Select(url => new CosmeticImage
-      //{
-      //  CosmeticId = cosmeticId,
-      //  ImageUrl = url
-      //}).ToList();
+      var cosmeticImages = uploadedUrls.Select(url => new CosmeticImage
+      {
+        CosmeticId = request.CosmeticId,
+        ImageUrl = url.ToString()
+      }).ToList();
 
-      //await _unitOfWork.CosmeticImages.AddRangeAsync(cosmeticImages);
+      foreach (var cosmeticImage in cosmeticImages)
+      {
+        await _unitOfWork.CosmeticImages.CreateAsync(cosmeticImage);
+      }
 
-      //var isSaved = await _unitOfWork.CompleteAsync();
-      //if (!isSaved)
-      //{
-      //  var error = _errorFactory.CreateDatabaseError("Cosmetic Images");
-      //  return Result<CosmeticResponse>.Failure([error.err], error.statusCode);
-      //}
+      var isSaved = await _unitOfWork.CompleteAsync();
+      if (!isSaved)
+      {
+        var error = _errorFactory.CreateDatabaseError("Cosmetic Images");
+        return Result<CosmeticResponse>.Failure([error.err], error.statusCode);
+      }
 
-      //return Result<CosmeticResponse>.Success(StatusCodes.Status201Created);
-      throw new NotImplementedException();
+      var cosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(request.CosmeticId);
+      var response = cosmetic.Adapt<CosmeticResponse>();
+
+      return Result<CosmeticResponse>.Success(response, StatusCodes.Status201Created);
     }
   }
 }
