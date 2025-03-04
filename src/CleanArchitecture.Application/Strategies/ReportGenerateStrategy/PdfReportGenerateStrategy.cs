@@ -32,8 +32,12 @@ namespace CleanArchitecture.Application.Strategies
             column.Spacing(20);
 
             // Date Range and Total Revenue
-            column.Item()
-              .Text($"Report Period: {reportContent.StartDate:MM/dd/yyyy} - {reportContent.ToDate:MM/dd/yyyy}");
+            if (!request.Type.Equals("productPerformance", StringComparison.OrdinalIgnoreCase))
+            {
+              column.Item()
+                .Text($"Report Period: {reportContent.StartDate:MM/dd/yyyy} - {reportContent.ToDate:MM/dd/yyyy}");
+            }
+
             column.Item().Text($"Total Revenue: {reportContent.TotalRevenue:C}", TextStyle.Default.SemiBold());
 
             // Table Header
@@ -82,7 +86,7 @@ namespace CleanArchitecture.Application.Strategies
       });
 
       // Optionally, uncomment the next line to preview in QuestPDF Companion.
-      document.ShowInCompanion(12500);
+      // document.ShowInCompanion(12500);
 
       byte[] fileBytes = document.GeneratePdf();
       return fileBytes;
@@ -90,10 +94,10 @@ namespace CleanArchitecture.Application.Strategies
 
     private static string GetHeader(string reportType)
     {
-      return reportType switch
+      return reportType.ToLower() switch
       {
         "revenue" => "Revenue Report",
-        "product_performance" => "Product Performance Report",
+        "productperformance" => "Product Performance Report",
         _ => "Report"
       };
     }
