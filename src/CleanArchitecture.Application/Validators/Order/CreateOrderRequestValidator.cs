@@ -19,7 +19,7 @@ public class CreateOrderRequestValidator : AbstractValidator<CreateOrderRequest>
 
     RuleFor(x => x.PaymentMethod)
         .NotEmpty().WithMessage("Payment method is required.")
-        .Must(pm => new[] { "VNPAY", "COD" }.Contains(pm.ToUpper()))
+        .Must(pm => new[] { "ONLINE", "COD" }.Contains(pm.ToUpper()))
         .WithMessage("Invalid payment method.");
 
     RuleFor(x => x.Currency)

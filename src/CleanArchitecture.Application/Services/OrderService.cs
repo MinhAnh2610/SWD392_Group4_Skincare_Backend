@@ -1,5 +1,4 @@
-﻿using Abp.AutoMapper;
-using CleanArchitecture.Application.Constants;
+﻿using CleanArchitecture.Application.Constants;
 using CleanArchitecture.Application.DTOs.GHN.Request;
 using CleanArchitecture.Application.DTOs.GHN.Response;
 using CleanArchitecture.Application.DTOs.Order;
@@ -7,7 +6,6 @@ using CleanArchitecture.Application.DTOs.OrderDto;
 using CleanArchitecture.Application.DTOs.VnPay;
 using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Application.Strategies.InvoiceGenerateStrategy;
-using CleanArchitecture.Application.Validators.Auth;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 
@@ -100,20 +98,22 @@ public class OrderService : IOrderService
       // Create order
       var order = CreateOrderEntity(request, cart, totalPrice);
 
-    
-
       // Get Shop Info for Create a Shipping Order
       var shopInfo = await _ghnService.GetStoreInformationAsync();
 
+      decimal codAmount = request.PaymentMethod == PaymentMethods.COD ? totalPrice : 0;
+      int paymentTypeId = request.PaymentMethod == PaymentMethods.COD ? 2 : 1;
+
       // Create Shipping Order in GHN
-      var ghnOrderResult = await _ghnService.CreateShippingOrderAsync(MapToCreateShippingOrderRequest(order, shopInfo.Data!, request, shippingDetails, customer));
+      var ghnOrderResult = await _ghnService.CreateShippingOrderAsync(MapToCreateShippingOrderRequest(order, shopInfo.Data!, request, shippingDetails, customer!, codAmount, paymentTypeId));
       if (!ghnOrderResult.IsSuccess)
       {
-        return Result<OrderResponse>.Failure(ghnOrderResult.Errors,ghnOrderResult.Status);
+        return Result<OrderResponse>.Failure(ghnOrderResult.Errors, ghnOrderResult.Status);
       }
 
-      // Save GHN Order ID & Tracking Number
+      // Save GHN Order ID & Tracking Number, also increase the total price
       order.TrackingNumber = ghnOrderResult.Data!.OrderCode;
+      order.TotalPrice += ghnOrderResult.Data.TotalFee;
 
       // Generate order response
       var orderResponse = MapToOrderResponse(order);
@@ -140,7 +140,7 @@ public class OrderService : IOrderService
           [new Error("Order.Create", ex.Message)],
           StatusCodes.Status500InternalServerError);
     }
-    }
+  }
 
   private async Task<Result<Cart>> ValidateOrderRequest(CreateOrderRequest request)
   {
@@ -535,11 +535,11 @@ public class OrderService : IOrderService
     };
   }
 
-  public static CreateGHNOrderRequest MapToCreateShippingOrderRequest(Order order, StoreData shopInfo, CreateOrderRequest orderRequest, ShippingDetails details, User customer)
+  public static CreateGHNOrderRequest MapToCreateShippingOrderRequest(Order order, StoreData shopInfo, CreateOrderRequest orderRequest, ShippingDetails details, User customer, decimal codAmount, int paymentTypeId)
   {
     var request = new CreateGHNOrderRequest
     {
-      PaymentTypeId = 2, // Default value or map from Order.Payment if applicable
+      PaymentTypeId = paymentTypeId, // Default value or map from Order.Payment if applicable
       Note = "Handle With Care", // Custom note
       RequiredNote = "CHOXEMHANGKHONGTHU", // Default required note
       FromName = shopInfo.Shops[1].Name, // Default sender name
@@ -558,7 +558,7 @@ public class OrderService : IOrderService
       ToAddress = order.ShippingAddress, // Use shipping address as recipient address
       ToWardCode = orderRequest.WardCode, // Default ward code or map if applicable
       ToDistrictId = orderRequest.DistrictId, // Default district ID or map if applicable
-      CodAmount = (int)order.TotalPrice, // Use total price as COD amount
+      CodAmount = (int)codAmount, // Use total price as COD amount
       Content = "Order from De Fleur", // Custom content
       Weight = details.Weight, // Calculate total weight
       Length = details.Length, // Default length or map if applicable
