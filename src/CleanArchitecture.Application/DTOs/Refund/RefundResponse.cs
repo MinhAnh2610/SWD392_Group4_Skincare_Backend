@@ -1,22 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CleanArchitecture.Application.DTOs.RefundItem;
 
-namespace CleanArchitecture.Application.DTOs.Refund
+namespace CleanArchitecture.Application.DTOs.Refund;
+
+public class RefundResponse
 {
-    public class RefundResponse
-    {
-        public Guid Id { get; set; }
-        public string? Reason { get; set; }
-        public decimal TotalAmount { get; set; }
-        public string? Status { get; set; }
-        public DateTime RequestedDate { get; set; }
-        public string? Method { get; set; }
-        public DateTime? CreateAt { get; set; }
-        public string? CreatedBy { get; set; }
-        public DateTime? LastModified { get; set; }
-        public string? LastModifiedBy { get; set; }
-    }
+  public Guid Id { get; set; }
+  public string? Reason { get; set; }
+  public decimal TotalAmount { get; set; }
+  public string? Status { get; set; }
+  public string? Method { get; set; }
+  public Guid? StaffId { get; set; }
+  public string? StaffName { get; set; }
+  public List<RefundItemResponse> RefundItems { get; set; } = new();
 }
