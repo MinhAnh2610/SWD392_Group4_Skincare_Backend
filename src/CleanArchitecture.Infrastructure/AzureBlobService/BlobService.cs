@@ -44,10 +44,10 @@ namespace CleanArchitecture.Infrastructure.AzureBlobService
       return blobClient.Uri.AbsoluteUri;
     }
 
-    public async Task<Stream> GetBlobAsync(string blobName)
+    public async Task<Stream> GetBlobAsync(string filePath)
     {
       var containerClient = _blobServiceClient.GetBlobContainerClient("defleur");
-      var blobClient = containerClient.GetBlobClient(blobName);
+      var blobClient = containerClient.GetBlobClient(filePath);
       var blobDownloadInfo = await blobClient.DownloadAsync();
 
       return blobDownloadInfo.Value.Content;
@@ -58,14 +58,13 @@ namespace CleanArchitecture.Infrastructure.AzureBlobService
     /// </summary>
     /// <param name="blobName">Name of file.</param>
     /// <param name="stream">File content</param>
-    public async Task<string> UploadBlobsAsync(string blobName, IEnumerable<IFormFile> files)
+    public async Task<string> UploadBlobsAsync(string filePath, IEnumerable<IFormFile> files)
     {
       var containerClient = _blobServiceClient.GetBlobContainerClient("defleur");
       string url = string.Empty;
       foreach (var file in files)
       {
-        blobName = $"{blobName}/{Guid.NewGuid()}_{file.FileName}";
-        var blobClient = containerClient.GetBlobClient(blobName);
+        var blobClient = containerClient.GetBlobClient(filePath);
 
         using (var stream = file.OpenReadStream())
         {
@@ -86,13 +85,13 @@ namespace CleanArchitecture.Infrastructure.AzureBlobService
       return url;
     }
 
-    public async Task<IEnumerable<string>> GetBlobsImageUrlsAsync(string blobName)
+    public async Task<IEnumerable<string>> GetBlobsImageUrlsAsync(string filePath)
     {
       var containerClient = _blobServiceClient.GetBlobContainerClient("defleur");
       var blobUrls = new List<string>();
 
       // Use the cosmetic ID as a prefix to list only related images
-      await foreach (var blobItem in containerClient.GetBlobsAsync(prefix: blobName + "/"))
+      await foreach (var blobItem in containerClient.GetBlobsAsync(prefix: filePath))
       {
         var blobClient = containerClient.GetBlobClient(blobItem.Name);
 
@@ -102,10 +101,10 @@ namespace CleanArchitecture.Infrastructure.AzureBlobService
       return blobUrls;
     }
 
-    public async Task DeleteBlobAsync(string blobName)
+    public async Task DeleteBlobAsync(string filePath)
     {
       var containerClient = _blobServiceClient.GetBlobContainerClient("defleur");
-      var blobClient = containerClient.GetBlobClient(blobName);
+      var blobClient = containerClient.GetBlobClient(filePath);
       await blobClient.DeleteIfExistsAsync();
     }
   }

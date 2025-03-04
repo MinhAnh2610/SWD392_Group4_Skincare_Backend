@@ -1,6 +1,6 @@
 ﻿using Abp.Extensions;
-using CleanArchitecture.Application.Constants.FirebasePath;
 using CleanArchitecture.Application.DTOs.Cosmetic;
+using CleanArchitecture.Application.Factories.FilePathFactory;
 using CleanArchitecture.Application.Interfaces;
 using Mapster;
 using Microsoft.AspNetCore.Http;
@@ -13,13 +13,15 @@ namespace CleanArchitecture.Application.Services
     private readonly IUnitOfWork _unitOfWork;
     private readonly IErrorFactory _errorFactory;
     private readonly IBlobService _blobService;
+    private readonly IFilePathFactory _filePathFactory;
     public CosmeticService(
       IUnitOfWork unitOfWork,
-      IErrorFactory errorFactory, IBlobService blobService)
+      IErrorFactory errorFactory, IBlobService blobService, IFilePathFactory filePathFactory)
     {
       _unitOfWork = unitOfWork;
       _errorFactory = errorFactory;
       _blobService = blobService;
+      _filePathFactory = filePathFactory;
     }
 
     public async Task<Result<CosmeticResponse>> CreateCosmetic(CreateCosmetic request)
@@ -41,7 +43,8 @@ namespace CleanArchitecture.Application.Services
       await _unitOfWork.Cosmetics.CreateAsync(orgcosmetic);
       if (request.Thumbnail is not null && request.Thumbnail.Length > 0)
       {
-        var url = await _blobService.UploadBlobsAsync(orgcosmetic.Id.ToString(), [request.Thumbnail]);
+        var filePath = _filePathFactory.CreateFilePath(ObjectType.CosmeticThumbnail, orgcosmetic.Id, request.Thumbnail.FileName);
+        var url = await _blobService.UploadBlobsAsync(filePath, [request.Thumbnail]);
         orgcosmetic.ThumbnailUrl = url;
       }
       
