@@ -12,7 +12,7 @@ public class CosmeticImagesUploadValidator : AbstractValidator<CosmeticImagesUpl
 
     RuleFor(x => x.Images)
         .NotEmpty().WithMessage("At least one image is required.")
-        .Must(images => images.Count <= 10).WithMessage("You can upload up to 10 images.");
+        .Must(Images => Images.Count <= 10).WithMessage("You can upload up to 10 images.");
 
     RuleForEach(x => x.Images).SetValidator(new ImageFileValidator());
   }

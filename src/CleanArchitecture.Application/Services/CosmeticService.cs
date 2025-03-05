@@ -1,8 +1,6 @@
-﻿using CleanArchitecture.Application.DTOs.Cart;
-using CleanArchitecture.Application.DTOs.Cosmetic;
+﻿using CleanArchitecture.Application.DTOs.Cosmetic;
 using CleanArchitecture.Application.Factories.FilePathFactory;
 using CleanArchitecture.Application.Interfaces;
-using CleanArchitecture.Application.Validators.Cart;
 using Mapster;
 using Microsoft.AspNetCore.Http;
 
@@ -50,7 +48,7 @@ namespace CleanArchitecture.Application.Services
       {
         var filePath = _filePathFactory.CreateFilePath(ObjectType.CosmeticThumbnail, orgcosmetic.Id, request.Thumbnail.FileName);
         var url = await _blobService.UploadBlobsAsync(filePath, [request.Thumbnail]);
-        orgcosmetic.ThumbnailUrl = url;
+        orgcosmetic.ThumbnailUrl = url.First();
       }
 
       var isSaved = await _unitOfWork.CompleteAsync();
@@ -299,7 +297,7 @@ namespace CleanArchitecture.Application.Services
       var validationResult = await _cosmeticImagesUploadValidator.ValidateAsync(request);
       if (!validationResult.IsValid)
       {
-        var errors = _errorFactory.CreateValidationError("Cart", validationResult);
+        var errors = _errorFactory.CreateValidationError("Images", validationResult);
         return Result<CosmeticResponse>.Failure(errors.errs, errors.statusCode);
       }
 
