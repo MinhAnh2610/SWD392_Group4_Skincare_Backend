@@ -99,4 +99,17 @@ public class CosmeticRepository : GenericRepository<Cosmetic>, ICosmeticReposito
 
     return cosmeticList;
   }
+
+  public async Task<List<Cosmetic>> GetCosmeticsByRoutine(Routine routine)
+  {
+    var cosmeticList = await (
+      from routines in _context.Routines
+      join routineSteps in _context.RoutineSteps on routines.Id equals routineSteps.RoutineId
+      join cosmetics in _context.Cosmetics on routineSteps.CosmeticId equals cosmetics.Id
+      where routines.Id == routine.Id
+      select cosmetics
+      ).ToListAsync();
+
+    return cosmeticList;
+  }
 }
