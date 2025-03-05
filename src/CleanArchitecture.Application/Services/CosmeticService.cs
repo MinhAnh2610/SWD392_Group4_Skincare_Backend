@@ -48,7 +48,8 @@ namespace CleanArchitecture.Application.Services
       if (request.Thumbnail is not null && request.Thumbnail.Length > 0)
       {
         var filePath = _filePathFactory.CreateFilePath(ObjectType.CosmeticThumbnail, orgcosmetic.Id, request.Thumbnail.FileName);
-        var url = await _blobService.UploadBlobsAsync(filePath, [request.Thumbnail]);
+        var uploadRequest = new UploadRequest(filePath, request.Thumbnail);
+        var url = await _blobService.UploadBlobsAsync([uploadRequest]);
         orgcosmetic.ThumbnailUrl = url.First();
       }
 
