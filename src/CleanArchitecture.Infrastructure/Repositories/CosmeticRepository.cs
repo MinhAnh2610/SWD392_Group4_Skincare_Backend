@@ -1,5 +1,4 @@
-﻿using CleanArchitecture.Application.DTOs.CartItem;
-using CleanArchitecture.Application.DTOs.Cosmetic;
+﻿using CleanArchitecture.Application.DTOs.Cosmetic;
 using CleanArchitecture.Domain.RepositoryContracts;
 using Mapster;
 using System.Linq.Expressions;
@@ -82,6 +81,19 @@ public class CosmeticRepository : GenericRepository<Cosmetic>, ICosmeticReposito
       join cartItems in _context.CartItems on carts.Id equals cartItems.CartId
       join cosmetics in _context.Cosmetics on cartItems.CosmeticId equals cosmetics.Id
       where carts.Id == cart.Id
+      select cosmetics
+      ).ToListAsync();
+
+    return cosmeticList;
+  }
+
+  public async Task<List<Cosmetic>> GetCosmeticsByOrder(Order order)
+  {
+    var cosmeticList = await(
+      from orders in _context.Orders
+      join orderItems in _context.OrderItems on orders.Id equals orderItems.OrderId
+      join cosmetics in _context.Cosmetics on orderItems.CosmeticId equals cosmetics.Id
+      where orders.Id == order.Id
       select cosmetics
       ).ToListAsync();
 

@@ -1,14 +1,10 @@
 ﻿using CleanArchitecture.Application.DTOs.Refund;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CleanArchitecture.Application.ServiceContracts
+namespace CleanArchitecture.Application.ServiceContracts;
+
+public interface IRefundService
 {
-    public interface IRefundService
-    {
- 
-    }
+  Task<Result<RefundResponse>> CreateRefundAsync(CreateRefundRequest request);
+  Task<Result<RefundResponse>> ReviewRefundAsync(ReviewRefundRequest request);
+  Task<Result<RefundResponse>> ProcessRefundAsync(ProcessRefundRequest request);
 }

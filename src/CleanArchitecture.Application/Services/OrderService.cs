@@ -3,6 +3,7 @@ using CleanArchitecture.Application.DTOs.GHN.Request;
 using CleanArchitecture.Application.DTOs.GHN.Response;
 using CleanArchitecture.Application.DTOs.Order;
 using CleanArchitecture.Application.DTOs.OrderDto;
+using CleanArchitecture.Application.DTOs.OrderItemDto;
 using CleanArchitecture.Application.DTOs.VnPay;
 using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Application.Strategies.InvoiceGenerateStrategy;
@@ -97,6 +98,10 @@ public class OrderService : IOrderService
 
       // Create order
       var order = CreateOrderEntity(request, cart, totalPrice);
+      foreach (var item in order.OrderItems)
+      {
+        item.SellingPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(item.Cosmetic);
+      }
 
       // Get Shop Info for Create a Shipping Order
       var shopInfo = await _ghnService.GetStoreInformationAsync();
@@ -120,8 +125,12 @@ public class OrderService : IOrderService
 
       // Handle payment method specific logic
       await HandlePaymentMethod(request.PaymentMethod, order, orderResponse);
+      
       // Save order to database
       _unitOfWork.Orders.Create(order);
+
+      // Clear customer cart after creating the
+      _unitOfWork.Carts.Remove(cart);
       var saved = await _unitOfWork.CompleteAsync();
 
       if (!saved)
@@ -531,7 +540,13 @@ public class OrderService : IOrderService
       CreateAt = order.CreateAt,
       CreatedBy = order.CreatedBy,
       LastModified = order.LastModified,
-      LastModifiedBy = order.LastModifiedBy
+      LastModifiedBy = order.LastModifiedBy,
+      OrderItems = order.OrderItems.Select(oi => new OrderItemResponse
+      {
+        CosmeticId = oi.CosmeticId,
+        Quantity = oi.Quantity,
+        SellingPrice = oi.SellingPrice
+      }).ToList()
     };
   }
 
