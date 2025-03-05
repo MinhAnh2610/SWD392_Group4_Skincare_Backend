@@ -179,29 +179,17 @@ public class QuizService : IQuizService
       return Result<List<RoutineResponse>?>.Failure([error.err], error.statusCode);
     }
 
-    return Result<List<RoutineResponse>?>.Success(routines.Select(routine => new RoutineResponse
+    var responses = MapToRoutineResponseList(routines);
+    foreach (var response in responses)
     {
-      Id = routine.Id,
-      Title = routine.Title,
-      Period = routine.Period,
-      SkinType = new SkinTypeResponse
+      foreach (var step in response.RoutineSteps!)
       {
-        Id = routine.SkinType.Id,
-        Name = routine.SkinType.Name,
-        Description = routine.SkinType.Description,
-        IsDry = routine.SkinType.IsDry,
-        IsSensitive = routine.SkinType.IsSensitive,
-        IsUneven = routine.SkinType.IsUneven,
-        IsWrinkle = routine.SkinType.IsWrinkle
-      },
-      RoutineSteps = routine.RoutineSteps.Select(routineStep => new RoutineStepResponse
-      {
-        CosmeticId = routineStep.CosmeticId,
-        CosmeticName = routineStep.Cosmetic.Name,
-        CosmeticNotice = routineStep.Cosmetic.Notice,
-        StepNumber = routineStep.StepNumber,
-      }).ToList(),
-    }).ToList(), StatusCodes.Status200OK);
+        var cosmetics = await _unitOfWork.Cosmetics.GetCosmeticsByRoutine(routines.First(r => r.Id == response.Id));
+        step.CosmeticPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetics.First(c => c.Id == step.CosmeticId));
+      }
+    }
+
+    return Result<List<RoutineResponse>?>.Success(responses, StatusCodes.Status200OK);
   }
 
   public async Task<Result<bool>> RemoveQuestionFromQuizAsync(Guid quizId, Guid questionId)
@@ -296,5 +284,37 @@ public class QuizService : IQuizService
       var error = _errorFactory.CreateDatabaseError(nameof(result));
       return Result<bool>.Failure([error.err], StatusCodes.Status500InternalServerError);
     }
+  }
+
+  public static RoutineResponse MapToRoutineResponse(Routine routine)
+  {
+    return new RoutineResponse
+    {
+      Id = routine.Id,
+      Title = routine.Title,
+      Period = routine.Period,
+      SkinType = new SkinTypeResponse
+      {
+        Id = routine.SkinType.Id,
+        Name = routine.SkinType.Name,
+        Description = routine.SkinType.Description,
+        IsDry = routine.SkinType.IsDry,
+        IsSensitive = routine.SkinType.IsSensitive,
+        IsUneven = routine.SkinType.IsUneven,
+        IsWrinkle = routine.SkinType.IsWrinkle
+      },
+      RoutineSteps = routine.RoutineSteps.Select(routineStep => new RoutineStepResponse
+      {
+        CosmeticId = routineStep.CosmeticId,
+        CosmeticName = routineStep.Cosmetic.Name,
+        CosmeticNotice = routineStep.Cosmetic.Notice,
+        StepNumber = routineStep.StepNumber,
+      }).ToList(),
+    };
+  }
+
+  public static List<RoutineResponse> MapToRoutineResponseList(List<Routine> routines)
+  {
+    return routines.Select(MapToRoutineResponse).ToList();
   }
 }
