@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Application.DTOs.RoutineDTO;
+﻿using Azure;
+using CleanArchitecture.Application.DTOs.RoutineDTO;
 using CleanArchitecture.Application.DTOs.RoutineStepDto;
 using CleanArchitecture.Application.DTOs.SkinTypeDto;
 using Microsoft.AspNetCore.Http;
@@ -20,6 +21,14 @@ namespace CleanArchitecture.Application.Services
       {
         var routines = await _unitOfWork.Routines.GetAllAsync();
         var responses = routines.Select(MapToRoutineResponse).ToList();
+        foreach (var response in responses)
+        {
+          foreach (var step in response.RoutineSteps!)
+          {
+            var cosmetics = await _unitOfWork.Cosmetics.GetCosmeticsByRoutine(routines.First(r => r.Id == response.Id));
+            step.CosmeticPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetics.First(c => c.Id == step.CosmeticId));
+          }
+        }
         return Result<List<RoutineResponse>>.Success(responses, StatusCodes.Status200OK);
       }
       catch (Exception ex)
@@ -67,9 +76,17 @@ namespace CleanArchitecture.Application.Services
         if (routines == null)
           return Result<List<RoutineResponse>?>.Failure(new List<Error> { new Error("Routine.GetRoutines", "Cannot found routines") }, StatusCodes.Status404NotFound);
 
-        var response = routines.Select(MapToRoutineResponse).ToList();
+        var responses = routines.Select(MapToRoutineResponse).ToList();
 
-        return Result<List<RoutineResponse>?>.Success(response, StatusCodes.Status200OK);
+        foreach (var response in responses)
+        {
+          foreach (var step in response.RoutineSteps!)
+          {
+            var cosmetics = await _unitOfWork.Cosmetics.GetCosmeticsByRoutine(routines.First(r => r.Id == response.Id));
+            step.CosmeticPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetics.First(c => c.Id == step.CosmeticId));
+          }
+        }
+        return Result<List<RoutineResponse>?>.Success(responses, StatusCodes.Status200OK);
       }
       catch (Exception ex)
       {

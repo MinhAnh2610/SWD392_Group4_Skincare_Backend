@@ -9,4 +9,5 @@ public interface ICosmeticRepository : IGenericRepository<Cosmetic>
   Task<decimal> GetCartItemPriceByCart(Cart cart);
   Task<List<Cosmetic>> GetCosmeticsByCart(Cart cart);
   Task<List<Cosmetic>> GetCosmeticsByOrder(Order order);
+  Task<List<Cosmetic>> GetCosmeticsByRoutine(Routine routine);
 }
