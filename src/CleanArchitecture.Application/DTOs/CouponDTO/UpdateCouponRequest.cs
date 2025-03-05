@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CleanArchitecture.Application.DTOs.CouponDTO
 {
-  public class CouponResponse
+  public class UpdateCouponRequest
   {
     public Guid Id { get; set; }
     public string Code { get; set; } = default!;

@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace CleanArchitecture.Application.DTOs.CouponDTO
 {
-  public class CouponResponse
+  public class CreateCouponRequest
   {
-    public Guid Id { get; set; }
     public string Code { get; set; } = default!;
     public double Discount { get; set; }
     public DateTime ExpiryDate { get; set; }
