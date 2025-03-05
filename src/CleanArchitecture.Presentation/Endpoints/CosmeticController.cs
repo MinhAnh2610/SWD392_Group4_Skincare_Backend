@@ -140,7 +140,9 @@ public class CosmeticController : ICarterModule
     .ProducesProblem(StatusCodes.Status400BadRequest)
     .ProducesProblem(StatusCodes.Status500InternalServerError)
     .WithSummary("UploadCosmeticImages")
-    .WithDescription("Upload Cosmetic Images");
+    .WithDescription("Upload Cosmetic Images")
+    //.RequireAuthorization()
+    .DisableAntiforgery();
     #endregion
   }
 }

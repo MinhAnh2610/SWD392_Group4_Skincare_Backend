@@ -2,4 +2,8 @@
 
 namespace CleanArchitecture.Application.DTOs.Cosmetic;
 
-public record CosmeticImagesUploadRequest(Guid CosmeticId, List<IFormFile> Images);
+public class CosmeticImagesUploadRequest()
+{
+  public Guid CosmeticId { get; set; }
+  public List<IFormFile>? Images { get; set; }
+}

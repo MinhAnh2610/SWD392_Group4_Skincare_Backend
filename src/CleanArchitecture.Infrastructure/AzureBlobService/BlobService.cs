@@ -58,10 +58,10 @@ namespace CleanArchitecture.Infrastructure.AzureBlobService
     /// </summary>
     /// <param name="blobName">Name of file.</param>
     /// <param name="stream">File content</param>
-    public async Task<string> UploadBlobsAsync(string filePath, IEnumerable<IFormFile> files)
+    public async Task<List<string>> UploadBlobsAsync(string filePath, IEnumerable<IFormFile> files)
     {
       var containerClient = _blobServiceClient.GetBlobContainerClient("defleur");
-      string url = string.Empty;
+      List<string> url = new();
       foreach (var file in files)
       {
         var blobClient = containerClient.GetBlobClient(filePath);
@@ -78,7 +78,7 @@ namespace CleanArchitecture.Infrastructure.AzureBlobService
           {
             HttpHeaders = blobHttpHeader
           });
-          url = blobClient.Uri.AbsoluteUri;
+          url.Add(blobClient.Uri.AbsoluteUri);
         }
       }
 
