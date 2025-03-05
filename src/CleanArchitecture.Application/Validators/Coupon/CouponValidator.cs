@@ -12,5 +12,8 @@ public class ApplyCouponRequestValidator : AbstractValidator<ApplyCouponRequest>
     RuleFor(x => x.order)
         .NotEmpty().WithMessage("Order ID is required.")
         .NotEqual(Guid.Empty).WithMessage("Order ID must be a valid GUID.");
+
   }
+
+
 }

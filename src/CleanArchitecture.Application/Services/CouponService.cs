@@ -1,4 +1,7 @@
-﻿using CleanArchitecture.Application.DTOs.CouponDTO;
+﻿using Abp.Collections.Extensions;
+using Azure.Core;
+using CleanArchitecture.Application.DTOs.BlogDto;
+using CleanArchitecture.Application.DTOs.CouponDTO;
 using CleanArchitecture.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 
@@ -10,12 +13,17 @@ namespace CleanArchitecture.Application.Services
     private readonly IErrorFactory _errorFactory;
 
     private readonly IValidator<ApplyCouponRequest> _couponValidator;
+    private readonly IValidator<UpdateCouponRequest> _updateCouponValidator;
+    private readonly IValidator<CreateCouponRequest> _createCouponValidator;
 
-    public CouponService(IUnitOfWork unitOfWork, IValidator<ApplyCouponRequest> couponValidator, IErrorFactory errorFactory)
+    public CouponService(IUnitOfWork unitOfWork, IValidator<ApplyCouponRequest> couponValidator, IErrorFactory errorFactory, IValidator<UpdateCouponRequest> updateValidator,
+      IValidator<CreateCouponRequest> createCouponValidator)
     {
       _unitOfWork = unitOfWork;
       _couponValidator = couponValidator;
       _errorFactory = errorFactory;
+      _updateCouponValidator = updateValidator;
+      _createCouponValidator = createCouponValidator;
     }
 
     public async Task<Result<CouponResponse>> ApplyCoupon(ApplyCouponRequest applyCouponRequest)
@@ -23,11 +31,8 @@ namespace CleanArchitecture.Application.Services
       var validationResult = await _couponValidator.ValidateAsync(applyCouponRequest);
       if (!validationResult.IsValid)
       {
-        var errors = validationResult.Errors
-          .Select(e => new Error("ValidationError", e.ErrorMessage))
-          .ToList();
-
-        return Result<CouponResponse>.Failure(errors, StatusCodes.Status400BadRequest);
+        var errors = _errorFactory.CreateValidationError("Coupon", validationResult);
+        return Result<CouponResponse>.Failure(errors.errs, errors.statusCode);
       }
 
       var coupon = await _unitOfWork.Coupons.GetByIdAsync(applyCouponRequest.code);
@@ -93,6 +98,12 @@ namespace CleanArchitecture.Application.Services
 
     public async Task<Result<CouponResponse>> CreateCoupon(CreateCouponRequest createCouponRequest)
     {
+      var validationResult = await _createCouponValidator.ValidateAsync(createCouponRequest);
+      if (!validationResult.IsValid)
+      {
+        var errors = _errorFactory.CreateValidationError("Coupon", validationResult);
+        return Result<CouponResponse>.Failure(errors.errs, errors.statusCode);
+      }
       var coupon = new Coupon
       {
         Code = createCouponRequest.Code,
@@ -162,6 +173,13 @@ namespace CleanArchitecture.Application.Services
 
     public async Task<Result<CouponResponse>> UpdateCoupon(UpdateCouponRequest updateCouponRequest)
     {
+      var validationResult = await _updateCouponValidator.ValidateAsync(updateCouponRequest);
+      if (!validationResult.IsValid)
+      {
+        var errors = _errorFactory.CreateValidationError("Coupon", validationResult);
+        return Result<CouponResponse>.Failure(errors.errs, errors.statusCode);
+      }
+
       var coupon = await _unitOfWork.Coupons.GetByIdAsync(updateCouponRequest.Id);
       if (coupon == null)
       {
@@ -170,6 +188,7 @@ namespace CleanArchitecture.Application.Services
                         StatusCodes.Status404NotFound
                                );
       }
+     
 
       coupon.Code = updateCouponRequest.Code;
       coupon.DiscountAmount = updateCouponRequest.Discount;
