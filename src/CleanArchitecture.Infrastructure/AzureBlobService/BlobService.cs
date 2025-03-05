@@ -1,6 +1,7 @@
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
+using CleanArchitecture.Application.DTOs.AzureBlob;
 using CleanArchitecture.Application.ServiceContracts;
 using Microsoft.AspNetCore.Http;
 
@@ -58,20 +59,20 @@ namespace CleanArchitecture.Infrastructure.AzureBlobService
     /// </summary>
     /// <param name="blobName">Name of file.</param>
     /// <param name="stream">File content</param>
-    public async Task<List<string>> UploadBlobsAsync(string filePath, IEnumerable<IFormFile> files)
+    public async Task<List<string>> UploadBlobsAsync(IEnumerable<UploadRequest> uploadRequests)
     {
       var containerClient = _blobServiceClient.GetBlobContainerClient("defleur");
       List<string> url = new();
-      foreach (var file in files)
+      foreach (var request in uploadRequests)
       {
-        var blobClient = containerClient.GetBlobClient(filePath);
+        var blobClient = containerClient.GetBlobClient(request.FilePath);
 
-        using (var stream = file.OpenReadStream())
+        using (var stream = request.File.OpenReadStream())
         {
           // Option to make show file instead of downloading it when click the link
           var blobHttpHeader = new BlobHttpHeaders()
           {
-            ContentType = file.ContentType,
+            ContentType = request.File.ContentType,
             ContentDisposition = "inline"
           };
           await blobClient.UploadAsync(stream, new BlobUploadOptions()

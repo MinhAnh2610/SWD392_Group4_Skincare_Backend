@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Application.DTOs.Cosmetic;
+﻿using CleanArchitecture.Application.DTOs.AzureBlob;
+using CleanArchitecture.Application.DTOs.Cosmetic;
 using CleanArchitecture.Application.Factories.FilePathFactory;
 using CleanArchitecture.Application.Interfaces;
 using Mapster;
@@ -301,7 +302,14 @@ namespace CleanArchitecture.Application.Services
         return Result<CosmeticResponse>.Failure(errors.errs, errors.statusCode);
       }
 
-      var uploadedUrls = await _blobService.UploadBlobsAsync(request.CosmeticId.ToString(), request.Images);
+      var uploadRequests = new List<UploadRequest>();
+      foreach (var image in request.Images)
+      {
+        string filePath = _filePathFactory.CreateFilePath(ObjectType.CosmeticImage, request.CosmeticId, image.FileName);
+        uploadRequests.Add(new UploadRequest(filePath, image));
+      }
+
+      var uploadedUrls = await _blobService.UploadBlobsAsync(uploadRequests);
       if (uploadedUrls == null || !uploadedUrls.Any())
       {
         var errors = _errorFactory.CreateFileCreatedFailed(nameof(uploadedUrls));
