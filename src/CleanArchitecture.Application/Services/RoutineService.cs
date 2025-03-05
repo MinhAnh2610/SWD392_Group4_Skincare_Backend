@@ -62,6 +62,7 @@ namespace CleanArchitecture.Application.Services
           CosmeticId = routineStep.CosmeticId,
           CosmeticName = routineStep.Cosmetic.Name,
           CosmeticNotice = routineStep.Cosmetic.Notice,
+          CosmeticImageUrl = routineStep.Cosmetic.ThumbnailUrl,
           StepNumber = routineStep.StepNumber,
         }).ToList(),
       };

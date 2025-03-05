@@ -308,6 +308,7 @@ public class QuizService : IQuizService
         CosmeticId = routineStep.CosmeticId,
         CosmeticName = routineStep.Cosmetic.Name,
         CosmeticNotice = routineStep.Cosmetic.Notice,
+        CosmeticImageUrl = routineStep.Cosmetic.ThumbnailUrl,
         StepNumber = routineStep.StepNumber,
       }).ToList(),
     };
