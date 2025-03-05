@@ -1695,15 +1695,10 @@ internal class InitialData
         {
           Id = guids[guidIndex++], SkinTypeId = skin.Id, Title = $"{skin.Name} Evening Routine", Period = "Evening",
         };
-        // Night Routine for this skin type
-        var nightRoutine = new Routine
-        {
-          Id = Guid.NewGuid(), SkinTypeId = skin.Id, Title = $"{skin.Name} Night Routine", Period = "Night",
-        };
+
         // Add to the list
         routines.Add(morningRoutine);
         routines.Add(eveningRoutine);
-        routines.Add(nightRoutine);
       }
 
       return routines;
