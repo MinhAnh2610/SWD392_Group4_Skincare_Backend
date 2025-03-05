@@ -19,7 +19,7 @@ namespace CleanArchitecture.Presentation.Endpoints
           {
             // Assign default values if not provided - for development
             var startDate = fromDate ?? new DateTime(2025, 1, 14);
-            var endDate = toDate ?? new DateTime(2025, 1, 18);
+            var endDate = toDate ?? new DateTime(2025, 3, 3);
 
             GenerateReportRequest request = new(format, type, startDate, endDate);
             var result = await service.GenerateReportAsync(request);

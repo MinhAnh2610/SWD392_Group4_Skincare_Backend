@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CleanArchitecture.Application.DTOs.RefundItem;
 
-namespace CleanArchitecture.Application.DTOs.Refund
+namespace CleanArchitecture.Application.DTOs.Refund;
+
+public class CreateRefundRequest
 {
-    public class CreateRefundRequest
-    {
-        public string? Reason { get; set; }
-        public decimal TotalAmount { get; set; }
-        public string? Status { get; set; }
-        public string? Method { get; set; }
-    }
+  public Guid OrderId { get; set; }
+  public string Reason { get; set; } = default!;
+  public string Method { get; set; } = default!;
+  public List<CreateRefundItemRequest> RefundItems { get; set; } = new();
 }
