@@ -1,4 +1,6 @@
-﻿namespace CleanArchitecture.Application.DTOs.UserDto;
+﻿using CleanArchitecture.Application.DTOs.SkinTypeDto;
+
+namespace CleanArchitecture.Application.DTOs.UserDto;
 
 public class UserProfileResponse
 {
@@ -11,6 +13,6 @@ public class UserProfileResponse
   public string? LastName { get; set; } = default!;
   public bool Gender { get; set; }
   public string? SkinTypeId { get; set; }
-  public string? SkinTypeName { get; set; }
+  public SkinTypeResponse? SkinType { get; set; }
   public List<string>? Roles { get; set; } = new List<string>();
 }

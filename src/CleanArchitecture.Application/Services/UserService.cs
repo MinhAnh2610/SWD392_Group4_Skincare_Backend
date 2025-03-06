@@ -1,11 +1,8 @@
-﻿using CleanArchitecture.Application.DTOs.UserDto;
-using CleanArchitecture.Application.Enums;
-using IdentityModel;
+﻿using CleanArchitecture.Application.DTOs.SkinTypeDto;
+using CleanArchitecture.Application.DTOs.UserDto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using System.Reflection;
 using System.Security.Claims;
-using static IdentityServer4.Models.IdentityResources;
 
 namespace CleanArchitecture.Application.Services;
 
@@ -15,16 +12,19 @@ public class UserService : IUserService
   private readonly UserManager<User> _userManager;
   private readonly IValidator<UpdateProfileRequest> _updateProfileValidator;
   private readonly IValidator<UserRequest> _userValidator;
+  private readonly IUnitOfWork _unitOfWork;
 
   public UserService(IHttpContextAccessor httpContextAccessor,
                      UserManager<User> userManager,
                      IValidator<UpdateProfileRequest> updateProfileValidator,
-                     IValidator<UserRequest> userValidator)
+                     IValidator<UserRequest> userValidator,
+                     IUnitOfWork unitOfWork)
   {
     _httpContextAccessor = httpContextAccessor;
     _userManager = userManager;
     _updateProfileValidator = updateProfileValidator;
     _userValidator = userValidator;
+    _unitOfWork = unitOfWork;
   }
 
   public async Task<Result<string>> DisableUserAsync(UserRequest request)
@@ -125,6 +125,11 @@ public class UserService : IUserService
 
     var userInfo = await _userManager.FindByIdAsync(id);
     var userRoles = await _userManager.GetRolesAsync(userInfo!);
+    var userSkinType = new SkinType();
+    if (userInfo!.SkinTypeId != null)
+    {
+      userSkinType = await _unitOfWork.SkinTypes.GetByIdAsync((Guid)userInfo.SkinTypeId);
+    }
 
     return Result<UserProfileResponse>.Success(new UserProfileResponse
     {
@@ -138,7 +143,16 @@ public class UserService : IUserService
       Gender = userInfo.Gender,
       Roles = userRoles.ToList(),
       SkinTypeId = userInfo.SkinTypeId.ToString(),
-      SkinTypeName = userInfo.SkinType?.Name,
+      SkinType = new SkinTypeResponse
+      { 
+        Id = userInfo.Id,
+        Description = userSkinType.Description,
+        Name = userSkinType.Name,
+        IsDry = userSkinType.IsDry,
+        IsSensitive = userSkinType.IsSensitive,
+        IsUneven = userSkinType.IsUneven,
+        IsWrinkle = userSkinType.IsWrinkle
+      }
     }, StatusCodes.Status200OK);
   }
 
