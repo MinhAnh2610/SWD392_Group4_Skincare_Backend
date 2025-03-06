@@ -1,5 +1,6 @@
 ﻿using CleanArchitecture.Application.DTOs.Cart;
 using CleanArchitecture.Application.DTOs.CartDto;
+using CleanArchitecture.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanArchitecture.Presentation.Endpoints
@@ -55,10 +56,10 @@ namespace CleanArchitecture.Presentation.Endpoints
       .RequireAuthorization();
 
       #region Update Cart (Current User) API
-      // Instead of using a cartId from the route, we now use the current user (via IClaimsService) to get or create the cart.
-      group.MapPut("/me", async (ICartService cartService, [FromBody] UpdateCartRequest request) =>
+      // For current user operations, we don't need cartId in the request
+      group.MapPut("/me", async (ICartService cartService, [FromBody] List<UpdateCartItemDto> items) =>
       {
-        var result = await cartService.UpdateCartAsync(request);
+        var result = await cartService.UpdateCurrentUserCartAsync(items);
         return result.Match("Updated cart successfully.");
       })
      .WithName("UpdateCartForCurrentUser")
@@ -72,7 +73,6 @@ namespace CleanArchitecture.Presentation.Endpoints
       #endregion
 
       #region Add to Cart (Current User) API
-      // Instead of using a cartId from the route, we now use the current user (via IClaimsService) to get or create the cart.
       group.MapPut("/me/items", async (ICartService cartService, [FromBody] AddProductRequest addProductRequest) =>
       {
         var result = await cartService.AddCartItemForCurrentUserAsync(addProductRequest);
@@ -83,11 +83,26 @@ namespace CleanArchitecture.Presentation.Endpoints
      .ProducesProblem(StatusCodes.Status401Unauthorized)
      .ProducesProblem(StatusCodes.Status500InternalServerError)
      .WithSummary("AddCartItem")
-     .WithDescription("Add item to current user’s cart")
+     .WithDescription("Add item to current user's cart")
      .RequireAuthorization();
       #endregion
 
       #region Delete Item from Cart API
+      // For removing items, we'll create a current user version
+      group.MapDelete("/me/items/{cosmeticId}", async (ICartService cartService, Guid cosmeticId) =>
+      {
+        var result = await cartService.DeleteCartItemForCurrentUserAsync(cosmeticId);
+        return result.Match("Item removed from cart successfully.");
+      })
+      .WithName("RemoveCartItemForCurrentUser")
+      .Produces<ApiResponse<CartResponse>>(StatusCodes.Status200OK)
+      .ProducesProblem(StatusCodes.Status401Unauthorized)
+      .ProducesProblem(StatusCodes.Status500InternalServerError)
+      .WithSummary("RemoveCartItemForCurrentUser")
+      .WithDescription("Remove item from current user's cart")
+      .RequireAuthorization();
+
+      // Keep the original endpoint for admin operations
       group.MapDelete("/{cartId}/items/{cosmeticId}", async (ICartService cartService, Guid cartId, Guid cosmeticId) =>
       {
         var request = new RemoveProductRequest { CartId = cartId, CosmeticId = cosmeticId };
@@ -110,7 +125,7 @@ namespace CleanArchitecture.Presentation.Endpoints
       .RequireAuthorization();
       #endregion
 
-      #region Get Current User’s Cart API
+      #region Get Current User's Cart API
       group.MapGet("/me", async (ICartService cartService) =>
       {
         var result = await cartService.GetCartByUserIdAsync();

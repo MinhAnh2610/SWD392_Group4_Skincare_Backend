@@ -14,14 +14,17 @@ namespace CleanArchitecture.Application.Services
     private readonly UserManager<User> _userManager;
     private readonly IClaimsService _claimsService;
     private readonly IErrorFactory _errorFactory;
-    private readonly IValidator<UpdateCartRequest> _updateCartRequestValidator;
-    public CartService(IUnitOfWork unitOfWork, IClaimsService claimsService, UserManager<User> userManager, IErrorFactory errorFactory, IValidator<UpdateCartRequest> updateCartRequestValidator)
+
+    public CartService(
+        IUnitOfWork unitOfWork,
+        IClaimsService claimsService,
+        UserManager<User> userManager,
+        IErrorFactory errorFactory)
     {
       _unitOfWork = unitOfWork;
       _claimsService = claimsService;
       _userManager = userManager;
       _errorFactory = errorFactory;
-      _updateCartRequestValidator = updateCartRequestValidator;
     }
 
     public async Task<Result<List<CartResponse>>> AddCartItemForCurrentUserAsync(AddProductRequest addProductRequest)
@@ -91,8 +94,6 @@ namespace CleanArchitecture.Application.Services
       }
 
       // Recalculate the cart's total price.
-      // Here, we assume that if the Cosmetic is not loaded in the CartItem, we fallback to the cosmetic's current price.
-      //TODO: PRICE
       cart.TotalPrice += await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic) * addProductRequest.Quantity;
 
       await _unitOfWork.CompleteAsync();
@@ -107,9 +108,55 @@ namespace CleanArchitecture.Application.Services
       return Result<List<CartResponse>>.Success(new List<CartResponse> { cartResponse }, StatusCodes.Status200OK);
     }
 
+    public async Task<Result<CartResponse>> DeleteCartItemForCurrentUserAsync(Guid cosmeticId)
+    {
+      // Get current user's ID
+      var userId = _claimsService.CurrentUserId;
+      if (userId == Guid.Empty)
+      {
+        return Result<CartResponse>.Failure(
+            new List<Error> { new Error("Cart.DeleteCartItem", "User not authenticated") },
+            StatusCodes.Status401Unauthorized);
+      }
+
+      // Get the user's cart
+      var cart = await _unitOfWork.Carts.GetCartByUserIdAsync(userId);
+      if (cart == null)
+      {
+        return Result<CartResponse>.Failure(
+            new List<Error> { new Error("Cart.DeleteCartItem", "Cart Not Found") },
+            StatusCodes.Status404NotFound);
+      }
+
+      var cartItem = cart.CartItems?.FirstOrDefault(x => x.CosmeticId == cosmeticId);
+      if (cartItem == null)
+      {
+        return Result<CartResponse>.Failure(
+            new List<Error> { new Error("Cart.DeleteCartItem", "Cart Item Not Found") },
+            StatusCodes.Status404NotFound);
+      }
+
+      // Deduct the item price from the total before removing it
+      var cosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(cartItem.CosmeticId);
+      if (cosmetic != null)
+      {
+        cart.TotalPrice -= await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic) * cartItem.Quantity;
+      }
+
+      cart.CartItems?.Remove(cartItem);
+      await _unitOfWork.CompleteAsync();
+
+      var cartResponse = MapCartToCartResponse(cart);
+      var cosmetics = await _unitOfWork.Cosmetics.GetCosmeticsByCart(cart);
+      foreach (var item in cartResponse.Items)
+      {
+        item.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetics.First(c => c.Id == item.CosmeticId));
+      }
+      return Result<CartResponse>.Success(cartResponse, StatusCodes.Status200OK);
+    }
+
     public async Task<Result<List<CartResponse>>> DeletebyIdAsync(RemoveProductRequest removeProductRequest)
     {
-
       var cart = await _unitOfWork.Carts.GetByIdAsync(removeProductRequest.CartId);
       if (cart == null)
       {
@@ -136,11 +183,6 @@ namespace CleanArchitecture.Application.Services
       }
 
       cart.CartItems?.Remove(cartItem);
-
-      // Recalculate the total price after removal
-      //TODO: PRICE
-      // cart.TotalPrice = cart.CartItems.Sum(ci => ci.Quantity * (ci.Cosmetic?.Price ?? 0));
-
       await _unitOfWork.CompleteAsync();
 
       var cartResponse = MapCartToCartResponse(cart);
@@ -220,8 +262,7 @@ namespace CleanArchitecture.Application.Services
         }
 
         // Get the cart for the current user (if it exists)
-        var carts = await _unitOfWork.Carts.GetAllAsync();
-        var cart = carts.FirstOrDefault(c => c.CustomerId == userId);
+        var cart = await _unitOfWork.Carts.GetCartByUserIdAsync(userId);
 
         // If the user doesn't have a cart, create one
         if (cart == null)
@@ -257,13 +298,7 @@ namespace CleanArchitecture.Application.Services
 
     public async Task<Result<CartResponse>> UpdateCartAsync(UpdateCartRequest request)
     {
-      var validationResult = await _updateCartRequestValidator.ValidateAsync(request);
-      if (!validationResult.IsValid)
-      {
-        var errors = _errorFactory.CreateValidationError("Cart", validationResult);
-        return Result<CartResponse>.Failure(errors.errs, errors.statusCode);
-      }
-
+      // Removed validation logic
       var cart = await _unitOfWork.Carts.GetByIdAsync(request.CartId);
       if (cart == null)
       {
@@ -273,10 +308,49 @@ namespace CleanArchitecture.Application.Services
         );
       }
 
+      // Update cart logic
+      return await UpdateCartItems(cart, request.Items);
+    }
+
+    public async Task<Result<CartResponse>> UpdateCurrentUserCartAsync(List<UpdateCartItemDto> items)
+    {
+      // Removed validation logic
+      var userId = _claimsService.CurrentUserId;
+      if (userId == Guid.Empty)
+      {
+        return Result<CartResponse>.Failure(
+            new List<Error> { new Error("Cart.UpdateCart", "User not authenticated") },
+            StatusCodes.Status401Unauthorized
+        );
+      }
+
+      // Get or create user's cart
+      var cart = await _unitOfWork.Carts.GetCartByUserIdAsync(userId);
+      if (cart == null)
+      {
+        cart = new Cart
+        {
+          Id = Guid.NewGuid(),
+          CustomerId = userId,
+          TotalPrice = 0,
+          CartItems = new List<CartItem>()
+        };
+
+        await _unitOfWork.Carts.CreateAsync(cart);
+        await _unitOfWork.CompleteAsync();
+      }
+
+      // Update cart logic
+      return await UpdateCartItems(cart, items);
+    }
+
+    // Helper method for updating cart items (used by both UpdateCartAsync and UpdateCurrentUserCartAsync)
+    private async Task<Result<CartResponse>> UpdateCartItems(Cart cart, List<UpdateCartItemDto> items)
+    {
       cart.CartItems?.Clear();
       cart.TotalPrice = 0;
 
-      foreach (var item in request.Items)
+      foreach (var item in items)
       {
         var cosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(item.CosmeticId);
         if (cosmetic == null)
@@ -337,10 +411,9 @@ namespace CleanArchitecture.Application.Services
           CosmeticName = ci.Cosmetic?.Name ?? string.Empty,
           // Select only the first image URL to avoid circular references:
           CosmeticImage = ci.Cosmetic?.CosmeticImages.FirstOrDefault()?.ImageUrl ?? string.Empty,
-          //TODO: PRICE
-          // Price = ci.Cosmetic?.Price ?? 0,
+          // Price will be set later
           Quantity = ci.Quantity,
-          Height = ci.Cosmetic?.Height ?? 0,   // Use null-conditional operator
+          Height = ci.Cosmetic?.Height ?? 0,
           Length = ci.Cosmetic?.Length ?? 0,
           Weight = ci.Cosmetic?.Weight ?? 0,
           Width = ci.Cosmetic?.Width ?? 0
