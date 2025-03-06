@@ -10,5 +10,7 @@ public class UserProfileResponse
   public string? FirstName { get; set; } = default!;
   public string? LastName { get; set; } = default!;
   public bool Gender { get; set; }
+  public string? SkinTypeId { get; set; }
+  public string? SkinTypeName { get; set; }
   public List<string>? Roles { get; set; } = new List<string>();
 }
