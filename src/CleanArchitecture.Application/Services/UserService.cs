@@ -114,26 +114,31 @@ public class UserService : IUserService
     }
 
     var id = user.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-    var userName = user.FindFirst(JwtClaimTypes.Name)!.Value;
-    var email = user.FindFirst(ClaimTypes.Email)!.Value;
-    var phoneNumber = user.FindFirst(JwtClaimTypes.PhoneNumber)?.Value;
-    var birthDate = user.FindFirst(ClaimTypes.DateOfBirth)?.Value;
-    var firstName = user.FindFirst(ClaimTypes.Surname)?.Value;
-    var lastname = user.FindFirst(ClaimTypes.GivenName)?.Value;
-    var gender = user.FindFirst(ClaimTypes.Gender)!.Value;
-    var roles = user.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
+    //var userName = user.FindFirst(JwtClaimTypes.Name)!.Value;
+    //var email = user.FindFirst(ClaimTypes.Email)!.Value;
+    //var phoneNumber = user.FindFirst(JwtClaimTypes.PhoneNumber)?.Value;
+    //var birthDate = user.FindFirst(ClaimTypes.DateOfBirth)?.Value;
+    //var firstName = user.FindFirst(ClaimTypes.Surname)?.Value;
+    //var lastname = user.FindFirst(ClaimTypes.GivenName)?.Value;
+    //var gender = user.FindFirst(ClaimTypes.Gender)!.Value;
+    //var roles = user.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
+
+    var userInfo = await _userManager.FindByIdAsync(id);
+    var userRoles = await _userManager.GetRolesAsync(userInfo!);
 
     return Result<UserProfileResponse>.Success(new UserProfileResponse
     {
       Id = id,
-      UserName = userName,
-      Email = email,
-      PhoneNumber = phoneNumber,
-      BirthDate = (birthDate == null) ? default : DateOnly.Parse(birthDate!),
-      FirstName = firstName,
-      LastName = lastname,
-      Gender = Boolean.Parse(gender),
-      Roles = roles
+      UserName = userInfo!.UserName,
+      Email = userInfo.Email,
+      PhoneNumber = userInfo.PhoneNumber,
+      BirthDate = (userInfo.BirthDate == null) ? default : userInfo.BirthDate,
+      FirstName = userInfo.FirstName,
+      LastName = userInfo.LastName,
+      Gender = userInfo.Gender,
+      Roles = userRoles.ToList(),
+      SkinTypeId = userInfo.SkinTypeId.ToString(),
+      SkinTypeName = userInfo.SkinType?.Name,
     }, StatusCodes.Status200OK);
   }
 
