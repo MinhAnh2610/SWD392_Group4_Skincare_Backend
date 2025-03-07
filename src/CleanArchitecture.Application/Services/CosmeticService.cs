@@ -43,8 +43,6 @@ namespace CleanArchitecture.Application.Services
 
     public async Task<Result<CosmeticResponse>> CreateCosmetic(CreateCosmetic request)
     {
-      // Begin a transaction to ensure all operations complete together
-      using var transaction = await _unitOfWork.BeginTransactionAsync();
       try
       {
         // Create and set up the Cosmetic entity
@@ -62,7 +60,7 @@ namespace CleanArchitecture.Application.Services
         _unitOfWork.SkinTypes.Attach(orgcosmetic.SkinType);
         _unitOfWork.CosmeticTypes.Attach(orgcosmetic.CosmeticType);
 
-        // Save the cosmetic first to get its ID
+        // Create the cosmetic
         await _unitOfWork.Cosmetics.CreateAsync(orgcosmetic);
 
         // Handle thumbnail if provided
@@ -80,7 +78,7 @@ namespace CleanArchitecture.Application.Services
           CosmeticId = orgcosmetic.Id,
           OriginalPrice = request.Price,
           // Set default values for required fields
-          EventId = Guid.Empty, // Or default event ID if applicable
+          EventId = new Guid("edabede4-1fac-46ba-b6d2-6d1b06d0096c"), // Or default event ID if applicable
           StartDate = DateTime.UtcNow,
           EndDate = DateTime.UtcNow.AddYears(10) // Set a far future date or appropriate business logic
         };
@@ -88,17 +86,13 @@ namespace CleanArchitecture.Application.Services
         // Save the cosmetic price
         await _unitOfWork.CosmeticPrices.CreateAsync(cosmeticPrice);
 
-        // Save all changes
+        // Save all changes in one go
         var isSaved = await _unitOfWork.CompleteAsync();
         if (!isSaved)
         {
-          await transaction.RollbackAsync();
           var error = _errorFactory.CreateDatabaseError("Cosmetic");
           return Result<CosmeticResponse>.Failure([error.err], error.statusCode);
         }
-
-        // Commit the transaction
-        await transaction.CommitAsync();
 
         // Map to response and set price
         var output = orgcosmetic.Adapt<CosmeticResponse>();
@@ -108,7 +102,6 @@ namespace CleanArchitecture.Application.Services
       }
       catch (Exception ex)
       {
-        await transaction.RollbackAsync();
         var error = _errorFactory.CreateDatabaseError($"Cosmetic creation failed: {ex.Message}");
         return Result<CosmeticResponse>.Failure([error.err], error.statusCode);
       }
