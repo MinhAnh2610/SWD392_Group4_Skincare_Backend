@@ -11,25 +11,26 @@ public class CosmeticController : ICarterModule
     var group = app.MapGroup("api/cosmetics").WithTags("Cosmetics Management");
 
     #region Get Cosmetics API
-    group.MapGet("/", async (ICosmeticService service) =>
-    {
-      var result = await service.GetAllCosmetics();
-      if (result != null)
-      {
-        return Results.Ok(ApiResponse<List<CosmeticResponse>>.SuccessResponse(result.Data!, "Retrieved Cosmetics Successfully."));
-      }
-
-      return Results.StatusCode(StatusCodes.Status500InternalServerError);
-    })
-    .WithName("GetCosmetics")
-    .Produces<ApiResponse<List<CosmeticResponse>>>(StatusCodes.Status200OK)
-    .ProducesProblem(StatusCodes.Status500InternalServerError)
-    .WithSummary("GetCosmetics")
-    .WithDescription("Get Cosmetics");
+    group.MapGet("/",
+   async (ICosmeticService service, string? name, Guid? brandId, Guid? skinTypeId, Guid? cosmeticTypeId,
+         bool? gender, string? sortColumn, string? sortOrder = "asc",
+         decimal? minPrice = null, decimal? maxPrice = null, int pageIndex = 1, int pageSize = 10) =>
+   {
+     var request = new GetCosmeticsRequest(name, brandId, skinTypeId, cosmeticTypeId,
+                                          gender, sortColumn, sortOrder,
+                                          minPrice, maxPrice, pageIndex, pageSize);
+     var result = await service.GetCosmeticsAsync(request);
+     return result.Match(Message.SUCCESSFUL_RETRIEVED("Cosmetics"));
+   })
+ .WithName("GetCosmetics")
+ .Produces<ApiResponse<PaginatedList<CosmeticResponse>>>()
+ .ProducesProblem(StatusCodes.Status500InternalServerError)
+ .WithSummary("GetCosmetics")
+ .WithDescription("Get Cosmetics with pagination and filtering options");
     #endregion
 
     #region Get Cosmetic By Id API
-    group.MapGet("/get-by-Id", async (ICosmeticService service, [FromQuery]Guid id) =>
+    group.MapGet("/get-by-Id", async (ICosmeticService service, [FromQuery] Guid id) =>
     {
       var result = await service.GetCosmeticById(id);
       if (result != null)
@@ -49,7 +50,7 @@ public class CosmeticController : ICarterModule
     #region Update Cosmetic  API
     group.MapPut("/{id}/update", async (Guid id, ICosmeticService service, UpdateCosmetic updateRequest) =>
     {
-      var result = await service.UpdateCosmetic(updateRequest,id);
+      var result = await service.UpdateCosmetic(updateRequest, id);
       if (result != null)
       {
         return Results.Ok(ApiResponse<CosmeticResponse>.SuccessResponse(result.Data!, "Update Cosmetic Successfully."));

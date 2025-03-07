@@ -9,7 +9,7 @@ namespace CleanArchitecture.Application.ServiceContracts
 {
 public interface ICosmeticService
 {
-    Task<Result<List<CosmeticResponse>>> GetAllCosmetics();
+    Task<Result<PaginatedList<CosmeticResponse>>> GetCosmeticsAsync(GetCosmeticsRequest request);
     Task<Result<CosmeticResponse>> GetCosmeticById(Guid id);
     Task<Result<List<CosmeticResponse>>> GetCosmeticsByBrandId(Guid brandId);
     Task<Result<List<CosmeticResponse>>> GetCosmeticsByTypeId(Guid typeId);

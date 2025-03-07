@@ -3,6 +3,7 @@ using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Application.Services;
 using CleanArchitecture.Application.Strategies;
 using CleanArchitecture.Application.Strategies.BlogFilterStrategy;
+using CleanArchitecture.Application.Strategies.CosmeticsFilterStrategy;
 using CleanArchitecture.Application.Strategies.InvoiceGenerateStrategy;
 using CleanArchitecture.Application.Strategies.ReportGenerateStrategy.ReportTypeStrategy;
 using CleanArchitecture.Application.Validators;
@@ -79,6 +80,13 @@ public static class DependencyInjection
 
     services.AddSingleton<IInvoiceGenerateStrategy, WalkInInvoiceStrategy>();
     services.AddSingleton<IInvoiceGenerateStrategy, OnlineInvoiceStrategy>();
+
+    services.AddSingleton<ICosmeticFilterStrategy, NameFilterStrategy>();
+    services.AddSingleton<ICosmeticFilterStrategy, BrandFilterStrategy>();
+    services.AddSingleton<ICosmeticFilterStrategy, SkinTypeFilterStrategy>();
+    services.AddSingleton<ICosmeticFilterStrategy, CosmeticTypeFilterStrategy>();
+    services.AddSingleton<ICosmeticFilterStrategy, GenderFilterStrategy>();
+
     #endregion
 
     #region Add Factories 

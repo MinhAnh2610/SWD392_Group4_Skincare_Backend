@@ -1,7 +1,16 @@
 ﻿using CleanArchitecture.Application.DTOs.AzureBlob;
+using CleanArchitecture.Application.DTOs.BatchDto;
+using CleanArchitecture.Application.DTOs.BrandDto;
 using CleanArchitecture.Application.DTOs.Cosmetic;
+using CleanArchitecture.Application.DTOs.CosmeticImageDto;
+using CleanArchitecture.Application.DTOs.CosmeticSubcategory;
+using CleanArchitecture.Application.DTOs.CosmeticTypeDto;
+using CleanArchitecture.Application.DTOs.FeedbackDto;
+using CleanArchitecture.Application.DTOs.SkinTypeDto;
 using CleanArchitecture.Application.Factories.FilePathFactory;
 using CleanArchitecture.Application.Interfaces;
+using CleanArchitecture.Application.Strategies.BlogFilterStrategy;
+using CleanArchitecture.Application.Strategies.CosmeticsFilterStrategy;
 using Mapster;
 using Microsoft.AspNetCore.Http;
 
@@ -14,18 +23,22 @@ namespace CleanArchitecture.Application.Services
     private readonly IBlobService _blobService;
     private readonly IValidator<CosmeticImagesUploadRequest> _cosmeticImagesUploadValidator;
     private readonly IFilePathFactory _filePathFactory;
+    private readonly IEnumerable<ICosmeticFilterStrategy> _filterStrategies;
     public CosmeticService(
       IUnitOfWork unitOfWork,
       IErrorFactory errorFactory,
       IBlobService blobService,
       IValidator<CosmeticImagesUploadRequest> cosmeticImagesUploadValidator,
-      IFilePathFactory filePathFactory)
+      IFilePathFactory filePathFactory,
+      IEnumerable<ICosmeticFilterStrategy> filterStrategies
+      )
     {
       _unitOfWork = unitOfWork;
       _errorFactory = errorFactory;
       _blobService = blobService;
       _cosmeticImagesUploadValidator = cosmeticImagesUploadValidator;
       _filePathFactory = filePathFactory;
+      _filterStrategies = filterStrategies;
     }
 
     public async Task<Result<CosmeticResponse>> CreateCosmetic(CreateCosmetic request)
@@ -63,29 +76,160 @@ namespace CleanArchitecture.Application.Services
       var output = orgcosmetic.Adapt<CosmeticResponse>();
       return Result<CosmeticResponse>.Success(output, StatusCodes.Status201Created);
     }
-
-    public async Task<Result<List<CosmeticResponse>>> GetAllCosmetics()
+    // Helper method for applying sorting
+    private IQueryable<Cosmetic> ApplySorting(IQueryable<Cosmetic> query, string sortColumn, string sortOrder)
     {
-      var cosmetics = await _unitOfWork.Cosmetics.GetAllAsync();
-      if (cosmetics != null)
-      {
-        var cosmeticsResponse = cosmetics.Adapt<List<CosmeticResponse>>();
+      bool isAscending = string.IsNullOrEmpty(sortOrder) || sortOrder.Equals("asc", StringComparison.OrdinalIgnoreCase);
 
-        // Set price for each cosmetic
-        foreach (var response in cosmeticsResponse)
+      return sortColumn.ToLower() switch
+      {
+        "name" => isAscending ? query.OrderBy(c => c.Name) : query.OrderByDescending(c => c.Name),
+        "createat" => isAscending ? query.OrderBy(c => c.CreateAt) : query.OrderByDescending(c => c.CreateAt),
+        "brand" => isAscending ? query.OrderBy(c => c.Brand.Name) : query.OrderByDescending(c => c.Brand.Name),
+        "skintype" => isAscending ? query.OrderBy(c => c.SkinType.Name) : query.OrderByDescending(c => c.SkinType.Name),
+        "cosmetictype" => isAscending ? query.OrderBy(c => c.CosmeticType.Name) : query.OrderByDescending(c => c.CosmeticType.Name),
+        // Note: Can't directly sort by Price since it's calculated from another table
+        _ => isAscending ? query.OrderBy(c => c.Name) : query.OrderByDescending(c => c.Name), // Default sort
+      };
+    }
+    public async Task<Result<PaginatedList<CosmeticResponse>>> GetCosmeticsAsync(GetCosmeticsRequest request)
+    {
+      try
+      {
+        // Get base queryable - store it in a separate variable before applying includes
+        var baseQuery = _unitOfWork.Cosmetics.GetQueryable();
+
+        // Apply filters first (on the simple IQueryable)
+        foreach (var strategy in _filterStrategies)
         {
-          var cosmetic = cosmetics.First(c => c.Id == response.Id);
-          response.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
+          baseQuery = strategy.ApplyFilter<object>(baseQuery, request);
         }
 
-        return Result<List<CosmeticResponse>>.Success(cosmeticsResponse, StatusCodes.Status200OK);
+        // Apply sorting if specified (also on the simple IQueryable)
+        if (!string.IsNullOrEmpty(request.SortColumn))
+        {
+          baseQuery = ApplySorting(baseQuery, request.SortColumn, request.SortOrder);
+        }
+
+        // Now apply includes after filtering and sorting
+        var query = baseQuery
+            .Include(c => c.Brand)
+            .Include(c => c.SkinType)
+            .Include(c => c.CosmeticType)
+            .Include(c => c.CosmeticSubcategories)
+            .Include(c => c.CosmeticImages)
+            .Include(c => c.Batches)
+            .Include(c => c.Feedbacks);
+
+        // Project to response DTO
+        var cosmeticResponseQuery = query.Select(c => new CosmeticResponse
+        {
+          Id = c.Id,
+          CreateAt = c.CreateAt,
+          CreatedBy = c.CreatedBy,
+          LastModified = c.LastModified,
+          LastModifiedBy = c.LastModifiedBy,
+          IsActive = c.IsActive,
+          BrandId = c.BrandId,
+          Brand = new BrandResponse
+          {
+            Id = c.Brand.Id,
+            Name = c.Brand.Name,
+            Description = c.Brand.Description,
+            WebsiteUrl = c.Brand.WebsiteUrl,
+            LogoUrl = c.Brand.LogoUrl
+            // Add other necessary brand properties
+          },
+          SkinTypeId = c.SkinTypeId,
+          SkinType = new SkinTypeResponse
+          {
+            Id = c.SkinType.Id,
+            Name = c.SkinType.Name,
+            Description = c.SkinType.Description,
+            IsDry = c.SkinType.IsDry,
+            IsSensitive = c.SkinType.IsSensitive,
+            IsUneven = c.SkinType.IsUneven,
+            IsWrinkle = c.SkinType.IsWrinkle
+            // Add other necessary skin type properties
+          },
+          CosmeticTypeId = c.CosmeticTypeId,
+          CosmeticType = new CosmeticTypeResponse
+          {
+            Id = c.CosmeticType.Id,
+            Name = c.CosmeticType.Name,
+            Description = c.CosmeticType.Description
+            // Add other necessary cosmetic type properties
+          },
+          Name = c.Name,
+          Gender = c.Gender,
+          Notice = c.Notice,
+          Ingredients = c.Ingredients,
+          MainUsage = c.MainUsage,
+          Texture = c.Texture,
+          Origin = c.Origin,
+          Instructions = c.Instructions,
+          Weight = c.Weight,
+          Length = c.Length,
+          Width = c.Width,
+          Height = c.Height,
+          ThumbnailUrl = c.ThumbnailUrl,
+          VolumeUnit = c.VolumeUnit,
+          CosmeticSubcategories = c.CosmeticSubcategories.Select(cs => new CosmeticSubcategoryResponse
+          {
+            CosmeticId = cs.CosmeticId,
+            SubCategoryId = cs.SubCategoryId,
+            SubCategory = new DTOs.SubCategoryDto.SubCategoryResponse
+            {
+              Id = cs.SubCategory.Id,
+              Name = cs.SubCategory.Name,
+              Description = cs.SubCategory.Description,
+              CategoryId = cs.SubCategory.CategoryId,
+            }
+              // Add other necessary subcategory properties
+            }).ToList(),
+          CosmeticImages = c.CosmeticImages.Select(ci => new CosmeticImageCosmeticResponse
+          {
+            Id = ci.Id,
+            ImageUrl = ci.ImageUrl
+            // Add other necessary image properties
+          }).ToList(),
+          Batches = c.Batches.Select(b => new BatchResponse
+          {
+            Id = b.Id,
+            Quantity = b.Quantity,
+            ExpirationDate = b.ExpirationDate,
+            ManufactureDate = b.ManufactureDate,
+            ExportedDate = b.ExportedDate,
+            // Add other necessary batch properties
+          }).ToList(),
+          Feedbacks = c.Feedbacks.Select(f => new FeedbackCosmeticResponse
+          {
+            Id = f.Id,
+            Rating = f.Rating,
+            // Add other necessary feedback properties
+          }).ToList()
+        });
+
+        // Create paginated list
+        var cosmetics = await PaginatedList<CosmeticResponse>.CreateAsync(cosmeticResponseQuery, request.PageIndex, request.PageSize);
+
+        // Get prices for each cosmetic in the results
+        foreach (var cosmetic in cosmetics.Items)
+        {
+          var entity = await _unitOfWork.Cosmetics.GetByIdAsync(cosmetic.Id);
+          if (entity != null)
+          {
+            cosmetic.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(entity);
+          }
+        }
+
+        return Result<PaginatedList<CosmeticResponse>>.Success(cosmetics, StatusCodes.Status200OK);
       }
-      else
+      catch (Exception ex)
       {
-        return Result<List<CosmeticResponse>>.Failure([CosmeticErrors.CosmeticNotFound], StatusCodes.Status404NotFound);
+        return Result<PaginatedList<CosmeticResponse>>.Failure([CosmeticErrors.CosmeticQueryFailue], StatusCodes.Status500InternalServerError);
       }
     }
-
     public async Task<Result<CosmeticResponse>> GetCosmeticById(Guid id)
     {
       var cosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(id);
