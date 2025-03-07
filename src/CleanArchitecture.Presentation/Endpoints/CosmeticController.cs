@@ -30,94 +30,74 @@ public class CosmeticController : ICarterModule
     #endregion
 
     #region Get Cosmetic By Id API
-    group.MapGet("/get-by-Id", async (ICosmeticService service, [FromQuery] Guid id) =>
+    group.MapGet("/{id}", async (ICosmeticService service, Guid id) =>
     {
       var result = await service.GetCosmeticById(id);
-      if (result != null)
-      {
-        return Results.Ok(ApiResponse<CosmeticResponse>.SuccessResponse(result.Data!, "Retrieved Cosmetic Successfully."));
-      }
-
-      return Results.StatusCode(StatusCodes.Status500InternalServerError);
+      return result.Match(Message.SUCCESSFUL_RETRIEVED("Cosmetic"));
     })
-    .WithName("GetCosmeticsById")
+    .WithName("GetCosmeticById")
     .Produces<ApiResponse<CosmeticResponse>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status404NotFound)
     .ProducesProblem(StatusCodes.Status500InternalServerError)
-    .WithSummary("GetCosmeticsById")
-    .WithDescription("Get Cosmetics By Id");
+    .WithSummary("Get Cosmetic By Id")
+    .WithDescription("Retrieve a specific cosmetic by its unique identifier");
     #endregion
 
-    #region Update Cosmetic  API
-    group.MapPut("/{id}/update", async (Guid id, ICosmeticService service, UpdateCosmetic updateRequest) =>
+    #region Update Cosmetic API
+    group.MapPut("/{id}", async (Guid id, ICosmeticService service, UpdateCosmetic updateRequest) =>
     {
       var result = await service.UpdateCosmetic(updateRequest, id);
-      if (result != null)
-      {
-        return Results.Ok(ApiResponse<CosmeticResponse>.SuccessResponse(result.Data!, "Update Cosmetic Successfully."));
-      }
-
-      return Results.StatusCode(StatusCodes.Status500InternalServerError);
+      return result.Match(Message.SUCCESSFUL_UPDATED("Cosmetic"));
     })
     .WithName("UpdateCosmetic")
     .Produces<ApiResponse<CosmeticResponse>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status404NotFound)
     .ProducesProblem(StatusCodes.Status500InternalServerError)
-    .WithSummary("UpdateCosmeticById")
-    .WithDescription("Update Cosmetic By Id");
+    .WithSummary("Update Cosmetic")
+    .WithDescription("Update an existing cosmetic's details");
     #endregion
 
-    #region Delete Cosmetic By Id API
-    group.MapPut("/{id}/delete", async (ICosmeticService service, Guid id) =>
+    #region Delete Cosmetic API
+    group.MapDelete("/{id}", async (ICosmeticService service, Guid id) =>
     {
       var result = await service.DeleteCosmetic(id);
-      if (result != null)
-      {
-        return Results.Ok(ApiResponse<CosmeticResponse>.SuccessResponse(result.Data!, "Delete Cosmetic Successfully."));
-      }
-
-      return Results.StatusCode(StatusCodes.Status500InternalServerError);
+      return result.Match(Message.SUCCESSFUL_DELETED("Cosmetic"));
     })
-    .WithName("DeleteCosmeticById")
+    .WithName("DeleteCosmetic")
     .Produces<ApiResponse<CosmeticResponse>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status404NotFound)
     .ProducesProblem(StatusCodes.Status500InternalServerError)
-    .WithSummary("DeleteCosmeticById")
-    .WithDescription("Delete Cosmetic By Id");
+    .WithSummary("Delete Cosmetic")
+    .WithDescription("Delete a cosmetic by its unique identifier");
     #endregion
 
-    #region Create Cosmetic By Id API
+    #region Create Cosmetic API
     group.MapPost("/", async (ICosmeticService service, [FromForm] CreateCosmetic cosmetic) =>
     {
       var result = await service.CreateCosmetic(cosmetic);
-      if (result != null)
-      {
-        return Results.Ok(ApiResponse<CosmeticResponse>.SuccessResponse(result.Data!, "Create Cosmetic Successfully."));
-      }
-
-      return Results.StatusCode(StatusCodes.Status500InternalServerError);
+      return result.Match(Message.SUCCESSFUL_CREATED("Cosmetic"));
     })
-    .WithName("CreateCosmeticById")
-    .Produces<ApiResponse<CosmeticResponse>>(StatusCodes.Status200OK)
+    .WithName("CreateCosmetic")
+    .Produces<ApiResponse<CosmeticResponse>>(StatusCodes.Status201Created)
+    .ProducesProblem(StatusCodes.Status400BadRequest)
     .ProducesProblem(StatusCodes.Status500InternalServerError)
-    .WithSummary("CreateCosmeticById")
-    .WithDescription("CreateCosmetic By Id")
+    .WithSummary("Create Cosmetic")
+    .WithDescription("Create a new cosmetic product with all its details")
     .DisableAntiforgery();
     #endregion
 
-    #region Filter Cosmetic  API
+    #region Filter Cosmetics API
     group.MapGet("/filter", async (ICosmeticService service, [AsParameters] FilterCosmeticRequest request) =>
     {
       var result = await service.SearchCosmetics(request);
-      if (result != null)
-      {
-        return Results.Ok(ApiResponse<List<CosmeticResponse>>.SuccessResponse(result.Data!, "Search Cosmetic Successfully."));
-      }
-
-      return Results.StatusCode(StatusCodes.Status500InternalServerError);
+      return result.Match(Message.SUCCESSFUL_RETRIEVED("Cosmetics"));
     })
-    .WithName("FilterCosmetic")
+    .WithName("FilterCosmetics")
     .Produces<ApiResponse<List<CosmeticResponse>>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status404NotFound)
     .ProducesProblem(StatusCodes.Status500InternalServerError)
-    .WithSummary("FilterCosmetic")
-    .WithDescription("FilterCosmetic");
+    .WithSummary("Filter Cosmetics")
+    .WithDescription("Search and filter cosmetics by various criteria");
     #endregion
 
     #region Upload Cosmetic Thumbnail API
@@ -130,19 +110,20 @@ public class CosmeticController : ICarterModule
     #endregion
 
     #region Upload Cosmetic Images API
-    group.MapPut("/images", async (ICosmeticService service, [FromForm] CosmeticImagesUploadRequest request) =>
+    group.MapPost("/{id}/images", async (ICosmeticService service, Guid id, [FromForm] CosmeticImagesUploadRequest request) =>
     {
+      // Ensure the ID in the route matches the request
+      request.CosmeticId = id;
       var result = await service.UploadCosmeticImages(request);
-
-      return result.Match(Message.SUCCESSFUL_CREATED(nameof(result)));
+      return result.Match(Message.SUCCESSFUL_CREATED("Cosmetic Images"));
     })
     .WithName("UploadCosmeticImages")
-    .Produces<ApiResponse<CosmeticResponse>>(StatusCodes.Status200OK)
+    .Produces<ApiResponse<CosmeticResponse>>(StatusCodes.Status201Created)
     .ProducesProblem(StatusCodes.Status400BadRequest)
+    .ProducesProblem(StatusCodes.Status404NotFound)
     .ProducesProblem(StatusCodes.Status500InternalServerError)
-    .WithSummary("UploadCosmeticImages")
-    .WithDescription("Upload Cosmetic Images")
-    //.RequireAuthorization()
+    .WithSummary("Upload Cosmetic Images")
+    .WithDescription("Upload multiple images for a specific cosmetic product")
     .DisableAntiforgery();
     #endregion
   }

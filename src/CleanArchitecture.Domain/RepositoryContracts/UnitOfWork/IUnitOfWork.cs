@@ -1,4 +1,6 @@
-﻿namespace CleanArchitecture.Domain.RepositoryContracts.UnitOfWork;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+
+namespace CleanArchitecture.Domain.RepositoryContracts.UnitOfWork;
 
 public interface IUnitOfWork : IDisposable
 {
@@ -40,7 +42,7 @@ public interface IUnitOfWork : IDisposable
   ITestimonialRepository Testimonials { get; }
   IUserRepository Users { get; }
   #endregion
-
+  Task<IDbContextTransaction> BeginTransactionAsync();
   Task RollBackAsync();
   Task<bool> CompleteAsync();
 }
