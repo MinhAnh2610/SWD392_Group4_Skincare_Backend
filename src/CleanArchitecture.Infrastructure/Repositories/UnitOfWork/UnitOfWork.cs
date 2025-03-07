@@ -84,7 +84,10 @@ public class UnitOfWork : IUnitOfWork
       return false;
     }
   }
-
+  public async Task<IDbContextTransaction> BeginTransactionAsync()
+  {
+    return await _context.Database.BeginTransactionAsync();
+  }
   public void Dispose()
   {
     _transaction?.Dispose();

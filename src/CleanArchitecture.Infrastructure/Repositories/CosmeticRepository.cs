@@ -49,14 +49,15 @@ public class CosmeticRepository : GenericRepository<Cosmetic>, ICosmeticReposito
 
   public async Task<decimal> GetCosmeticPrice(Cosmetic cosmetic)
   {
-    var price = await(
-      from cosmeticPrice in _context.CosmeticPrices
-      join events in _context.Events on cosmeticPrice.EventId equals events.Id
-      where cosmeticPrice.CosmeticId == cosmetic.Id
-      select (cosmeticPrice.OriginalPrice * (100 - events.DiscountPercentage)) / 100
-      ).FirstOrDefaultAsync();
+    var price = await (
+        from cosmeticPrice in _context.CosmeticPrices
+        join events in _context.Events on cosmeticPrice.EventId equals events.Id into eventGroup
+        from e in eventGroup.DefaultIfEmpty()
+        where cosmeticPrice.CosmeticId == cosmetic.Id
+        select cosmeticPrice.OriginalPrice * (e != null ? (100m - e.DiscountPercentage) / 100m : 1m)
+    ).FirstOrDefaultAsync();
 
-    return (decimal)price;
+    return (decimal)(price != 0m ? price : 0m); // Return 0 if no price exists, adjust as per business logic
   }
 
   public async Task<decimal> GetCartItemPriceByCart(Cart cart)
