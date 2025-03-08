@@ -1,5 +1,6 @@
 ﻿using CleanArchitecture.Application.DTOs.UserDto;
 using CleanArchitecture.Application.Enums;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CleanArchitecture.Presentation.Endpoints;
 
@@ -52,7 +53,10 @@ public class UserController : ICarterModule
     .ProducesProblem(StatusCodes.Status500InternalServerError)
     .WithSummary("GetAllUsers")
     .WithDescription("Get All Users")
-    .RequireAuthorization();
+    .RequireAuthorization(new AuthorizeAttribute
+    {
+      Roles = "Manager, Staff"
+    });
     #endregion
 
     #region Update User Profile API
@@ -144,5 +148,23 @@ public class UserController : ICarterModule
     });
     #endregion
 
+    #region Create Walk In User API
+    group.MapPost("/walkin", async (IUserService userService, [FromBody] CreateWalkInUserRequest request) =>
+    {
+      var result = await userService.CreateWalkInUser(request);
+
+      return result.Match(Message.SUCCESSFUL_CREATED(nameof(result)));
+    })
+    .WithName("CreateWalkInUser")
+    .Produces<ApiResponse<UserProfileResponse>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status401Unauthorized)
+    .ProducesProblem(StatusCodes.Status500InternalServerError)
+    .WithSummary("CreateWalkInUser")
+    .WithDescription("Create Walk In User")
+    .RequireAuthorization(new AuthorizeAttribute
+    {
+      Roles = "Staff, Manager"
+    });
+    #endregion
   }
 }

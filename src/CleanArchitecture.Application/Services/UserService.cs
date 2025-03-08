@@ -1,5 +1,9 @@
-﻿using CleanArchitecture.Application.DTOs.SkinTypeDto;
+﻿using Azure.Core;
+using CleanArchitecture.Application.Common;
+using CleanArchitecture.Application.DTOs.SkinTypeDto;
 using CleanArchitecture.Application.DTOs.UserDto;
+using CleanArchitecture.Application.Enums;
+using CleanArchitecture.Domain.RepositoryContracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
@@ -12,19 +16,61 @@ public class UserService : IUserService
   private readonly UserManager<User> _userManager;
   private readonly IValidator<UpdateProfileRequest> _updateProfileValidator;
   private readonly IValidator<UserRequest> _userValidator;
+  private readonly IValidator<CreateWalkInUserRequest> _createWalkInUserRequest;
   private readonly IUnitOfWork _unitOfWork;
 
   public UserService(IHttpContextAccessor httpContextAccessor,
                      UserManager<User> userManager,
                      IValidator<UpdateProfileRequest> updateProfileValidator,
                      IValidator<UserRequest> userValidator,
+                     IValidator<CreateWalkInUserRequest> createWalkInUserRequest,
                      IUnitOfWork unitOfWork)
   {
     _httpContextAccessor = httpContextAccessor;
     _userManager = userManager;
     _updateProfileValidator = updateProfileValidator;
     _userValidator = userValidator;
+    _createWalkInUserRequest = createWalkInUserRequest;
     _unitOfWork = unitOfWork;
+  }
+
+  public async Task<Result<UserProfileResponse>> CreateWalkInUser(CreateWalkInUserRequest request)
+  {
+    var validationResult = await _createWalkInUserRequest.ValidateAsync(request);
+    if (!validationResult.IsValid)
+    {
+      throw new ValidationException(validationResult.Errors);
+    }
+
+    if (await _userManager.FindByNameAsync(request.UserName!) != null)
+    {
+      return Result<UserProfileResponse>.Failure([AuthErrors.DuplicateUserName], StatusCodes.Status409Conflict);
+    }
+    if (await _unitOfWork.Users.GetByPhoneNumberAsync(request.PhoneNumber) != null)
+    {
+      return Result<UserProfileResponse>.Failure([AuthErrors.DuplicatePhoneNumber], StatusCodes.Status409Conflict);
+    }
+
+    var user = new User
+    {
+      UserName = request.UserName,
+      PhoneNumber = request.PhoneNumber
+    };
+
+    var result = await _userManager.CreateAsync(user, request.Password);
+    if (!result.Succeeded)
+    {
+      var errors = result.Errors.Select(e => new Error(e.Code, e.Description)).ToList();
+      return Result<UserProfileResponse>.Failure(errors, StatusCodes.Status500InternalServerError);
+    }
+    var roleResult = await _userManager.AddToRolesAsync(user, [Roles.Customer]);
+    if (!roleResult.Succeeded)
+    {
+      var errors = roleResult.Errors.Select(e => new Error(e.Code, e.Description)).ToList();
+      return Result<UserProfileResponse>.Failure(errors, StatusCodes.Status500InternalServerError);
+    }
+    await _unitOfWork.CompleteAsync();
+    return Result<UserProfileResponse>.Success(default!, StatusCodes.Status200OK);
   }
 
   public async Task<Result<string>> DisableUserAsync(UserRequest request)
@@ -144,7 +190,7 @@ public class UserService : IUserService
       Roles = userRoles.ToList(),
       SkinTypeId = userInfo.SkinTypeId.ToString(),
       SkinType = new SkinTypeResponse
-      { 
+      {
         Id = userInfo.Id,
         Description = userSkinType.Description,
         Name = userSkinType.Name,
