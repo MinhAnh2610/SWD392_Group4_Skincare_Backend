@@ -2,6 +2,5 @@
 
 public record CreateWalkInUserRequest(
   string UserName,
-  string PhoneNumber,
-  string Password
+  string PhoneNumber
   );

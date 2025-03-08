@@ -57,7 +57,7 @@ public class UserService : IUserService
       PhoneNumber = request.PhoneNumber
     };
 
-    var result = await _userManager.CreateAsync(user, request.Password);
+    var result = await _userManager.CreateAsync(user, request.PhoneNumber);
     if (!result.Succeeded)
     {
       var errors = result.Errors.Select(e => new Error(e.Code, e.Description)).ToList();

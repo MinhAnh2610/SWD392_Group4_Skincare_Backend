@@ -13,9 +13,5 @@ public class CreateWalkInUserValidator : AbstractValidator<CreateWalkInUserReque
     RuleFor(x => x.PhoneNumber)
             .NotEmpty().WithMessage("Phone number is required.")
             .Matches(@"^\+?\d{10,15}$").WithMessage("Invalid phone number format.");
-
-    RuleFor(x => x.Password)
-        .NotEmpty().WithMessage("Password is required.")
-        .MinimumLength(5).WithMessage("Password must be at least 5 characters long.");
   }
 }
