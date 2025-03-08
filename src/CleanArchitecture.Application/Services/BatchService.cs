@@ -21,7 +21,7 @@ namespace CleanArchitecture.Application.Services
     public async Task<Result<BatchResponse>> CreateBatch(BatchCreateRequest batch)
     {
       var orgbatch = batch.Adapt<Batch>();
-      orgbatch.Cosmetic = new Cosmetic { Id = batch.CosmeticId };
+      //orgbatch.Cosmetic = new Cosmetic { Id = batch.CosmeticId };
       orgbatch.CosmeticId = batch.CosmeticId;
       orgbatch.Quantity = batch.Quantity;
       orgbatch.ExportedDate = batch.ExportedDate;
@@ -29,6 +29,14 @@ namespace CleanArchitecture.Application.Services
       orgbatch.ExpirationDate = batch.ExpirationDate;
 
       _unitOfWork.Batches.Create(orgbatch);
+
+      var isSaved = await _unitOfWork.CompleteAsync();
+      if (!isSaved)
+      {
+        var error = _errorFactory.CreateDatabaseError("Batch");
+        return Result<BatchResponse>.Failure([error.err], error.statusCode);
+      }
+
       var output = orgbatch.Adapt<BatchResponse>();
       return Result<BatchResponse>.Success(output, StatusCodes.Status201Created);
     }
@@ -74,7 +82,7 @@ namespace CleanArchitecture.Application.Services
         var error = _errorFactory.CreateNotFoundError("Batch");
         return Result<BatchResponse>.Failure([error.err], error.statusCode);
       }
-      
+
       return Result<BatchResponse>.Success(batch.Adapt<BatchResponse>(), StatusCodes.Status200OK);
     }
 

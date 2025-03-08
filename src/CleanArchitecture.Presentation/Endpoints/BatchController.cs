@@ -1,11 +1,6 @@
 ﻿using CleanArchitecture.Application.DTOs.BatchDto;
 using CleanArchitecture.Application.Exceptions;
-using CleanArchitecture.Application.Services;
-using CleanArchitecture.Domain.Entities;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 
 namespace CleanArchitecture.Presentation.Endpoints;
 
@@ -19,9 +14,7 @@ public class BatchController : ICarterModule
     group.MapPost("/create", async (IBatchService service, BatchCreateRequest request) =>
     {
       var result = await service.CreateBatch(request);
-      return result.IsSuccess
-          ? Results.Ok(ApiResponse<BatchResponse>.SuccessResponse(result.Data!, "Batch created successfully"))
-          : Results.StatusCode(StatusCodes.Status500InternalServerError);
+      return result.Match(Message.SUCCESSFUL_CREATED(nameof(result)));
     })
     .WithName("CreateBatch")
     .Produces<ApiResponse<BatchResponse>>(StatusCodes.Status201Created)
@@ -118,17 +111,17 @@ public class BatchController : ICarterModule
         [FromQuery] DateOnly endDate,
         [FromQuery] string searchTypes = "Exported,Manufacture,Expiration") =>
     {
-          if (startDate > endDate)
-            {
-                return Results.BadRequest(ApiResponse<List<BatchResponse>>.FailureResponse([BatchErrors.WrongDateRange],
-        "Start date cannot be after end date"));
-            }
-      
-          if (!Enum.TryParse<DateSearchType>(searchTypes, out var parsedTypes))
-            {
-              return Results.BadRequest(ApiResponse<List<BatchResponse>>.FailureResponse([BatchErrors.WrongSearchType],
-        "Invalid search types provided"));
-           }
+      if (startDate > endDate)
+      {
+        return Results.BadRequest(ApiResponse<List<BatchResponse>>.FailureResponse([BatchErrors.WrongDateRange],
+"Start date cannot be after end date"));
+      }
+
+      if (!Enum.TryParse<DateSearchType>(searchTypes, out var parsedTypes))
+      {
+        return Results.BadRequest(ApiResponse<List<BatchResponse>>.FailureResponse([BatchErrors.WrongSearchType],
+  "Invalid search types provided"));
+      }
       var result = await service.GetBatchesByDateRangeAsync(startDate, endDate, parsedTypes);
       return result.IsSuccess
           ? Results.Ok(ApiResponse<List<BatchResponse>>.SuccessResponse(result.Data!, "Batches found"))
