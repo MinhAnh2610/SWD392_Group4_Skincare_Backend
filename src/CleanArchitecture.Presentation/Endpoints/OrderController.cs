@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Application.DTOs.Order;
+﻿using CleanArchitecture.Application.Constants;
+using CleanArchitecture.Application.DTOs.Order;
 using CleanArchitecture.Application.DTOs.OrderDto;
 using CleanArchitecture.Application.DTOs.VnPay;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +12,9 @@ public class OrderController : ICarterModule
 
     // 1. Create Order
     group.MapPost("/", async (
-        [FromBody] CreateOrderRequest request,
+        [FromBody] CreateOnlineOrderRequest request,
         IOrderService orderService,
-        IVnPayIntegrationService vnPayIntegrationService,
-        HttpContext context) =>
+        [FromQuery] string? orderType = "online")=>
     {
       var result = await orderService.InitiateOrder(request);
       if (result.IsSuccess)
@@ -40,6 +40,18 @@ public class OrderController : ICarterModule
     .WithSummary("CreateOrder")
     .WithDescription("Create Order");
 
+    group.MapPost("/walkin", async ([FromBody] CreateWalkInOrderRequest request, IOrderService orderService) =>
+    {
+      var result = await orderService.InitiateOrder(request);
+
+      return result.Match(Message.SUCCESSFUL_CREATED(nameof(result)));
+    })
+    .WithName("CreateWalkInOrder")
+    .Produces<ApiResponse<OrderResponse>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status400BadRequest)
+    .WithSummary("CreateWalkInOrder")
+    .WithDescription("Create Walk-In Order");
+    
     // 2. Complete Order (After payment)
     group.MapPost("/{orderId}/complete", async (
         Guid orderId,

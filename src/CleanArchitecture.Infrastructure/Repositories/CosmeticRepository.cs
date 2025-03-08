@@ -9,7 +9,6 @@ public class CosmeticRepository : GenericRepository<Cosmetic>, ICosmeticReposito
 {
   public CosmeticRepository(ApplicationDbContext context) : base(context)
   {
-
   }
 
   public async Task<List<Cosmetic>> GetListByAnyId(Expression<Func<Cosmetic, bool>> predicate)
@@ -42,9 +41,9 @@ public class CosmeticRepository : GenericRepository<Cosmetic>, ICosmeticReposito
         .Where(c => c.Id == id)
         .ProjectToType<CosmeticResponse>()
         .FirstOrDefaultAsync();
+
     var cosmetics = cosmeticsdtos.Adapt<Cosmetic>();
     return cosmetics;
-
   }
 
   public async Task<decimal> GetCosmeticPrice(Cosmetic cosmetic)
@@ -58,6 +57,17 @@ public class CosmeticRepository : GenericRepository<Cosmetic>, ICosmeticReposito
     ).FirstOrDefaultAsync();
 
     return (decimal)(price != 0m ? price : 0m); // Return 0 if no price exists, adjust as per business logic
+  }
+
+  public async Task<decimal> GetCosmeticOriginalPrice(Cosmetic cosmetic)
+  {
+    var originalPrice = await (
+      from cosmeticPrice in _context.CosmeticPrices
+      where cosmeticPrice.CosmeticId == cosmetic.Id
+      select cosmeticPrice.OriginalPrice
+    ).FirstOrDefaultAsync();
+    
+    return (originalPrice != 0m ? originalPrice : 0m);
   }
 
   public async Task<decimal> GetCartItemPriceByCart(Cart cart)

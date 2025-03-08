@@ -4,6 +4,6 @@ namespace CleanArchitecture.Application.Strategies.InvoiceGenerateStrategy
 {
   public interface IInvoiceGenerateStrategy
   {
-    byte[] Generate(Order order);
+    Task<byte[]> GenerateAsync(Order order, IUnitOfWork unitOfWork);
   }
 }

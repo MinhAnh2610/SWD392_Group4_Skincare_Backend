@@ -2,7 +2,7 @@
 
 namespace CleanArchitecture.Application.Validators.Order;
 
-public class CreateOrderRequestValidator : AbstractValidator<CreateOrderRequest>
+public class CreateOrderRequestValidator : AbstractValidator<CreateOnlineOrderRequest>
 {
   public CreateOrderRequestValidator()
   {

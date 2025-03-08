@@ -20,6 +20,12 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
       .WithOne(orderItem => orderItem.Order)
       .HasForeignKey(orderItem => orderItem.OrderId);
 
+    builder.Property(order => order.BillingAddress).IsRequired(false);
+    builder.Property(order => order.TrackingNumber).IsRequired(false);
+    builder.Property(order => order.DeliveryDate).IsRequired(false);
+    builder.Property(order => order.ShippingAddress).IsRequired(false);
+      
+
     builder.Property(order => order.OrderDate)
       .HasColumnType("timestamp")
       .HasDefaultValueSql("CURRENT_TIMESTAMP");
