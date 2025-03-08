@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CleanArchitecture.Application.DTOs.BatchDto
 {
@@ -14,8 +9,7 @@ namespace CleanArchitecture.Application.DTOs.BatchDto
     [Range(0, int.MaxValue)]
     [Required]
     public int Quantity { get; set; }
-    [Required]
-    public DateOnly ExportedDate { get; set; }
+    public DateOnly ExportedDate => DateOnly.FromDateTime(DateTime.UtcNow);
     [Required]
     public DateOnly ManufactureDate { get; set; }
     [Required]
