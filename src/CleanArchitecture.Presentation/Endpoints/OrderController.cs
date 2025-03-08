@@ -17,25 +17,11 @@ public class OrderController : ICarterModule
         [FromQuery] string? orderType = "online")=>
     {
       var result = await orderService.InitiateOrder(request);
-      if (result.IsSuccess)
-      {
-        var response = new CreateOrderResponse
-        {
-          OrderId = result.Data.Id,
-          Status = result.Data.Status,
-          PaymentUrl = result.Data.PaymentUrl
-        };
-
-        return Results.Ok(ApiResponse<CreateOrderResponse>.SuccessResponse(
-          response,
-          "Order initiated successfully."
-        ));
-      }
 
       return result.Match(Message.SUCCESSFUL_CREATED(nameof(result)));
     })
     .WithName("CreateOrder")
-    .Produces<ApiResponse<CreateOrderResponse>>(StatusCodes.Status200OK)
+    .Produces<ApiResponse<OrderResponse>>(StatusCodes.Status200OK)
     .ProducesProblem(StatusCodes.Status400BadRequest)
     .WithSummary("CreateOrder")
     .WithDescription("Create Order");
