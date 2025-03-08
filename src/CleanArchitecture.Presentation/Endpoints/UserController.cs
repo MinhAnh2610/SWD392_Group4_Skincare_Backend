@@ -53,7 +53,10 @@ public class UserController : ICarterModule
     .ProducesProblem(StatusCodes.Status500InternalServerError)
     .WithSummary("GetAllUsers")
     .WithDescription("Get All Users")
-    .RequireAuthorization();
+    .RequireAuthorization(new AuthorizeAttribute
+    {
+      Roles = "Manager, Staff"
+    });
     #endregion
 
     #region Update User Profile API
@@ -160,7 +163,7 @@ public class UserController : ICarterModule
     .WithDescription("Create Walk In User")
     .RequireAuthorization(new AuthorizeAttribute
     {
-      Roles = "Staff, Admin"
+      Roles = "Staff, Manager"
     });
     #endregion
   }
