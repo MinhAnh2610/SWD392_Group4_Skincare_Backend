@@ -4,7 +4,6 @@
   public User Customer { get; set; } = default!;
   public Guid? CouponId { get; set; }
   public Coupon? Coupon { get; set; }  // made nullable if coupon is optional
-  public Payment? Payment { get; set; }  // allow null until payment is recorded
   public decimal SubTotal { get; set; }
   public decimal TotalPrice { get; set; }
   public DateTime OrderDate { get; set; }

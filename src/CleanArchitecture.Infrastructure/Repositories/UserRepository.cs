@@ -13,4 +13,10 @@ public class UserRepository : GenericRepository<User>, IUserRepository
   {
     return await _context.Users.Include(u => u.UserRoles).ToListAsync();
   }
+
+  public async Task<User?> GetByPhoneNumberAsync(string phoneNumber)
+  {
+    return await _context.Users.Where(user => user.PhoneNumber == phoneNumber).FirstOrDefaultAsync();
+      
+  }
 }

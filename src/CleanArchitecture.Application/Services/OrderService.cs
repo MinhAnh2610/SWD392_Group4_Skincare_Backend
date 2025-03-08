@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Application.Constants;
+﻿using Castle.Core.Internal;
+using CleanArchitecture.Application.Constants;
 using CleanArchitecture.Application.DTOs.GHN.Request;
 using CleanArchitecture.Application.DTOs.GHN.Response;
 using CleanArchitecture.Application.DTOs.Order;
@@ -20,22 +21,23 @@ public class OrderService : IOrderService
   private readonly ITimeZoneService _timeZoneService;
   private readonly IVnPayIntegrationService _vnPayIntegrationService;
   private readonly IHttpContextAccessor _httpContextAccessor;
-  private readonly IValidator<CreateOrderRequest> _createOrderRequestValidator;
+  private readonly IValidator<CreateOnlineOrderRequest> _createOrderRequestValidator;
+  private readonly IValidator<CreateWalkInOrderRequest> _createWalkInOrderRequestValidator;
   private readonly UserManager<User> _userManager;
 
   // Exchange rate from USD to VND - should ideally come from a service
   private const decimal USD_TO_VND_RATE = 24850;
 
   public OrderService(
-      IUnitOfWork unitOfWork,
-      IErrorFactory errorFactory,
-      IClaimsService claimsService,
-      IGHNService ghnService,
-      ITimeZoneService timeZoneService,
-      IVnPayIntegrationService vnPayIntegrationService,
-      IHttpContextAccessor httpContextAccessor,
-      IValidator<CreateOrderRequest> createOrderRequestValidator,
-      UserManager<User> userManager)
+    IUnitOfWork unitOfWork,
+    IErrorFactory errorFactory,
+    IClaimsService claimsService,
+    IGHNService ghnService,
+    ITimeZoneService timeZoneService,
+    IVnPayIntegrationService vnPayIntegrationService,
+    IHttpContextAccessor httpContextAccessor,
+    IValidator<CreateOnlineOrderRequest> createOrderRequestValidator,
+    UserManager<User> userManager, IValidator<CreateWalkInOrderRequest> createWalkInOrderRequestValidator, IEnumerable<IInvoiceGenerateStrategy> invoiceGenerateStrategies)
   {
     _unitOfWork = unitOfWork;
     _errorFactory = errorFactory;
@@ -46,10 +48,12 @@ public class OrderService : IOrderService
     _httpContextAccessor = httpContextAccessor;
     _createOrderRequestValidator = createOrderRequestValidator;
     _userManager = userManager;
+    _createWalkInOrderRequestValidator = createWalkInOrderRequestValidator;
+    _invoiceGenerateStrategies = invoiceGenerateStrategies;
   }
 
   // 1. Initiate Order (First step of checkout)
-  public async Task<Result<OrderResponse>> InitiateOrder(CreateOrderRequest request)
+  public async Task<Result<OrderResponse>> InitiateOrder(CreateOnlineOrderRequest request)
   {
     try
     {
@@ -57,8 +61,8 @@ public class OrderService : IOrderService
       if (!validationResult.IsValid)
       {
         var errors = validationResult.Errors
-            .Select(e => new Error("ValidationError", e.ErrorMessage))
-            .ToList();
+          .Select(e => new Error("ValidationError", e.ErrorMessage))
+          .ToList();
 
         return Result<OrderResponse>.Failure(errors, StatusCodes.Status400BadRequest);
       }
@@ -69,8 +73,8 @@ public class OrderService : IOrderService
       {
         // Create a proper Result<OrderResponse> from the Result<Cart>
         return Result<OrderResponse>.Failure(
-            cartValidationResult.Errors,
-            cartValidationResult.Status);
+          cartValidationResult.Errors,
+          cartValidationResult.Status);
       }
 
       var cart = cartValidationResult.Data;
@@ -80,8 +84,8 @@ public class OrderService : IOrderService
       if (!inventoryResult.IsSuccess)
       {
         return Result<OrderResponse>.Failure(
-            inventoryResult.Errors,
-            inventoryResult.Status);
+          inventoryResult.Errors,
+          inventoryResult.Status);
       }
 
       // Calculate shipping dimensions
@@ -97,20 +101,25 @@ public class OrderService : IOrderService
       var customer = await _userManager.FindByIdAsync(_claimsService.CurrentUserId.ToString());
 
       // Create order
-      var order = CreateOrderEntity(request, cart, totalPrice);
+      var order = CreateOrderEntity(request, cart);
+      decimal subTotal = 0;
       foreach (var item in order.OrderItems)
       {
-        item.SellingPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(item.Cosmetic);
+        subTotal += await _unitOfWork.Cosmetics.GetCosmeticOriginalPrice(item.Cosmetic) * item.Quantity;
+        item.SellingPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(item.Cosmetic) * item.Quantity;
       }
+      
+      order.SubTotal = subTotal;
 
-      // Get Shop Info for Create a Shipping Order
+      // Get Shop Info for Create a Shipping Orer
       var shopInfo = await _ghnService.GetStoreInformationAsync();
 
       decimal codAmount = request.PaymentMethod == PaymentMethods.COD ? totalPrice : 0;
       int paymentTypeId = request.PaymentMethod == PaymentMethods.COD ? 2 : 1;
 
       // Create Shipping Order in GHN
-      var ghnOrderResult = await _ghnService.CreateShippingOrderAsync(MapToCreateShippingOrderRequest(order, shopInfo.Data!, request, shippingDetails, customer!, codAmount, paymentTypeId));
+      var ghnOrderResult = await _ghnService.CreateShippingOrderAsync(MapToCreateShippingOrderRequest(order,
+        shopInfo.Data!, request, shippingDetails, customer!, codAmount, paymentTypeId));
       if (!ghnOrderResult.IsSuccess)
       {
         return Result<OrderResponse>.Failure(ghnOrderResult.Errors, ghnOrderResult.Status);
@@ -125,7 +134,7 @@ public class OrderService : IOrderService
 
       // Handle payment method specific logic
       await HandlePaymentMethod(request.PaymentMethod, order, orderResponse);
-      
+
       // Save order to database
       _unitOfWork.Orders.Create(order);
 
@@ -136,38 +145,134 @@ public class OrderService : IOrderService
       if (!saved)
       {
         return Result<OrderResponse>.Failure(
-            [new Error("Order.Create", "Failed to save order")],
-            StatusCodes.Status500InternalServerError);
+          [new Error("Order.Create", "Failed to save order")],
+          StatusCodes.Status500InternalServerError);
       }
+
+      var invoiceStrategy = _invoiceGenerateStrategies.OfType<OnlineInvoiceStrategy>().FirstOrDefault();
+      byte[] invoice = [];
+      if (invoiceStrategy != null)
+      {
+        invoice = await invoiceStrategy.GenerateAsync(order, _unitOfWork);
+      }
+      
+      orderResponse.Invoice = invoice;
+
       return Result<OrderResponse>.Success(
-          orderResponse,
-          StatusCodes.Status200OK);
+        orderResponse,
+        StatusCodes.Status200OK);
     }
     catch (Exception ex)
     {
       return Result<OrderResponse>.Failure(
-          [new Error("Order.Create", ex.Message)],
-          StatusCodes.Status500InternalServerError);
+        [new Error("Order.Create", ex.Message)],
+        StatusCodes.Status500InternalServerError);
     }
   }
 
-  private async Task<Result<Cart>> ValidateOrderRequest(CreateOrderRequest request)
+  public async Task<Result<OrderResponse>> InitiateOrder(CreateWalkInOrderRequest request)
+  {
+    var validationResult = await _createWalkInOrderRequestValidator.ValidateAsync(request);
+    if (!validationResult.IsValid)
+    {
+      var error = _errorFactory.CreateValidationError(nameof(request), validationResult);
+      return Result<OrderResponse>.Failure(error.errs, error.statusCode);
+    }
+
+    if (request.CouponId is not null)
+    {
+      var coupon = await _unitOfWork.Coupons.GetByIdAsync(request.CouponId);
+      if (coupon is null)
+      {
+        var error = _errorFactory.CreateInvalidCouponError();
+        return Result<OrderResponse>.Failure([error.err], error.statusCode);
+      }
+    }
+
+    var customer = await _unitOfWork.Users.GetByPhoneNumberAsync(request.CustomerPhoneNumber);
+
+    if (customer is null)
+    {
+      var error = _errorFactory.CreateNotFoundError("Customer");
+      return Result<OrderResponse>.Failure([error.err], error.statusCode);
+    }
+
+    var order = new Order()
+    {
+      CustomerId = customer.Id,
+      CouponId = request.CouponId,
+      CreateAt = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow),
+      OrderDate = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow),
+      IsActive = true
+    };
+    
+    List<OrderItem> orderItems = new List<OrderItem>();
+    decimal subTotal = 0;
+    decimal totalPrice = 0;
+
+    foreach (var orderItem in request.Cosmetics)
+    {
+      var cosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(orderItem.Key);
+      if (cosmetic is null)
+        return null;
+      
+      var originalPrice = await _unitOfWork.Cosmetics.GetCosmeticOriginalPrice(cosmetic);
+      var sellingPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
+      var quantity = orderItem.Value;
+      subTotal+= originalPrice * quantity;
+      totalPrice += sellingPrice * quantity;
+      
+      orderItems.Add(new OrderItem()
+      {
+        CosmeticId = cosmetic.Id, SellingPrice = sellingPrice * orderItem.Value, Quantity = orderItem.Value, OrderId = order.Id
+      });
+    }
+
+    if (request.CouponId is not null)
+    {
+      var coupon = await _unitOfWork.Coupons.GetByIdAsync(request.CouponId);
+      totalPrice = (totalPrice * (100m - (decimal)coupon.DiscountAmount)) / 100m;
+    }
+    order.TotalPrice = totalPrice;
+    order.SubTotal = subTotal;
+    order.OrderItems = orderItems;
+    order.Status = OrderStatus.PENDING;
+    
+    await _unitOfWork.Orders.CreateAsync(order);
+    await _unitOfWork.CompleteAsync();
+    
+    var invoiceStrategy = _invoiceGenerateStrategies.OfType<WalkInInvoiceStrategy>().FirstOrDefault();
+    var invoiceByte = await invoiceStrategy.GenerateAsync(order, _unitOfWork);
+    if (invoiceByte.Length == 0)
+    {
+      var error = _errorFactory.CreateFileCreatedFailed("Invoice");
+      return Result<OrderResponse>.Failure([error.err], error.statusCode);
+    }
+
+    var orderResponse = MapToOrderResponse(order);
+    orderResponse.CustomerId = customer.Id;
+    orderResponse.Invoice = invoiceByte;
+
+    return Result<OrderResponse>.Success(orderResponse, StatusCodes.Status200OK);
+  }
+
+  private async Task<Result<Cart>> ValidateOrderRequest(CreateOnlineOrderRequest request)
   {
     // Validate cart exists and has items
     var cart = await _unitOfWork.Carts.GetCartWithItemsAsync(request.CartId);
     if (cart == null || !cart.CartItems.Any())
     {
       return Result<Cart>.Failure(
-          [new Error("Order.Invalid", "Cart not found or empty")],
-          StatusCodes.Status400BadRequest);
+        [new Error("Order.Invalid", "Cart not found or empty")],
+        StatusCodes.Status400BadRequest);
     }
 
     // Validate cart belongs to current user
     if (cart.CustomerId != _claimsService.CurrentUserId)
     {
       return Result<Cart>.Failure(
-          [new Error("Order.Unauthorized", "Not authorized to access this cart")],
-          StatusCodes.Status403Forbidden);
+        [new Error("Order.Unauthorized", "Not authorized to access this cart")],
+        StatusCodes.Status403Forbidden);
     }
 
     // Validate addresses
@@ -175,8 +280,8 @@ public class OrderService : IOrderService
         string.IsNullOrEmpty(request.BillingAddress))
     {
       return Result<Cart>.Failure(
-          [new Error("Order.Invalid", "Shipping and billing addresses are required")],
-          StatusCodes.Status400BadRequest);
+        [new Error("Order.Invalid", "Shipping and billing addresses are required")],
+        StatusCodes.Status400BadRequest);
     }
 
     return Result<Cart>.Success(cart, StatusCodes.Status200OK);
@@ -204,16 +309,16 @@ public class OrderService : IOrderService
       if (!availableBatches.Any())
       {
         return Result<bool>.Failure(
-            [new Error("Order.ExpiredStock", "All available stock has expired")],
-            StatusCodes.Status400BadRequest);
+          [new Error("Order.ExpiredStock", "All available stock has expired")],
+          StatusCodes.Status400BadRequest);
       }
 
       int totalAvailable = availableBatches.Sum(b => b.Quantity);
       if (totalAvailable < quantityNeeded)
       {
         return Result<bool>.Failure(
-            [new Error("Order.InsufficientStock", "Not enough stock available")],
-            StatusCodes.Status400BadRequest);
+          [new Error("Order.InsufficientStock", "Not enough stock available")],
+          StatusCodes.Status400BadRequest);
       }
 
       // Deduct from batches (FIFO)
@@ -254,24 +359,16 @@ public class OrderService : IOrderService
       totalHeight += cartItem.Cosmetic.Height * cartItem.Quantity; // Stack height
     }
 
-    return new ShippingDetails
-    {
-      Weight = totalWeight,
-      Length = totalLength,
-      Width = totalWidth,
-      Height = totalHeight
-    };
+    return new ShippingDetails { Weight = totalWeight, Length = totalLength, Width = totalWidth, Height = totalHeight };
   }
 
-  private Order CreateOrderEntity(CreateOrderRequest request, Cart cart, decimal totalPrice)
+  private Order CreateOrderEntity(CreateOnlineOrderRequest request, Cart cart)
   {
     return new Order
     {
       Id = Guid.NewGuid(),
       CustomerId = cart.CustomerId,
       CouponId = request.CouponId,
-      SubTotal = totalPrice, // Using possibly converted price
-      TotalPrice = totalPrice, // Using possibly converted price
       OrderDate = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow),
       ShippingAddress = request.ShippingAddress,
       BillingAddress = request.BillingAddress,
@@ -283,9 +380,7 @@ public class OrderService : IOrderService
       LastModifiedBy = cart.Customer.UserName,
       OrderItems = cart.CartItems.Select(ci => new OrderItem
       {
-        Cosmetic = ci.Cosmetic,
-        CosmeticId = ci.CosmeticId,
-        Quantity = ci.Quantity
+        Cosmetic = ci.Cosmetic, CosmeticId = ci.CosmeticId, Quantity = ci.Quantity
       }).ToList(),
       // Set default delivery date to 7 days from now
       DeliveryDate = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow.AddDays(7))
@@ -306,9 +401,7 @@ public class OrderService : IOrderService
     {
       var vnPayRequest = new VnPayPaymentRequestDto
       {
-        OrderId = order.Id,
-        PaymentMethod = PaymentMethods.ONLINE,
-        Amount = (float)order.TotalPrice
+        OrderId = order.Id, PaymentMethod = PaymentMethods.ONLINE, Amount = (float)order.TotalPrice
       };
 
       var httpContext = _httpContextAccessor.HttpContext;
@@ -326,7 +419,8 @@ public class OrderService : IOrderService
     // else if (paymentMethod == PaymentMethods.COD) { ... }
   }
 
-  public async Task<Result<OrderResponse>> CompleteOrder(Guid orderId, string paymentStatus, PaymentReturnData paymentData)
+  public async Task<Result<OrderResponse>> CompleteOrder(Guid orderId, string paymentStatus,
+    PaymentReturnData paymentData)
   {
     try
     {
@@ -334,8 +428,8 @@ public class OrderService : IOrderService
       if (order == null || order.Status != OrderStatus.PENDING)
       {
         return Result<OrderResponse>.Failure(
-            new List<Error> { new Error("Order.NotFound", "Invalid order or wrong status") },
-            StatusCodes.Status404NotFound);
+          new List<Error> { new Error("Order.NotFound", "Invalid order or wrong status") },
+          StatusCodes.Status404NotFound);
       }
 
       // Determine order status based on VNPay's return paymentStatus (e.g. "00" means success)
@@ -356,7 +450,6 @@ public class OrderService : IOrderService
 
         // Save payment record using your PaymentRepository
         _unitOfWork.Payments.Create(payment);
-        order.Payment = payment;
 
         // Optionally, clear the cart after successful payment
         await _unitOfWork.Carts.ClearCartItemsAsync(order.CustomerId);
@@ -374,19 +467,19 @@ public class OrderService : IOrderService
       if (!saved)
       {
         return Result<OrderResponse>.Failure(
-            new List<Error> { new Error("Order.Complete", "Failed to update order") },
-            StatusCodes.Status500InternalServerError);
+          new List<Error> { new Error("Order.Complete", "Failed to update order") },
+          StatusCodes.Status500InternalServerError);
       }
 
       return Result<OrderResponse>.Success(
-            MapToOrderResponse(order),
-            StatusCodes.Status200OK);
+        MapToOrderResponse(order),
+        StatusCodes.Status200OK);
     }
     catch (Exception ex)
     {
       return Result<OrderResponse>.Failure(
-          new List<Error> { new Error("Order.Complete", ex.Message) },
-          StatusCodes.Status500InternalServerError);
+        new List<Error> { new Error("Order.Complete", ex.Message) },
+        StatusCodes.Status500InternalServerError);
     }
   }
 
@@ -402,8 +495,8 @@ public class OrderService : IOrderService
     catch (Exception ex)
     {
       return Result<List<OrderResponse>>.Failure(
-          [new Error("Order.GetAll", ex.Message)],
-          StatusCodes.Status500InternalServerError);
+        [new Error("Order.GetAll", ex.Message)],
+        StatusCodes.Status500InternalServerError);
     }
   }
 
@@ -419,8 +512,8 @@ public class OrderService : IOrderService
     catch (Exception ex)
     {
       return Result<List<OrderResponse>>.Failure(
-          [new Error("Order.GetByCustomerId", ex.Message)],
-          StatusCodes.Status500InternalServerError);
+        [new Error("Order.GetByCustomerId", ex.Message)],
+        StatusCodes.Status500InternalServerError);
     }
   }
 
@@ -433,8 +526,8 @@ public class OrderService : IOrderService
       if (order == null)
       {
         return Result<OrderResponse>.Failure(
-            [new Error("Order.NotFound", "Order not found")],
-            StatusCodes.Status404NotFound);
+          [new Error("Order.NotFound", "Order not found")],
+          StatusCodes.Status404NotFound);
       }
 
       order.Status = request.Status;
@@ -447,19 +540,19 @@ public class OrderService : IOrderService
       if (!saved)
       {
         return Result<OrderResponse>.Failure(
-            [new Error("Order.Update", "Failed to update order")],
-            StatusCodes.Status500InternalServerError);
+          [new Error("Order.Update", "Failed to update order")],
+          StatusCodes.Status500InternalServerError);
       }
 
       return Result<OrderResponse>.Success(
-          MapToOrderResponse(order),
-          StatusCodes.Status200OK);
+        MapToOrderResponse(order),
+        StatusCodes.Status200OK);
     }
     catch (Exception ex)
     {
       return Result<OrderResponse>.Failure(
-          [new Error("Order.Update", ex.Message)],
-          StatusCodes.Status500InternalServerError);
+        [new Error("Order.Update", ex.Message)],
+        StatusCodes.Status500InternalServerError);
     }
   }
 
@@ -472,8 +565,8 @@ public class OrderService : IOrderService
       if (order == null)
       {
         return Result<string>.Failure(
-            [new Error("Order.Delete", "Order not found")],
-            StatusCodes.Status404NotFound);
+          [new Error("Order.Delete", "Order not found")],
+          StatusCodes.Status404NotFound);
       }
 
       _unitOfWork.Orders.Remove(order);
@@ -482,19 +575,19 @@ public class OrderService : IOrderService
       if (!saved)
       {
         return Result<string>.Failure(
-            [new Error("Order.Delete", "Failed to delete order")],
-            StatusCodes.Status500InternalServerError);
+          [new Error("Order.Delete", "Failed to delete order")],
+          StatusCodes.Status500InternalServerError);
       }
 
       return Result<string>.Success(
-          "Order deleted successfully",
-          StatusCodes.Status200OK);
+        "Order deleted successfully",
+        StatusCodes.Status200OK);
     }
     catch (Exception ex)
     {
       return Result<string>.Failure(
-          [new Error("Order.Delete", ex.Message)],
-          StatusCodes.Status500InternalServerError);
+        [new Error("Order.Delete", ex.Message)],
+        StatusCodes.Status500InternalServerError);
     }
   }
 
@@ -543,14 +636,14 @@ public class OrderService : IOrderService
       LastModifiedBy = order.LastModifiedBy,
       OrderItems = order.OrderItems.Select(oi => new OrderItemResponse
       {
-        CosmeticId = oi.CosmeticId,
-        Quantity = oi.Quantity,
-        SellingPrice = oi.SellingPrice
+        CosmeticId = oi.CosmeticId, Quantity = oi.Quantity, SellingPrice = oi.SellingPrice
       }).ToList()
     };
   }
 
-  public static CreateGHNOrderRequest MapToCreateShippingOrderRequest(Order order, StoreData shopInfo, CreateOrderRequest orderRequest, ShippingDetails details, User customer, decimal codAmount, int paymentTypeId)
+  public static CreateGHNOrderRequest MapToCreateShippingOrderRequest(Order order, StoreData shopInfo,
+    CreateOnlineOrderRequest onlineOrderRequest, ShippingDetails details, User customer, decimal codAmount,
+    int paymentTypeId)
   {
     var request = new CreateGHNOrderRequest
     {
@@ -571,8 +664,8 @@ public class OrderService : IOrderService
       ToName = customer.FirstName + customer.LastName, // Use customer's name as recipient name
       ToPhone = customer.PhoneNumber, // Use customer's phone as recipient phone
       ToAddress = order.ShippingAddress, // Use shipping address as recipient address
-      ToWardCode = orderRequest.WardCode, // Default ward code or map if applicable
-      ToDistrictId = orderRequest.DistrictId, // Default district ID or map if applicable
+      ToWardCode = onlineOrderRequest.WardCode, // Default ward code or map if applicable
+      ToDistrictId = onlineOrderRequest.DistrictId, // Default district ID or map if applicable
       CodAmount = (int)codAmount, // Use total price as COD amount
       Content = "Order from De Fleur", // Custom content
       Weight = details.Weight, // Calculate total weight
@@ -591,6 +684,7 @@ public class OrderService : IOrderService
 
     return request;
   }
+
   private static List<GHNOrderItem> MapOrderItemsToGHNItems(List<OrderItem> orderItems)
   {
     return orderItems.Select(item => new GHNOrderItem
@@ -606,6 +700,7 @@ public class OrderService : IOrderService
     }).ToList();
   }
 }
+
 
 // Helper class for shipping calculations
 public class ShippingDetails

@@ -8,9 +8,7 @@ namespace CleanArchitecture.Infrastructure.Data.Configuration
     {
       builder.HasKey(payment => payment.Id);
 
-      builder.HasOne(payment => payment.Order)
-        .WithOne(order => order.Payment)
-        .HasForeignKey<Payment>(payment => payment.OrderId);
+      builder.HasOne(payment => payment.Order);
     }
   }
 }

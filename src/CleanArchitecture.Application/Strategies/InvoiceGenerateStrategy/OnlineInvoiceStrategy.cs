@@ -7,10 +7,28 @@ using System.Globalization;
 
 namespace CleanArchitecture.Application.Strategies.InvoiceGenerateStrategy
 {
-  public class OnlineInvoiceStrategy: IInvoiceGenerateStrategy
+  public class OnlineInvoiceStrategy : IInvoiceGenerateStrategy
   {
-    public byte[] Generate(Order order)
+    private IUnitOfWork _unitOfWork;
+
+    public async Task<byte[]> GenerateAsync(Order order, IUnitOfWork unitOfWork)
     {
+      _unitOfWork = unitOfWork;
+
+      var cosmeticsDict = new Dictionary<Guid, Cosmetic>();
+      var cosmeticPriceDict = new Dictionary<Guid, decimal>();
+      var coupon = await _unitOfWork.Coupons.GetByIdAsync(order.CouponId);
+
+      foreach (var item in order.OrderItems)
+      {
+        // Assume GetByIdAsync returns a Cosmetic instance
+        var cosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(item.CosmeticId);
+        cosmeticsDict[item.CosmeticId] = cosmetic;
+
+        var cosmeticPrice = await _unitOfWork.Cosmetics.GetCosmeticOriginalPrice(cosmeticsDict[item.CosmeticId]);
+        cosmeticPriceDict[item.CosmeticId] = cosmeticPrice;
+      }
+
       var document = Document.Create(container =>
       {
         container.Page(page =>
@@ -37,6 +55,10 @@ namespace CleanArchitecture.Application.Strategies.InvoiceGenerateStrategy
             column.Item().Text($"Invoice Date: {order.OrderDate:MM/dd/yyyy}");
             column.Item().Text($"Order ID: {order.Id}");
             column.Item().Text($"Customer ID: {order.CustomerId}");
+            
+            if (coupon is not null)
+              column.Item().Text($"Coupon: {coupon.Name}");
+
             column.Item().Text($"Tracking Number: {order.TrackingNumber}");
             column.Item().Text($"Delivery Date: {order.DeliveryDate:MM/dd/yyyy}");
             column.Item().Text($"Shipping Address: {order.ShippingAddress}");
@@ -63,30 +85,31 @@ namespace CleanArchitecture.Application.Strategies.InvoiceGenerateStrategy
               // Header Row
               table.Header(header =>
               {
-                header.Cell().Element(CellStyle).Text("Cosmetic Name");
+                header.Cell().Element(CellStyle).Text("Cosmetic");
                 header.Cell().Element(CellStyle).Text("Quantity");
                 header.Cell().Element(CellStyle).Text("Unit Price");
-                header.Cell().Element(CellStyle).Text("Line Total");
+                header.Cell().Element(CellStyle).Text("Total");
               });
 
               // Data Rows
               foreach (var item in order.OrderItems)
               {
+                var cosmetic = cosmeticsDict[item.CosmeticId];
                 // Assuming Cosmetic has Price and Name properties.
-                decimal unitPrice = 100;
+                decimal unitPrice = cosmeticPriceDict[item.CosmeticId];
                 decimal lineTotal = unitPrice * item.Quantity;
 
-                table.Cell().Element(CellStyle).Text(item.Cosmetic.Name);
+                table.Cell().Element(CellStyle).Text(cosmetic.Name);
                 table.Cell().Element(CellStyle).Text(item.Quantity.ToString());
-                table.Cell().Element(CellStyle).Text($"{unitPrice:C}", TextStyle.Default.FontSize(10));
-                table.Cell().Element(CellStyle).Text($"{lineTotal:C}", TextStyle.Default.FontSize(10));
+                table.Cell().Element(CellStyle).Text($"{unitPrice:0,0}VND", TextStyle.Default.FontSize(10));
+                table.Cell().Element(CellStyle).Text($"{lineTotal:0,0}VND", TextStyle.Default.FontSize(10));
               }
             });
 
             // Totals Section
             column.Item().Text(" ");
-            column.Item().Text($"SubTotal: {order.SubTotal:C}", TextStyle.Default.SemiBold());
-            column.Item().Text($"Total Price: {order.TotalPrice:C}", TextStyle.Default.SemiBold());
+            column.Item().Text($"SubTotal: {order.SubTotal:0,0}VND", TextStyle.Default.SemiBold());
+            column.Item().Text($"Total Price: {order.TotalPrice:0,0}VND", TextStyle.Default.SemiBold());
           });
 
           // Footer: Page number

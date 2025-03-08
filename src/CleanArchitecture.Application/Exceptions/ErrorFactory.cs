@@ -52,5 +52,10 @@ namespace CleanArchitecture.Application.Exceptions
     {
       return new (new Error("Input.InvalidFile", "The file input is invalid."), StatusCodes.Status400BadRequest);
     }
+
+    public (Error err, int statusCode) CreateInvalidCouponError()
+    {
+      return new (new Error("Coupon.InvalidCoupon", "The coupon code is invalid."), StatusCodes.Status400BadRequest);
+    }
   }
 }

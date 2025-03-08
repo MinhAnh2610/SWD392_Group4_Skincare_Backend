@@ -86,6 +86,8 @@ public static class DependencyInjection
     services.AddSingleton<ICosmeticFilterStrategy, SkinTypeFilterStrategy>();
     services.AddSingleton<ICosmeticFilterStrategy, CosmeticTypeFilterStrategy>();
     services.AddSingleton<ICosmeticFilterStrategy, GenderFilterStrategy>();
+    services.AddSingleton<IInvoiceGenerateStrategy, WalkInInvoiceStrategy>();
+    services.AddSingleton<IInvoiceGenerateStrategy, OnlineInvoiceStrategy>();
 
     #endregion
 

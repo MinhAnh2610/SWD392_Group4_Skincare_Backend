@@ -12,6 +12,11 @@ namespace CleanArchitecture.Infrastructure.Repositories
     {
       return base.GetQueryable();
     }
+
+    public async Task<CosmeticPrice?> GetByCosmeticIdAsync(Guid cosmeticId)
+    {
+      return await _context.CosmeticPrices.Where(c => c.CosmeticId == cosmeticId).FirstOrDefaultAsync(); 
+    }
     //TODO: HERE
     // public Task<CosmeticPrice?> GetByCosmeticIdAsync(Guid cosmeticId)
     // {
