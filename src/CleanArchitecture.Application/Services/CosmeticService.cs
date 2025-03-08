@@ -78,7 +78,7 @@ namespace CleanArchitecture.Application.Services
           CosmeticId = orgcosmetic.Id,
           OriginalPrice = request.Price,
           // Set default values for required fields
-          EventId = new Guid("edabede4-1fac-46ba-b6d2-6d1b06d0096c"), // Or default event ID if applicable
+          EventId = new Guid("57934496-4d7c-4e21-aaf6-f42c023033ae"), // Or default event ID if applicable
           StartDate = DateTime.UtcNow,
           EndDate = DateTime.UtcNow.AddYears(10) // Set a far future date or appropriate business logic
         };
