@@ -106,6 +106,7 @@ namespace CleanArchitecture.Application.Services
       }
       var coupon = new Coupon
       {
+        Name = createCouponRequest.Name,
         Code = createCouponRequest.Code,
         DiscountAmount = createCouponRequest.Discount,
         StartDate = DateTime.Now,

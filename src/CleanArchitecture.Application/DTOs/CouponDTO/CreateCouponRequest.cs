@@ -8,6 +8,7 @@ namespace CleanArchitecture.Application.DTOs.CouponDTO
 {
   public class CreateCouponRequest
   {
+    public string Name { get; set; } = default!;
     public string Code { get; set; } = default!;
     public double Discount { get; set; }
     public DateTime ExpiryDate { get; set; }
