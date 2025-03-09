@@ -237,10 +237,9 @@ public class OrderService : IOrderService
       if (cosmetic is null)
         return null;
 
-      var originalPrice = await _unitOfWork.Cosmetics.GetCosmeticOriginalPrice(cosmetic);
       var sellingPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
       var quantity = orderItem.Value;
-      subTotal += originalPrice * quantity;
+      subTotal += sellingPrice * quantity;
       totalPrice += sellingPrice * quantity;
 
       orderItems.Add(new OrderItem()
@@ -255,7 +254,18 @@ public class OrderService : IOrderService
     if (request.CouponId is not null)
     {
       var coupon = await _unitOfWork.Coupons.GetByIdAsync(request.CouponId);
+      if (coupon!.UsageLimit == 0 || coupon.EndDate < DateTime.UtcNow)
+      {
+        var errors = new List<Error>
+        {
+          new Error("Coupon.Usage", "Coupon is not available")
+        };
+        return Result<OrderResponse>.Failure(errors, StatusCodes.Status400BadRequest);
+      }
       totalPrice = (totalPrice * (100m - (decimal)coupon.DiscountAmount)) / 100m;
+
+      coupon.UsageLimit -= 1;
+      _unitOfWork.Coupons.Update(coupon);
     }
     order.TotalPrice = totalPrice;
     order.SubTotal = subTotal;
