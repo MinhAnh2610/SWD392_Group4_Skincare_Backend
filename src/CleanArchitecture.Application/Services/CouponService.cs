@@ -232,7 +232,27 @@ namespace CleanArchitecture.Application.Services
         UsageLimit = coupon.UsageLimit
       }, StatusCodes.Status200OK);
     }
-
+    
+    public async Task<Result<CouponResponse>> GetCouponByCode(string code)
+    {
+      var coupons = await _unitOfWork.Coupons.GetAllAsync();
+      var coupon = coupons.FirstOrDefault(c => c.Code == code);
+      if (coupon == null)
+      {
+        return Result<CouponResponse>.Failure(
+                new List<Error> { new Error("Coupon.Get", "Coupon Not Found") },
+                StatusCodes.Status404NotFound
+        );
+      }
+      return Result<CouponResponse>.Success(new CouponResponse
+      {
+        Id = coupon.Id,
+        Code = coupon.Code,
+        Discount = coupon.DiscountAmount,
+        ExpiryDate = coupon.EndDate,
+        UsageLimit = coupon.UsageLimit
+      }, StatusCodes.Status200OK);
+    }
 
     //Just in case API if error occurs remove this method
     public async Task<Result<CouponResponse>> RemoveCoupon(string code, Guid orderId)

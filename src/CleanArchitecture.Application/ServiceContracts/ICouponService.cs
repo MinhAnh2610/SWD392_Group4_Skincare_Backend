@@ -16,5 +16,6 @@ namespace CleanArchitecture.Application.ServiceContracts
     Task<Result<CouponResponse>> DeleteCoupon(Guid id);
     Task<Result<List<CouponResponse>>> GetAllCoupons();
     Task<Result<CouponResponse>> GetCouponById(Guid id);
+    Task<Result<CouponResponse>> GetCouponByCode(string code);
   }
 }

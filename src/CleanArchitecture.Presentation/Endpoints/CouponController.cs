@@ -141,6 +141,28 @@ namespace CleanArchitecture.Presentation.Endpoints
         .WithDescription("Get Coupon By Id")
         .RequireAuthorization();
       #endregion
+
+      #region Get Coupon By Code API
+      group.MapGet("/get-coupon-by-code/{code}", async (ICouponService couponService, string code) =>
+      {
+        var result = await couponService.GetCouponByCode(code);
+        if (result.IsSuccess)
+        {
+          return Results.Ok(ApiResponse<CouponResponse>.SuccessResponse(result.Data!, "Get Coupon By Code Successfully."));
+        }
+        return result.Status switch
+        {
+          _ => Results.StatusCode(StatusCodes.Status500InternalServerError)
+        };
+      })
+        .WithName("GetCouponByCode")
+        .Produces<ApiResponse<CouponResponse>>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status401Unauthorized)
+        .ProducesProblem(StatusCodes.Status500InternalServerError)
+        .WithSummary("GetCouponByCode")
+        .WithDescription("Get Coupon By Code")
+        .RequireAuthorization();
+      #endregion
     }
   }
 }
