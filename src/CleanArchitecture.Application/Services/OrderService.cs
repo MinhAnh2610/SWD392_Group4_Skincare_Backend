@@ -5,7 +5,9 @@ using CleanArchitecture.Application.DTOs.GHN.Response;
 using CleanArchitecture.Application.DTOs.Order;
 using CleanArchitecture.Application.DTOs.OrderDto;
 using CleanArchitecture.Application.DTOs.OrderItemDto;
+using CleanArchitecture.Application.DTOs.UserDto;
 using CleanArchitecture.Application.DTOs.VnPay;
+using CleanArchitecture.Application.Enums;
 using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Application.Strategies.InvoiceGenerateStrategy;
 using Microsoft.AspNetCore.Http;
@@ -108,7 +110,7 @@ public class OrderService : IOrderService
         subTotal += await _unitOfWork.Cosmetics.GetCosmeticPrice(item.Cosmetic) * item.Quantity;
         item.SellingPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(item.Cosmetic);
       }
-      
+
       order.SubTotal = subTotal;
 
       // Get Shop Info for Create a Shipping Orer
@@ -155,7 +157,7 @@ public class OrderService : IOrderService
       {
         invoice = await invoiceStrategy.GenerateAsync(order, _unitOfWork);
       }
-      
+
       orderResponse.Invoice = invoice;
 
       return Result<OrderResponse>.Success(
@@ -189,12 +191,28 @@ public class OrderService : IOrderService
       }
     }
 
-    var customer = await _unitOfWork.Users.GetByPhoneNumberAsync(request.CustomerPhoneNumber);
+    var customer = await _unitOfWork.Users.GetByPhoneNumberAsync(request.CustomerPhoneNumber!);
 
     if (customer is null)
     {
-      var error = _errorFactory.CreateNotFoundError("Customer");
-      return Result<OrderResponse>.Failure([error.err], error.statusCode);
+      var user = new User
+      {
+        UserName = request.CustomerPhoneNumber,
+        PhoneNumber = request.CustomerPhoneNumber
+      };
+
+      var result = await _userManager.CreateAsync(user, request.CustomerPhoneNumber!);
+      if (!result.Succeeded)
+      {
+        var errors = result.Errors.Select(e => new Error(e.Code, e.Description)).ToList();
+        return Result<OrderResponse>.Failure(errors, StatusCodes.Status500InternalServerError);
+      }
+      var roleResult = await _userManager.AddToRolesAsync(user, [Roles.Customer]);
+      if (!roleResult.Succeeded)
+      {
+        var errors = roleResult.Errors.Select(e => new Error(e.Code, e.Description)).ToList();
+        return Result<OrderResponse>.Failure(errors, StatusCodes.Status500InternalServerError);
+      }
     }
 
     var order = new Order()
@@ -205,7 +223,7 @@ public class OrderService : IOrderService
       OrderDate = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow),
       IsActive = true
     };
-    
+
     List<OrderItem> orderItems = new List<OrderItem>();
     decimal subTotal = 0;
     decimal totalPrice = 0;
@@ -215,16 +233,19 @@ public class OrderService : IOrderService
       var cosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(orderItem.Key);
       if (cosmetic is null)
         return null;
-      
+
       var originalPrice = await _unitOfWork.Cosmetics.GetCosmeticOriginalPrice(cosmetic);
       var sellingPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
       var quantity = orderItem.Value;
-      subTotal+= originalPrice * quantity;
+      subTotal += originalPrice * quantity;
       totalPrice += sellingPrice * quantity;
-      
+
       orderItems.Add(new OrderItem()
       {
-        CosmeticId = cosmetic.Id, SellingPrice = sellingPrice * orderItem.Value, Quantity = orderItem.Value, OrderId = order.Id
+        CosmeticId = cosmetic.Id,
+        SellingPrice = sellingPrice * orderItem.Value,
+        Quantity = orderItem.Value,
+        OrderId = order.Id
       });
     }
 
@@ -237,10 +258,10 @@ public class OrderService : IOrderService
     order.SubTotal = subTotal;
     order.OrderItems = orderItems;
     order.Status = OrderStatus.PENDING;
-    
+
     await _unitOfWork.Orders.CreateAsync(order);
     await _unitOfWork.CompleteAsync();
-    
+
     var invoiceStrategy = _invoiceGenerateStrategies.OfType<WalkInInvoiceStrategy>().FirstOrDefault();
     var invoiceByte = await invoiceStrategy.GenerateAsync(order, _unitOfWork);
     if (invoiceByte.Length == 0)
@@ -380,7 +401,9 @@ public class OrderService : IOrderService
       LastModifiedBy = cart.Customer.UserName,
       OrderItems = cart.CartItems.Select(ci => new OrderItem
       {
-        Cosmetic = ci.Cosmetic, CosmeticId = ci.CosmeticId, Quantity = ci.Quantity
+        Cosmetic = ci.Cosmetic,
+        CosmeticId = ci.CosmeticId,
+        Quantity = ci.Quantity
       }).ToList(),
       // Set default delivery date to 7 days from now
       DeliveryDate = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow.AddDays(7))
@@ -401,7 +424,9 @@ public class OrderService : IOrderService
     {
       var vnPayRequest = new VnPayPaymentRequestDto
       {
-        OrderId = order.Id, PaymentMethod = PaymentMethods.ONLINE, Amount = (float)order.TotalPrice
+        OrderId = order.Id,
+        PaymentMethod = PaymentMethods.ONLINE,
+        Amount = (float)order.TotalPrice
       };
 
       var httpContext = _httpContextAccessor.HttpContext;
@@ -636,7 +661,9 @@ public class OrderService : IOrderService
       LastModifiedBy = order.LastModifiedBy,
       OrderItems = order.OrderItems.Select(oi => new OrderItemResponse
       {
-        CosmeticId = oi.CosmeticId, Quantity = oi.Quantity, SellingPrice = oi.SellingPrice
+        CosmeticId = oi.CosmeticId,
+        Quantity = oi.Quantity,
+        SellingPrice = oi.SellingPrice
       }).ToList()
     };
   }
