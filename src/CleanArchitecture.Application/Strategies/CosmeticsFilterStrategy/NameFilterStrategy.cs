@@ -13,7 +13,7 @@ namespace CleanArchitecture.Application.Strategies.CosmeticsFilterStrategy
     {
       if (!string.IsNullOrWhiteSpace(request.Name))
       {
-        return query.Where(c => c.Name.Contains(request.Name));
+        return query.Where(c => c.Name.ToLower().Contains(request.Name.ToLower()));
       }
       return query;
     }
