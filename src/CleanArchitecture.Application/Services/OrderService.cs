@@ -195,19 +195,22 @@ public class OrderService : IOrderService
 
     if (customer is null)
     {
-      var user = new User
+      customer = new User
       {
+        Id = Guid.NewGuid(),
+        FirstName = request.FirstName,
+        LastName = request.LastName,
         UserName = request.CustomerPhoneNumber,
         PhoneNumber = request.CustomerPhoneNumber
       };
 
-      var result = await _userManager.CreateAsync(user, request.CustomerPhoneNumber!);
+      var result = await _userManager.CreateAsync(customer, request.CustomerPhoneNumber!);
       if (!result.Succeeded)
       {
         var errors = result.Errors.Select(e => new Error(e.Code, e.Description)).ToList();
         return Result<OrderResponse>.Failure(errors, StatusCodes.Status500InternalServerError);
       }
-      var roleResult = await _userManager.AddToRolesAsync(user, [Roles.Customer]);
+      var roleResult = await _userManager.AddToRolesAsync(customer, [Roles.Customer]);
       if (!roleResult.Succeeded)
       {
         var errors = roleResult.Errors.Select(e => new Error(e.Code, e.Description)).ToList();
