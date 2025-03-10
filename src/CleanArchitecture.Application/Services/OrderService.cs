@@ -1,4 +1,5 @@
-﻿using Castle.Core.Internal;
+﻿using Castle.Components.DictionaryAdapter.Xml;
+using Castle.Core.Internal;
 using CleanArchitecture.Application.Constants;
 using CleanArchitecture.Application.DTOs.GHN.Request;
 using CleanArchitecture.Application.DTOs.GHN.Response;
@@ -93,27 +94,63 @@ public class OrderService : IOrderService
       // Calculate shipping dimensions
       var shippingDetails = CalculateShippingDetails(cart.CartItems);
 
-      // Convert currency if needed
-      decimal totalPrice = cart.TotalPrice;
-      if (request.Currency == "USD")
-      {
-        totalPrice = ConvertUsdToVnd(totalPrice);
-      }
-
       var customer = await _userManager.FindByIdAsync(_claimsService.CurrentUserId.ToString());
 
       // Create order
       var order = CreateOrderEntity(request, cart);
-      decimal subTotal = 0;
+
+      // Calculate subtotal (original prices)
+      decimal subtotal = 0;
+      decimal discountedSubtotal = 0;
+
       foreach (var item in order.OrderItems)
       {
-        subTotal += await _unitOfWork.Cosmetics.GetCosmeticPrice(item.Cosmetic) * item.Quantity;
-        item.SellingPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(item.Cosmetic);
+        var cosmeticPrice = await _unitOfWork.CosmeticPrices.GetByCosmeticIdAsync(item.CosmeticId);
+
+        if (cosmeticPrice != null)
+        {
+          decimal originalPrice = cosmeticPrice.OriginalPrice;
+          decimal discountedPrice = originalPrice;
+
+          // Apply event discount if available
+          if (cosmeticPrice.Event != null && cosmeticPrice.Event.DiscountPercentage.HasValue)
+          {
+            discountedPrice = originalPrice * (1 - (cosmeticPrice.Event.DiscountPercentage.Value / 100m));
+          }
+
+          item.SellingPrice = discountedPrice; // Store the discounted price
+          subtotal += originalPrice * item.Quantity;
+          discountedSubtotal += discountedPrice * item.Quantity;
+        }
+        else
+        {
+          // Fallback to regular price method
+          decimal price = await _unitOfWork.Cosmetics.GetCosmeticPrice(item.Cosmetic);
+          item.SellingPrice = price;
+          subtotal += price * item.Quantity;
+          discountedSubtotal += price * item.Quantity;
+        }
       }
 
-      order.SubTotal = subTotal;
+      order.SubTotal = subtotal;
+      decimal totalPrice = discountedSubtotal;
 
-      // Get Shop Info for Create a Shipping Orer
+      // Apply coupon discount if provided
+      if (request.CouponId.HasValue)
+      {
+        var coupon = await _unitOfWork.Coupons.GetByIdAsync(request.CouponId.Value);
+        if (coupon != null && coupon.UsageLimit > 0 && coupon.EndDate > DateTime.UtcNow)
+        {
+          decimal couponDiscount = (totalPrice * (decimal)coupon.DiscountAmount) / 100m;
+          totalPrice -= couponDiscount;
+
+          // Update coupon usage
+          coupon.UsageLimit--;
+          _unitOfWork.Coupons.Update(coupon);
+        }
+      }
+
+      // Get Shop Info for Create a Shipping Order
       var shopInfo = await _ghnService.GetStoreInformationAsync();
 
       decimal codAmount = request.PaymentMethod == PaymentMethods.COD ? totalPrice : 0;
@@ -127,9 +164,9 @@ public class OrderService : IOrderService
         return Result<OrderResponse>.Failure(ghnOrderResult.Errors, ghnOrderResult.Status);
       }
 
-      // Save GHN Order ID & Tracking Number, also increase the total price
+      // Add shipping fee to total price
       order.TrackingNumber = ghnOrderResult.Data!.OrderCode;
-      order.TotalPrice = ghnOrderResult.Data.TotalFee + order.SubTotal;
+      order.TotalPrice = totalPrice + ghnOrderResult.Data.TotalFee;
 
       // Generate order response
       var orderResponse = MapToOrderResponse(order);
@@ -140,7 +177,7 @@ public class OrderService : IOrderService
       // Save order to database
       _unitOfWork.Orders.Create(order);
 
-      // Clear customer cart after creating the
+      // Clear customer cart after creating the order
       _unitOfWork.Carts.Remove(cart);
       var saved = await _unitOfWork.CompleteAsync();
 

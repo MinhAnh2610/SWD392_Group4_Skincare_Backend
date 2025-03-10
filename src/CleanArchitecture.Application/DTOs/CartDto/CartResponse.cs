@@ -6,7 +6,9 @@ namespace CleanArchitecture.Application.DTOs.Cart
   public class CartResponse
   {
     public Guid Id { get; set; }
-    public decimal TotalPrice => Items.Sum(ci => ci.Subtotal);
+    public decimal TotalPrice { get; set; } // This will be the discounted total price
+    public decimal OriginalTotalPrice { get; set; } // Total before any discounts
+    public decimal EventDiscountTotal { get; set; } // Total event discounts
 
     // Customer info without circular references
     public CustomerDto Customer { get; set; } = default!;

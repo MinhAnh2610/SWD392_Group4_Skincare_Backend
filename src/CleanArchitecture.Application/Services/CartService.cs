@@ -248,6 +248,7 @@ namespace CleanArchitecture.Application.Services
       }
     }
 
+    // Update the GetCartByUserIdAsync method in CartService
     public async Task<Result<CartResponse>> GetCartByUserIdAsync()
     {
       try
@@ -281,10 +282,59 @@ namespace CleanArchitecture.Application.Services
 
         var response = MapCartToCartResponse(cart);
         var cosmetics = await _unitOfWork.Cosmetics.GetCosmeticsByCart(cart!);
+
+        decimal originalTotalPrice = 0;
+        decimal eventDiscountTotal = 0;
+        decimal discountedTotalPrice = 0;
+
         foreach (var item in response.Items)
         {
-          item.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetics.First(c => c.Id == item.CosmeticId));
+          var cosmetic = cosmetics.First(c => c.Id == item.CosmeticId);
+
+          // Get the original price
+          var cosmeticPrice = await _unitOfWork.CosmeticPrices.GetByCosmeticIdAsync(cosmetic.Id);
+
+          if (cosmeticPrice != null)
+          {
+            item.Price = cosmeticPrice.OriginalPrice;
+
+            // Calculate discount if there's an active event
+            if (cosmeticPrice.Event != null && cosmeticPrice.Event.DiscountPercentage.HasValue)
+            {
+              item.DiscountPercentage = cosmeticPrice.Event.DiscountPercentage.Value;
+              item.DiscountedPrice = item.Price * (1 - (item.DiscountPercentage / 100m));
+            }
+            else
+            {
+              item.DiscountedPrice = item.Price; // No discount
+              item.DiscountPercentage = 0;
+            }
+          }
+          else
+          {
+            // Fallback to regular price method if no active price found
+            item.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
+            item.DiscountedPrice = item.Price;
+            item.DiscountPercentage = 0;
+          }
+
+          // Calculate totals
+          originalTotalPrice += item.Subtotal;
+          discountedTotalPrice += item.DiscountedSubtotal;
         }
+
+        eventDiscountTotal = originalTotalPrice - discountedTotalPrice;
+
+        // Update response with calculated values
+        response.OriginalTotalPrice = originalTotalPrice;
+        response.EventDiscountTotal = eventDiscountTotal;
+        response.TotalPrice = discountedTotalPrice;
+
+        // Update the cart's TotalPrice in the database to reflect discounts
+        cart.TotalPrice = discountedTotalPrice;
+        _unitOfWork.Carts.Update(cart);
+        await _unitOfWork.CompleteAsync();
+
         return Result<CartResponse>.Success(response, StatusCodes.Status200OK);
       }
       catch (Exception ex)
