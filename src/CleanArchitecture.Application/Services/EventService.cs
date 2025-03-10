@@ -1,6 +1,5 @@
 using CleanArchitecture.Application.DTOs.Events;
 using CleanArchitecture.Application.Interfaces;
-using CleanArchitecture.Domain.RepositoryContracts;
 using Mapster;
 using Microsoft.AspNetCore.Http;
 
@@ -24,7 +23,7 @@ namespace CleanArchitecture.Application.Services
     public async Task<Result<List<EventResponse>>> GetAllEventsAsync()
     {
       var events = await _unitOfWork.Events.GetAllAsync();
-      
+
       return Result<List<EventResponse>>.Success(events.Adapt<List<EventResponse>>(), StatusCodes.Status200OK);
     }
 
@@ -37,7 +36,9 @@ namespace CleanArchitecture.Application.Services
         var error = _errorFactory.CreateNotFoundError("Event");
         return Result<EventResponse>.Failure([error.err], error.statusCode);
       }
-
+      existingEvent.IsActive = true;
+      var events = await _unitOfWork.Events.GetAllAsync();
+      events.Where(e => e.Name != eventName).Select(e => e.IsActive = false).ToList();
       await _unitOfWork.Events.ApplyEventAsync(existingEvent);
 
       var isSaved = await _unitOfWork.CompleteAsync();
@@ -47,7 +48,7 @@ namespace CleanArchitecture.Application.Services
         var error = _errorFactory.CreateDatabaseError("Event");
         return Result<EventResponse>.Failure([error.err], error.statusCode);
       }
-      
+
       return Result<EventResponse>.Success(existingEvent.Adapt<EventResponse>(), StatusCodes.Status200OK);
     }
 
@@ -68,14 +69,14 @@ namespace CleanArchitecture.Application.Services
       }
 
       _unitOfWork.Events.Create(request.Adapt<Event>());
-      
+
       var isSaved = await _unitOfWork.CompleteAsync();
       if (!isSaved)
       {
         var error = _errorFactory.CreateDatabaseError("Event");
         return Result<EventResponse>.Failure([error.err], error.statusCode);
       }
-      
+
       return Result<EventResponse>.Success(request.Adapt<EventResponse>(), StatusCodes.Status201Created);
     }
   }
