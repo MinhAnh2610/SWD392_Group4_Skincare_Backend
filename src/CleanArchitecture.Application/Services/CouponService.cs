@@ -89,8 +89,10 @@ namespace CleanArchitecture.Application.Services
       return Result<CouponResponse>.Success(new CouponResponse
       {
         Id = coupon.Id,
+        Name = coupon.Name,
         Code = coupon.Code,
         Discount = coupon.DiscountAmount,
+        StartDate = coupon.StartDate,
         ExpiryDate = coupon.EndDate,
         UsageLimit = coupon.UsageLimit
       }, StatusCodes.Status200OK);
@@ -124,8 +126,10 @@ namespace CleanArchitecture.Application.Services
       return Result<CouponResponse>.Success(new CouponResponse
       {
         Id = coupon.Id,
+        Name = coupon.Name,
         Code = coupon.Code,
         Discount = coupon.DiscountAmount,
+        StartDate = coupon.StartDate,
         ExpiryDate = coupon.EndDate,
         UsageLimit = coupon.UsageLimit
       }, StatusCodes.Status201Created);
@@ -152,8 +156,10 @@ namespace CleanArchitecture.Application.Services
       return Result<CouponResponse>.Success(new CouponResponse
       {
         Id = coupon.Id,
+        Name = coupon.Name,
         Code = coupon.Code,
         Discount = coupon.DiscountAmount,
+        StartDate = coupon.StartDate,
         ExpiryDate = coupon.EndDate,
         UsageLimit = coupon.UsageLimit
       }, StatusCodes.Status200OK);
@@ -165,8 +171,10 @@ namespace CleanArchitecture.Application.Services
       return Result<List<CouponResponse>>.Success(coupons.Select(c => new CouponResponse
       {
         Id = c.Id,
+        Name = c.Name,
         Code = c.Code,
         Discount = c.DiscountAmount,
+        StartDate = c.StartDate,
         ExpiryDate = c.EndDate,
         UsageLimit = c.UsageLimit
       }).ToList(), StatusCodes.Status200OK);
@@ -189,7 +197,7 @@ namespace CleanArchitecture.Application.Services
                         StatusCodes.Status404NotFound
                                );
       }
-     
+
 
       coupon.Code = updateCouponRequest.Code;
       coupon.DiscountAmount = updateCouponRequest.Discount;
@@ -206,8 +214,10 @@ namespace CleanArchitecture.Application.Services
       return Result<CouponResponse>.Success(new CouponResponse
       {
         Id = coupon.Id,
+        Name = coupon.Name,
         Code = coupon.Code,
         Discount = coupon.DiscountAmount,
+        StartDate = coupon.StartDate,
         ExpiryDate = coupon.EndDate,
         UsageLimit = coupon.UsageLimit
       }, StatusCodes.Status200OK);
@@ -226,13 +236,15 @@ namespace CleanArchitecture.Application.Services
       return Result<CouponResponse>.Success(new CouponResponse
       {
         Id = coupon.Id,
+        Name = coupon.Name,
         Code = coupon.Code,
         Discount = coupon.DiscountAmount,
+        StartDate = coupon.StartDate,
         ExpiryDate = coupon.EndDate,
         UsageLimit = coupon.UsageLimit
       }, StatusCodes.Status200OK);
     }
-    
+
     public async Task<Result<CouponResponse>> GetCouponByCode(string code)
     {
       var coupons = await _unitOfWork.Coupons.GetAllAsync();
@@ -247,8 +259,10 @@ namespace CleanArchitecture.Application.Services
       return Result<CouponResponse>.Success(new CouponResponse
       {
         Id = coupon.Id,
+        Name = coupon.Name,
         Code = coupon.Code,
         Discount = coupon.DiscountAmount,
+        StartDate = coupon.StartDate,
         ExpiryDate = coupon.EndDate,
         UsageLimit = coupon.UsageLimit
       }, StatusCodes.Status200OK);
@@ -302,8 +316,10 @@ namespace CleanArchitecture.Application.Services
       return Result<CouponResponse>.Success(new CouponResponse
       {
         Id = coupon.Id,
+        Name = coupon.Name,
         Code = coupon.Code,
         Discount = coupon.DiscountAmount,
+        StartDate = coupon.StartDate,
         ExpiryDate = coupon.EndDate,
         UsageLimit = coupon.UsageLimit
       }, StatusCodes.Status200OK);
