@@ -93,9 +93,19 @@ namespace CleanArchitecture.Application.Services
         cart.CartItems?.Add(cartItem);
       }
 
-      // Recalculate the cart's total price.
-      cart.TotalPrice += await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic) * addProductRequest.Quantity;
+      // Recalculate the cart's total price with discounts
+      decimal totalPrice = 0;
+      foreach (var item in cart.CartItems)
+      {
+        var itemCosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(item.CosmeticId);
+        if (itemCosmetic != null)
+        {
+          decimal discountedPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(itemCosmetic);
+          totalPrice += discountedPrice * item.Quantity;
+        }
+      }
 
+      cart.TotalPrice = totalPrice;
       await _unitOfWork.CompleteAsync();
 
       // Map the updated cart to a DTO.
@@ -284,50 +294,36 @@ namespace CleanArchitecture.Application.Services
         var cosmetics = await _unitOfWork.Cosmetics.GetCosmeticsByCart(cart!);
 
         decimal originalTotalPrice = 0;
-        decimal eventDiscountTotal = 0;
         decimal discountedTotalPrice = 0;
 
         foreach (var item in response.Items)
         {
           var cosmetic = cosmetics.First(c => c.Id == item.CosmeticId);
 
-          // Get the original price
-          var cosmeticPrice = await _unitOfWork.CosmeticPrices.GetByCosmeticIdAsync(cosmetic.Id);
+          // Get original price and discounted price using repository methods
+          decimal originalPrice = await _unitOfWork.Cosmetics.GetCosmeticOriginalPrice(cosmetic);
+          decimal discountedPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
 
-          if (cosmeticPrice != null)
+          // Calculate discount percentage
+          decimal discountPercentage = 0;
+          if (originalPrice > 0)
           {
-            item.Price = cosmeticPrice.OriginalPrice;
+            discountPercentage = (1 - (discountedPrice / originalPrice)) * 100;
+          }
 
-            // Calculate discount if there's an active event
-            if (cosmeticPrice.Event != null && cosmeticPrice.Event.DiscountPercentage.HasValue)
-            {
-              item.DiscountPercentage = cosmeticPrice.Event.DiscountPercentage.Value;
-              item.DiscountedPrice = item.Price * (1 - (item.DiscountPercentage / 100m));
-            }
-            else
-            {
-              item.DiscountedPrice = item.Price; // No discount
-              item.DiscountPercentage = 0;
-            }
-          }
-          else
-          {
-            // Fallback to regular price method if no active price found
-            item.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
-            item.DiscountedPrice = item.Price;
-            item.DiscountPercentage = 0;
-          }
+          // Update item with price information
+          item.Price = originalPrice;
+          item.DiscountedPrice = discountedPrice;
+          item.DiscountPercentage = discountPercentage;
 
           // Calculate totals
           originalTotalPrice += item.Subtotal;
           discountedTotalPrice += item.DiscountedSubtotal;
         }
 
-        eventDiscountTotal = originalTotalPrice - discountedTotalPrice;
-
         // Update response with calculated values
         response.OriginalTotalPrice = originalTotalPrice;
-        response.EventDiscountTotal = eventDiscountTotal;
+        response.EventDiscountTotal = originalTotalPrice - discountedTotalPrice;
         response.TotalPrice = discountedTotalPrice;
 
         // Update the cart's TotalPrice in the database to reflect discounts

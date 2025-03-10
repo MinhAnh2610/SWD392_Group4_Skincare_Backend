@@ -56,6 +56,7 @@ public class OrderService : IOrderService
   }
 
   // 1. Initiate Order (First step of checkout)
+  // 1. Initiate Order (First step of checkout)
   public async Task<Result<OrderResponse>> InitiateOrder(CreateOnlineOrderRequest request)
   {
     try
@@ -99,14 +100,18 @@ public class OrderService : IOrderService
       // Create order
       var order = CreateOrderEntity(request, cart);
 
-      // Calculate subtotal (original prices)
+      // Calculate subtotal (original prices) and discounted subtotal
       decimal subtotal = 0;
       decimal discountedSubtotal = 0;
 
       foreach (var item in order.OrderItems)
       {
-        subTotal += await _unitOfWork.Cosmetics.GetCosmeticOriginalPrice(item.Cosmetic) * item.Quantity;
-        item.SellingPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(item.Cosmetic);
+        decimal originalPrice = await _unitOfWork.Cosmetics.GetCosmeticOriginalPrice(item.Cosmetic);
+        decimal discountedPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(item.Cosmetic);
+
+        item.SellingPrice = discountedPrice; // Store the discounted price
+        subtotal += originalPrice * item.Quantity;
+        discountedSubtotal += discountedPrice * item.Quantity;
       }
 
       order.SubTotal = subtotal;
@@ -143,7 +148,7 @@ public class OrderService : IOrderService
 
       // Add shipping fee to total price
       order.TrackingNumber = ghnOrderResult.Data!.OrderCode;
-      order.TotalPrice = ghnOrderResult.Data.TotalFee + totalPrice;
+      order.TotalPrice = totalPrice + ghnOrderResult.Data.TotalFee;
 
       // Generate order response
       var orderResponse = MapToOrderResponse(order);
@@ -185,6 +190,7 @@ public class OrderService : IOrderService
         StatusCodes.Status500InternalServerError);
     }
   }
+
 
   public async Task<Result<OrderResponse>> InitiateOrder(CreateWalkInOrderRequest request)
   {
