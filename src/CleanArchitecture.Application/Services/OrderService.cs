@@ -107,7 +107,7 @@ public class OrderService : IOrderService
       decimal subTotal = 0;
       foreach (var item in order.OrderItems)
       {
-        subTotal += await _unitOfWork.Cosmetics.GetCosmeticPrice(item.Cosmetic) * item.Quantity;
+        subTotal += await _unitOfWork.Cosmetics.GetCosmeticOriginalPrice(item.Cosmetic) * item.Quantity;
         item.SellingPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(item.Cosmetic);
       }
 
@@ -129,7 +129,7 @@ public class OrderService : IOrderService
 
       // Save GHN Order ID & Tracking Number, also increase the total price
       order.TrackingNumber = ghnOrderResult.Data!.OrderCode;
-      order.TotalPrice = ghnOrderResult.Data.TotalFee + order.SubTotal;
+      order.TotalPrice = ghnOrderResult.Data.TotalFee + totalPrice;
 
       // Generate order response
       var orderResponse = MapToOrderResponse(order);
@@ -236,10 +236,10 @@ public class OrderService : IOrderService
       var cosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(orderItem.Key);
       if (cosmetic is null)
         return null;
-
+      var originalPrice = await _unitOfWork.Cosmetics.GetCosmeticOriginalPrice(cosmetic);
       var sellingPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
       var quantity = orderItem.Value;
-      subTotal += sellingPrice * quantity;
+      subTotal += originalPrice * quantity;
       totalPrice += sellingPrice * quantity;
 
       orderItems.Add(new OrderItem()
