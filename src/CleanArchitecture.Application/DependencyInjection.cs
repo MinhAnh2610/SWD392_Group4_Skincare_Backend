@@ -1,3 +1,4 @@
+using CleanArchitecture.Application.DTOs.Email;
 using CleanArchitecture.Application.Factories.FilePathFactory;
 using CleanArchitecture.Application.Interfaces;
 using CleanArchitecture.Application.Services;
@@ -23,7 +24,7 @@ public static class DependencyInjection
   {
 
     QuestPDF.Settings.License = LicenseType.Community;
-    
+
     services.AddFeatureManagement();
     services.AddHttpContextAccessor();
 
@@ -32,6 +33,9 @@ public static class DependencyInjection
 
     // Add identity server 4 validator for owner password
     services.AddTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>();
+
+    // Add Email Configuration
+    services.AddSingleton(configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>()!);
 
     // Add services
     services.AddScoped<IAuthService, AuthService>();
@@ -44,6 +48,7 @@ public static class DependencyInjection
     services.AddScoped<ICosmeticImageService, CosmeticImageService>();
     services.AddScoped<ICosmeticTypeService, CosmeticTypeService>();
     services.AddScoped<ICouponService, CouponService>();
+    services.AddScoped<IEmailService, EmailService>();
     services.AddScoped<IFeedbackService, FeedbackService>();
     services.AddScoped<IOrderService, OrderService>();
     services.AddScoped<IPaymentService, PaymentService>();

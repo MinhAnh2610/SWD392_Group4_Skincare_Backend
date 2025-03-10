@@ -1,4 +1,5 @@
 ﻿using CleanArchitecture.Application.DTOs.Auth;
+using CleanArchitecture.Application.DTOs.Email;
 using CleanArchitecture.Application.Enums;
 using IdentityModel.Client;
 using Microsoft.AspNetCore.Http;
@@ -10,6 +11,7 @@ namespace CleanArchitecture.Application.Services;
 public class AuthService : IAuthService
 {
   private readonly UserManager<User> _userManager;
+  private readonly IEmailService _emailService;
   private readonly IHttpClientFactory _httpClientFactory;
   private readonly IHttpContextAccessor _httpContextAccessor;
   private readonly IValidator<LoginRequest> _loginValidator;
@@ -19,6 +21,7 @@ public class AuthService : IAuthService
   private readonly IValidator<DTOs.Auth.RefreshTokenRequest> _refreshTokenValidator;
 
   public AuthService(UserManager<User> userManager,
+                     IEmailService emailService,
                      IHttpClientFactory httpClientFactory,
                      IValidator<LoginRequest> loginValidator,
                      IValidator<RegisterRequest> registerValidator,
@@ -29,13 +32,14 @@ public class AuthService : IAuthService
                      )
   {
     _userManager = userManager;
+    _emailService = emailService;
     _httpClientFactory = httpClientFactory;
     _loginValidator = loginValidator;
     _registerValidator = registerValidator;
     _forgotPasswordValidator = forgotPasswordValidator;
     _resetPasswordValidator = resetPasswordValidator;
     _refreshTokenValidator = refreshTokenValidator;
-    _httpContextAccessor = httpContextAccessor; 
+    _httpContextAccessor = httpContextAccessor;
   }
 
   public async Task<Result<string>> ForgotPasswordAsync(ForgotPasswordRequest request)
@@ -57,7 +61,106 @@ public class AuthService : IAuthService
 
     var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-    // later you need to configure the email for sending the reset token
+    var domain = "https://de-fleur.netlify.app/reset-password";
+    var queryString = $"?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(user.Email!)}";
+    var forgotPasswordLink = $"{domain}{queryString}";
+    var htmlMail = $@"<!DOCTYPE html>
+      <html lang=""en"">
+        <head>
+          <meta charset=""UTF-8"" />
+          <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"" />
+          <title>Password Reset Request</title>
+          <style>
+            .overlay {{
+              background-color: rgba(255, 255, 255, 0.7); /* White with 70% opacity */
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              z-index: 1;
+            }}
+            .content-container {{
+              position: relative;
+              z-index: 2;
+            }}
+          </style>
+        </head>
+        <body
+          style=""margin: 0; font-family: Arial, sans-serif; background-color: #f9f9f9""
+        >
+          <div
+            style=""
+              max-width: 800px;
+              margin: auto;
+              background-color: white;
+              padding: 20px;
+            ""
+          >
+            <div style=""text-align: center; padding: 20px; background-color: white"">
+              <div
+                style=""
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  text-align: center;
+                  height: 80px;
+                ""
+              >
+                <span style=""font-size: 3.5rem; font-weight: 600; color: #3a4d39""
+                  >De Fleur</span
+                >
+              </div>
+            </div>
+            <div class=""overlay""></div>
+            <div class=""content-container"" style=""padding: 20px"">
+              <h2 style=""font-size: 2rem; font-weight: bold"">
+                Password Reset Request
+              </h2>
+              <p style=""font-size: 1rem"">Dear User,</p>
+              <p style=""font-size: 1rem"">
+                You requested to reset your password. Please click the button below to
+                reset your password:
+              </p>
+              <p style=""font-size: 1rem"">
+                To ensure the security of your account, please note the following:
+              </p>
+              <ul style=""font-size: 1rem; line-height: 1.5"">
+                <li>The reset link is valid for only 24 hours.</li>
+                <li>
+                  If you did not request a password reset, please ignore this email or
+                  contact our support team.
+                </li>
+                <li>Do not share this email or the reset link with anyone.</li>
+              </ul>
+              <div style=""text-align: center; margin: 20px 0"">
+                <a
+                  href='{forgotPasswordLink}'
+                  style=""
+                    display: inline-block;
+                    background-color: #789678;
+                    color: white;
+                    padding: 10px 20px;
+                    text-decoration: none;
+                    border-radius: 4px;
+                  ""
+                  >Reset Password</a
+                >
+              </div>
+              <p style=""font-size: 1rem"">
+                Thank you for using our services. We value your security and are here
+                to help if you need any assistance.
+              </p>
+              <p style=""font-size: 1rem"">
+                Best regards,<br />Your Company Support Team
+              </p>
+            </div>
+          </div>
+        </body>
+      </html>
+      ";
+    var message = new EmailMessage([user.Email!], "Reset password link", htmlMail);
+    await _emailService.SendEmailAsync(message);
 
     return Result<string>.Success(token, StatusCodes.Status200OK);
   }
@@ -196,9 +299,9 @@ public class AuthService : IAuthService
       return Result<string>.Failure(errors, StatusCodes.Status400BadRequest);
     }
 
-    var user = new User 
-    { 
-      UserName = request.UserName, 
+    var user = new User
+    {
+      UserName = request.UserName,
       Email = request.Email,
       Gender = request.Gender,
       FirstName = request.FirstName,
