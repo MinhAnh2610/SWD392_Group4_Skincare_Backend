@@ -105,31 +105,8 @@ public class OrderService : IOrderService
 
       foreach (var item in order.OrderItems)
       {
-        var cosmeticPrice = await _unitOfWork.CosmeticPrices.GetByCosmeticIdAsync(item.CosmeticId);
-
-        if (cosmeticPrice != null)
-        {
-          decimal originalPrice = cosmeticPrice.OriginalPrice;
-          decimal discountedPrice = originalPrice;
-
-          // Apply event discount if available
-          if (cosmeticPrice.Event != null && cosmeticPrice.Event.DiscountPercentage.HasValue)
-          {
-            discountedPrice = originalPrice * (1 - (cosmeticPrice.Event.DiscountPercentage.Value / 100m));
-          }
-
-          item.SellingPrice = discountedPrice; // Store the discounted price
-          subtotal += originalPrice * item.Quantity;
-          discountedSubtotal += discountedPrice * item.Quantity;
-        }
-        else
-        {
-          // Fallback to regular price method
-          decimal price = await _unitOfWork.Cosmetics.GetCosmeticPrice(item.Cosmetic);
-          item.SellingPrice = price;
-          subtotal += price * item.Quantity;
-          discountedSubtotal += price * item.Quantity;
-        }
+        subTotal += await _unitOfWork.Cosmetics.GetCosmeticOriginalPrice(item.Cosmetic) * item.Quantity;
+        item.SellingPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(item.Cosmetic);
       }
 
       order.SubTotal = subtotal;
@@ -166,7 +143,7 @@ public class OrderService : IOrderService
 
       // Add shipping fee to total price
       order.TrackingNumber = ghnOrderResult.Data!.OrderCode;
-      order.TotalPrice = totalPrice + ghnOrderResult.Data.TotalFee;
+      order.TotalPrice = ghnOrderResult.Data.TotalFee + totalPrice;
 
       // Generate order response
       var orderResponse = MapToOrderResponse(order);
@@ -273,10 +250,10 @@ public class OrderService : IOrderService
       var cosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(orderItem.Key);
       if (cosmetic is null)
         return null;
-
+      var originalPrice = await _unitOfWork.Cosmetics.GetCosmeticOriginalPrice(cosmetic);
       var sellingPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
       var quantity = orderItem.Value;
-      subTotal += sellingPrice * quantity;
+      subTotal += originalPrice * quantity;
       totalPrice += sellingPrice * quantity;
 
       orderItems.Add(new OrderItem()
