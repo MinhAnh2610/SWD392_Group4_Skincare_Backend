@@ -149,6 +149,7 @@ public class OrderService : IOrderService
       // Add shipping fee to total price
       order.TrackingNumber = ghnOrderResult.Data!.OrderCode;
       order.TotalPrice = totalPrice + ghnOrderResult.Data.TotalFee;
+      order.Customer = customer!;
 
       // Generate order response
       var orderResponse = MapToOrderResponse(order);
@@ -547,7 +548,7 @@ public class OrderService : IOrderService
     try
     {
       var orders = await _unitOfWork.Orders.GetAllAsync();
-      var response = orders.Select(MapToOrderResponse).ToList();
+      var response = orders.Select(o => MapToOrderResponse(o)).ToList();
       return Result<List<OrderResponse>>.Success(response, StatusCodes.Status200OK);
     }
     catch (Exception ex)
@@ -564,6 +565,12 @@ public class OrderService : IOrderService
     try
     {
       var orders = await _unitOfWork.Orders.GetOrdersByCustomerIdAsync(customerId);
+      if (orders == null)
+      {
+        return Result<List<OrderResponse>>.Failure(
+          new List<Error> { new Error("Order.Customer", "Could not find orders") },
+          StatusCodes.Status404NotFound);
+      }
       var response = orders.Select(MapToOrderResponse).ToList();
       return Result<List<OrderResponse>>.Success(response, StatusCodes.Status200OK);
     }
@@ -601,7 +608,6 @@ public class OrderService : IOrderService
           [new Error("Order.Update", "Failed to update order")],
           StatusCodes.Status500InternalServerError);
       }
-
       return Result<OrderResponse>.Success(
         MapToOrderResponse(order),
         StatusCodes.Status200OK);
@@ -679,7 +685,10 @@ public class OrderService : IOrderService
     {
       Id = order.Id,
       CustomerId = order.CustomerId,
+      CustomerUserName = order.Customer.UserName,
+      CustomerEmail = order.Customer.Email,
       CouponId = order.CouponId,
+      CouponName = order.Coupon?.Name,
       SubTotal = order.SubTotal,
       TotalPrice = order.TotalPrice,
       OrderDate = order.OrderDate,
