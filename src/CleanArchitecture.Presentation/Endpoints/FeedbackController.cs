@@ -42,10 +42,7 @@ public class FeedbackController : ICarterModule
     .ProducesProblem(StatusCodes.Status500InternalServerError)
     .WithSummary("LeaveFeedback")
     .WithDescription("Leave Feedback")
-    .RequireAuthorization(new AuthorizeAttribute
-    {
-      Roles = "Customer"
-    });
+    .RequireAuthorization();
     #endregion
 
     #region Get Feedback By Customer API
