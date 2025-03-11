@@ -10,7 +10,7 @@ public class BatchController : ICarterModule
   {
     var group = app.MapGroup("api/batch").WithTags("Batch Management");
 
-    #region Create Batch
+    #region Create Batch management
     group.MapPost("/create", async (IBatchService service, BatchCreateRequest request) =>
     {
       var result = await service.CreateBatch(request);
@@ -24,7 +24,7 @@ public class BatchController : ICarterModule
     .WithDescription("Creates a new cosmetic batch entry");
     #endregion
 
-    #region Get All Batches
+    #region Get All Batches management
     group.MapGet("/get-all", async (IBatchService service) =>
     {
       var result = await service.GetAllBatches();
@@ -40,7 +40,7 @@ public class BatchController : ICarterModule
     .WithDescription("Retrieves all available batches");
     #endregion
 
-    #region Get Batch by ID
+    #region Get Batch by ID for use
     group.MapGet("/{id}", async (IBatchService service, Guid id) =>
     {
       var result = await service.GetBatchById(id);
@@ -56,7 +56,7 @@ public class BatchController : ICarterModule
     .WithDescription("Retrieves a single batch by its GUID");
     #endregion
 
-    #region Get Batches by Cosmetic ID
+    #region Get Batches by Cosmetic ID for use
     group.MapGet("/by-cosmetic/{cosmeticId}", async (IBatchService service, Guid cosmeticId) =>
     {
       var result = await service.GetBatchesByCosmeticId(cosmeticId);
@@ -72,7 +72,7 @@ public class BatchController : ICarterModule
     .WithDescription("Retrieves all batches associated with a cosmetic");
     #endregion
 
-    #region Update Batch
+    #region Update Batch for use
     group.MapPut("/{id}", async (IBatchService service, Guid id, BatchUpdateRequest request) =>
     {
       var result = await service.UpdateBatch(request, id);
@@ -89,7 +89,7 @@ public class BatchController : ICarterModule
     .WithDescription("Updates an existing batch entry");
     #endregion
 
-    #region Delete Batch
+    #region Delete Batch for use
     group.MapDelete("/{id}", async (IBatchService service, Guid id) =>
     {
       var result = await service.DeleteBatch(id);
@@ -105,7 +105,7 @@ public class BatchController : ICarterModule
     .WithDescription("Permanently deletes a batch entry");
     #endregion
 
-    #region Batch Date Range Search
+    #region Batch Date Range Search for use
     group.MapGet("/search", async (IBatchService service,
         [FromQuery] DateOnly startDate,
         [FromQuery] DateOnly endDate,

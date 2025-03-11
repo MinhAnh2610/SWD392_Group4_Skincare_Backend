@@ -16,7 +16,7 @@ public class UnitOfWork : IUnitOfWork
 
   #region Repositories
 
-  public IBatchRepository Batches => new BatchRepository(_context);
+  public IBatchRepository Batches  => new BatchRepository(_context);
   public IBlogRepository Blogs => new BlogRepository(_context);
   public IBlogTagRepository BlogTags => new BlogTagRepository(_context);
   public IBrandRepository Brands => new BrandRepository(_context);
