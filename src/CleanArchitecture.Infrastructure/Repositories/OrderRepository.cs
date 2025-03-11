@@ -7,7 +7,14 @@ public class OrderRepository : GenericRepository<Order>, IOrderRepository
   public OrderRepository(ApplicationDbContext context) : base(context)
   {
   }
-
+  public async Task<List<Order>> GetAllOrdersWithItemsAsync()
+  {
+    return await _context.Orders
+            .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Cosmetic)
+            .OrderByDescending(o => o.CreateAt)
+            .ToListAsync();
+  }
   public async Task<List<Order>> GetExpiredPendingOrdersAsync(DateTime expiryTime)
   {
     return await _context.Orders

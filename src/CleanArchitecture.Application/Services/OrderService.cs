@@ -56,7 +56,6 @@ public class OrderService : IOrderService
   }
 
   // 1. Initiate Order (First step of checkout)
-  // 1. Initiate Order (First step of checkout)
   public async Task<Result<OrderResponse>> InitiateOrder(CreateOnlineOrderRequest request)
   {
     try
@@ -547,8 +546,9 @@ public class OrderService : IOrderService
   {
     try
     {
-      var orders = await _unitOfWork.Orders.GetAllAsync();
-      var response = orders.Select(o => MapToOrderResponse(o)).ToList();
+      // Replace the generic GetAllAsync with a repository method that includes order items
+      var orders = await _unitOfWork.Orders.GetAllOrdersWithItemsAsync();
+      var response = orders.Select(MapToOrderResponse).ToList();
       return Result<List<OrderResponse>>.Success(response, StatusCodes.Status200OK);
     }
     catch (Exception ex)
