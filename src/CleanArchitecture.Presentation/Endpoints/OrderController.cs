@@ -82,7 +82,7 @@ public class OrderController : ICarterModule
     .WithDescription("Get All Order")
     .RequireAuthorization(new AuthorizeAttribute
     {
-      Roles = "Manager"
+      Roles = "Staff, Manager"
     });
 
     // 4. Get Orders for the Current User
@@ -128,7 +128,7 @@ public class OrderController : ICarterModule
     .WithDescription("Update Order Status")
     .RequireAuthorization(new AuthorizeAttribute
     {
-      Roles = "Manager"
+      Roles = "Staff, Manager"
     });
 
     // 6. Delete Order (Admin)
