@@ -18,6 +18,8 @@ public class OrderRepository : GenericRepository<Order>, IOrderRepository
   public async Task<List<Order>> GetExpiredPendingOrdersAsync(DateTime expiryTime)
   {
     return await _context.Orders
+        .Include(o => o.Customer)
+        .Include(o => o.Coupon)
         .Where(o => o.Status == "PENDING_PAYMENT" && o.CreateAt < expiryTime)
         .ToListAsync();
   }
@@ -27,6 +29,8 @@ public class OrderRepository : GenericRepository<Order>, IOrderRepository
     return await _context.Orders
             .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Cosmetic)
+            .Include(o => o.Customer)
+            .Include(o => o.Coupon)
             .Where(o => o.CustomerId == customerId)
             .OrderByDescending(o => o.CreateAt)
             .ToListAsync();
@@ -36,6 +40,8 @@ public class OrderRepository : GenericRepository<Order>, IOrderRepository
   {
     return await _context.Orders
           .Include(o => o.OrderItems)
+          .Include(o => o.Customer)
+          .Include(o => o.Coupon)
           .Where(o => o.Status == status)
           .OrderByDescending(o => o.CreateAt)
           .ToListAsync();
@@ -44,8 +50,29 @@ public class OrderRepository : GenericRepository<Order>, IOrderRepository
   {
     return await _context.Orders
         .Include(o => o.Customer)
+        .Include(o => o.Coupon)
         .Include(o => o.OrderItems)
             .ThenInclude(oi => oi.Cosmetic)
         .FirstOrDefaultAsync(o => o.Id == orderId);
+  }
+
+  public override async Task<List<Order>> GetAllAsync()
+  {
+    return await _context.Orders
+      .Include(o => o.Customer)
+      .Include(o => o.Coupon)
+      .Include(o => o.OrderItems)
+          .ThenInclude(oi => oi.Cosmetic)
+      .ToListAsync();
+  }
+
+  public override async Task<Order?> GetByIdAsync(Guid orderId)
+  {
+    return await _context.Orders
+      .Include(o => o.Customer)
+      .Include(o => o.Coupon)
+      .Include(o => o.OrderItems)
+          .ThenInclude(oi => oi.Cosmetic)
+      .FirstOrDefaultAsync(o => o.Id == orderId);
   }
 }
