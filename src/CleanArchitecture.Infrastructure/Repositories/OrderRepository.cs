@@ -10,10 +10,12 @@ public class OrderRepository : GenericRepository<Order>, IOrderRepository
   public async Task<List<Order>> GetAllOrdersWithItemsAsync()
   {
     return await _context.Orders
-            .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Cosmetic)
-            .OrderByDescending(o => o.CreateAt)
-            .ToListAsync();
+      .Include(o => o.Customer)
+      .Include(o => o.Coupon)
+      .Include(o => o.OrderItems)
+          .ThenInclude(oi => oi.Cosmetic)
+      .OrderByDescending(o => o.CreateAt)
+      .ToListAsync();
   }
   public async Task<List<Order>> GetExpiredPendingOrdersAsync(DateTime expiryTime)
   {
