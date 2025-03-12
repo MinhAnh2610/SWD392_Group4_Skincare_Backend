@@ -10,6 +10,7 @@
   public string ShippingAddress { get; set; } = default!;
   public string BillingAddress { get; set; } = default!;
   public string? TrackingNumber { get; set; }
+  public DateTime? ETA { get; set; } // made nullable for walk in orders
   public DateTime? DeliveryDate { get; set; } // made nullable if delivery date is set later
   public string Status { get; set; } = default!;
   public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();

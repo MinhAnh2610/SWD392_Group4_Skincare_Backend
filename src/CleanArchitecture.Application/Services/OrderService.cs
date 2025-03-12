@@ -149,6 +149,8 @@ public class OrderService : IOrderService
       order.TrackingNumber = ghnOrderResult.Data!.OrderCode;
       order.TotalPrice = totalPrice + ghnOrderResult.Data.TotalFee;
       order.Customer = customer!;
+      order.ETA = ghnOrderResult.Data!.ExpectedDeliveryTime;
+      order.DeliveryDate = null;
 
       // Generate order response
       var orderResponse = MapToOrderResponse(order);
@@ -244,6 +246,8 @@ public class OrderService : IOrderService
       CouponId = request.CouponId,
       CreateAt = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow),
       OrderDate = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow),
+      DeliveryDate = null,
+      ETA = null,
       IsActive = true
     };
 
@@ -290,7 +294,7 @@ public class OrderService : IOrderService
     order.TotalPrice = totalPrice;
     order.SubTotal = subTotal;
     order.OrderItems = orderItems;
-    order.Status = OrderStatus.PENDING;
+    order.Status = OrderStatus.COMPLETED;
 
     await _unitOfWork.Orders.CreateAsync(order);
     await _unitOfWork.CompleteAsync();
