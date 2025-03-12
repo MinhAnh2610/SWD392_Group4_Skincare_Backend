@@ -16,6 +16,7 @@ public class OrderResponse
   public string? ShippingAddress { get; set; } = default!;
   public string? BillingAddress { get; set; } = default!;
   public string? TrackingNumber { get; set; } = default!;
+  public DateTime? ETA { get; set; }
   public DateTime? DeliveryDate { get; set; }
   public string? Status { get; set; } = default!;
   public string? PaymentUrl { get; set; }
