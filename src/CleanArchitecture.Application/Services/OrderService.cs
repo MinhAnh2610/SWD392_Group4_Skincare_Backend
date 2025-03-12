@@ -699,6 +699,7 @@ public class OrderService : IOrderService
       ShippingAddress = order.ShippingAddress,
       BillingAddress = order.BillingAddress,
       TrackingNumber = order.TrackingNumber,
+      ETA = order.ETA,
       DeliveryDate = order.DeliveryDate,
       Status = order.Status,
       CreateAt = order.CreateAt,
