@@ -56,7 +56,6 @@ public class OrderService : IOrderService
   }
 
   // 1. Initiate Order (First step of checkout)
-  // 1. Initiate Order (First step of checkout)
   public async Task<Result<OrderResponse>> InitiateOrder(CreateOnlineOrderRequest request)
   {
     try
@@ -149,6 +148,9 @@ public class OrderService : IOrderService
       // Add shipping fee to total price
       order.TrackingNumber = ghnOrderResult.Data!.OrderCode;
       order.TotalPrice = totalPrice + ghnOrderResult.Data.TotalFee;
+      order.Customer = customer!;
+      order.ETA = ghnOrderResult.Data!.ExpectedDeliveryTime;
+      order.DeliveryDate = null;
 
       // Generate order response
       var orderResponse = MapToOrderResponse(order);
@@ -244,6 +246,8 @@ public class OrderService : IOrderService
       CouponId = request.CouponId,
       CreateAt = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow),
       OrderDate = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow),
+      DeliveryDate = null,
+      ETA = null,
       IsActive = true
     };
 
@@ -290,7 +294,7 @@ public class OrderService : IOrderService
     order.TotalPrice = totalPrice;
     order.SubTotal = subTotal;
     order.OrderItems = orderItems;
-    order.Status = OrderStatus.PENDING;
+    order.Status = OrderStatus.COMPLETED;
 
     await _unitOfWork.Orders.CreateAsync(order);
     await _unitOfWork.CompleteAsync();
@@ -589,6 +593,12 @@ public class OrderService : IOrderService
     try
     {
       var orders = await _unitOfWork.Orders.GetOrdersByCustomerIdAsync(customerId);
+      if (orders == null)
+      {
+        return Result<List<OrderResponse>>.Failure(
+          new List<Error> { new Error("Order.Customer", "Could not find orders") },
+          StatusCodes.Status404NotFound);
+      }
       var response = orders.Select(MapToOrderResponse).ToList();
       return Result<List<OrderResponse>>.Success(response, StatusCodes.Status200OK);
     }
@@ -626,7 +636,6 @@ public class OrderService : IOrderService
           [new Error("Order.Update", "Failed to update order")],
           StatusCodes.Status500InternalServerError);
       }
-
       return Result<OrderResponse>.Success(
         MapToOrderResponse(order),
         StatusCodes.Status200OK);
@@ -704,13 +713,17 @@ public class OrderService : IOrderService
     {
       Id = order.Id,
       CustomerId = order.CustomerId,
+      CustomerUserName = order.Customer.UserName,
+      CustomerEmail = order.Customer.Email,
       CouponId = order.CouponId,
+      CouponName = order.Coupon?.Name,
       SubTotal = order.SubTotal,
       TotalPrice = order.TotalPrice,
       OrderDate = order.OrderDate,
       ShippingAddress = order.ShippingAddress,
       BillingAddress = order.BillingAddress,
       TrackingNumber = order.TrackingNumber,
+      ETA = order.ETA,
       DeliveryDate = order.DeliveryDate,
       Status = order.Status,
       CreateAt = order.CreateAt,

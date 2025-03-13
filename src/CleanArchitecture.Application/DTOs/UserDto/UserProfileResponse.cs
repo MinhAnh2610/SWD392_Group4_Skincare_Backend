@@ -15,4 +15,5 @@ public class UserProfileResponse
   public string? SkinTypeId { get; set; }
   public SkinTypeResponse? SkinType { get; set; }
   public List<string>? Roles { get; set; } = new List<string>();
+  public DateTime CreateAt { get; set; }
 }
