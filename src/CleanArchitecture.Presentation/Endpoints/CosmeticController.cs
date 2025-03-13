@@ -110,11 +110,12 @@ public class CosmeticController : ICarterModule
     #endregion
 
     #region Upload Cosmetic Images API
-    group.MapPost("/{id}/images", async (ICosmeticService service, Guid id, [FromForm] CosmeticImagesUploadRequest request) =>
+    group.MapPost("/{id}/images", async (ICosmeticService service, Guid id, [FromForm] CosmeticImagesUploadRequest request, [FromQuery] string? imageType = "") =>
+      
     {
       // Ensure the ID in the route matches the request
       request.CosmeticId = id;
-      var result = await service.UploadCosmeticImages(request);
+      var result = await service.UploadCosmeticImages(request, imageType);
       return result.Match(Message.SUCCESSFUL_CREATED("Cosmetic Images"));
     })
     .WithName("UploadCosmeticImages")
