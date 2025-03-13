@@ -17,11 +17,8 @@ namespace CleanArchitecture.Application.DTOs.Cosmetic
     public string? LastModifiedBy { get; set; }
     public bool IsActive { get; set; }
     public Guid BrandId { get; set; }
-    public BrandResponse? Brand { get; set; }
     public Guid SkinTypeId { get; set; }
-    public SkinTypeResponse? SkinType { get; set; }
     public Guid CosmeticTypeId { get; set; }
-    public CosmeticTypeResponse? CosmeticType { get; set; }
     public string Name { get; set; } = default!;
     public decimal Price { get; set; }
     public decimal OriginalPrice { get; set; }
@@ -37,21 +34,18 @@ namespace CleanArchitecture.Application.DTOs.Cosmetic
     public int Width { get; set; }
     public int Height { get; set; }
     public string? ThumbnailUrl { get; set; }
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public VolumeUnit VolumeUnit { get; set; }
     public List<CosmeticSubcategoryResponse>? CosmeticSubcategories { get; set; }
-    public List<CosmeticImageCosmeticResponse>?CosmeticImages { get; set; }
-    public List<BatchResponse>? Batches { get; set; }
+    public List<CosmeticImageCosmeticResponse>? CosmeticImages { get; set; }
     public List<FeedbackCosmeticResponse>? Feedbacks { get; set; }
+    public List<BatchResponse>? Batches { get; set; }
     public int Quantity =>
-    Batches?
-        .Where(b => b.ExpirationDate > DateOnly.FromDateTime(DateTime.Now))
-        .Sum(b => b.Quantity) ?? 0;
+      Batches?
+          .Where(b => b.ExpirationDate > DateOnly.FromDateTime(DateTime.Now))
+          .Sum(b => b.Quantity) ?? 0;
 
     public decimal? Rating =>
         Feedbacks?.Count > 0
             ? Feedbacks.Average(f => f.Rating)
             : 0;
-
   }
 }

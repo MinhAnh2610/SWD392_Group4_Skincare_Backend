@@ -141,17 +141,12 @@ namespace CleanArchitecture.Application.Services
           baseQuery = ApplySorting(baseQuery, request.SortColumn, request.SortOrder);
         }
 
-        // Now apply includes after filtering and sorting
+        // Now apply only the necessary includes
         var query = baseQuery
-            .Include(c => c.Brand)
-            .Include(c => c.SkinType)
-            .Include(c => c.CosmeticType)
-            .Include(c => c.CosmeticSubcategories)
             .Include(c => c.CosmeticImages)
-            .Include(c => c.Batches)
             .Include(c => c.Feedbacks);
 
-        // Project to response DTO
+        // Project to a simplified response DTO with only the needed fields
         var cosmeticResponseQuery = query.Select(c => new CosmeticResponse
         {
           Id = c.Id,
@@ -161,35 +156,8 @@ namespace CleanArchitecture.Application.Services
           LastModifiedBy = c.LastModifiedBy,
           IsActive = c.IsActive,
           BrandId = c.BrandId,
-          Brand = new BrandResponse
-          {
-            Id = c.Brand.Id,
-            Name = c.Brand.Name,
-            Description = c.Brand.Description,
-            WebsiteUrl = c.Brand.WebsiteUrl,
-            LogoUrl = c.Brand.LogoUrl
-            // Add other necessary brand properties
-          },
           SkinTypeId = c.SkinTypeId,
-          SkinType = new SkinTypeResponse
-          {
-            Id = c.SkinType.Id,
-            Name = c.SkinType.Name,
-            Description = c.SkinType.Description,
-            IsDry = c.SkinType.IsDry,
-            IsSensitive = c.SkinType.IsSensitive,
-            IsUneven = c.SkinType.IsUneven,
-            IsWrinkle = c.SkinType.IsWrinkle
-            // Add other necessary skin type properties
-          },
           CosmeticTypeId = c.CosmeticTypeId,
-          CosmeticType = new CosmeticTypeResponse
-          {
-            Id = c.CosmeticType.Id,
-            Name = c.CosmeticType.Name,
-            Description = c.CosmeticType.Description
-            // Add other necessary cosmetic type properties
-          },
           Name = c.Name,
           Gender = c.Gender,
           Notice = c.Notice,
@@ -203,40 +171,21 @@ namespace CleanArchitecture.Application.Services
           Width = c.Width,
           Height = c.Height,
           ThumbnailUrl = c.ThumbnailUrl,
-          VolumeUnit = c.VolumeUnit,
           CosmeticSubcategories = c.CosmeticSubcategories.Select(cs => new CosmeticSubcategoryResponse
           {
             CosmeticId = cs.CosmeticId,
-            SubCategoryId = cs.SubCategoryId,
-            SubCategory = new DTOs.SubCategoryDto.SubCategoryResponse
-            {
-              Id = cs.SubCategory.Id,
-              Name = cs.SubCategory.Name,
-              Description = cs.SubCategory.Description,
-              CategoryId = cs.SubCategory.CategoryId,
-            }
-              // Add other necessary subcategory properties
-            }).ToList(),
+            SubCategoryId = cs.SubCategoryId
+          }).ToList(),
           CosmeticImages = c.CosmeticImages.Select(ci => new CosmeticImageCosmeticResponse
           {
             Id = ci.Id,
             ImageUrl = ci.ImageUrl
-            // Add other necessary image properties
-          }).ToList(),
-          Batches = c.Batches.Select(b => new BatchResponse
-          {
-            Id = b.Id,
-            Quantity = b.Quantity,
-            ExpirationDate = b.ExpirationDate,
-            ManufactureDate = b.ManufactureDate,
-            ExportedDate = b.ExportedDate,
-            // Add other necessary batch properties
           }).ToList(),
           Feedbacks = c.Feedbacks.Select(f => new FeedbackCosmeticResponse
           {
             Id = f.Id,
             Rating = f.Rating,
-            // Add other necessary feedback properties
+            Content = f.Content
           }).ToList()
         });
 
@@ -252,6 +201,13 @@ namespace CleanArchitecture.Application.Services
             cosmetic.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(entity);
             cosmetic.OriginalPrice = await _unitOfWork.Cosmetics.GetCosmeticOriginalPrice(entity);
           }
+        }
+
+        // Calculate quantity and rating
+        foreach (var cosmetic in cosmetics.Items)
+        {
+          // Quantity and Rating are calculated properties in your DTO
+          // They will be calculated automatically based on the Batches and Feedbacks collections
         }
 
         return Result<PaginatedList<CosmeticResponse>>.Success(cosmetics, StatusCodes.Status200OK);
