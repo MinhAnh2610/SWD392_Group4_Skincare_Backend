@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Application.DTOs.AzureBlob;
+﻿using CleanArchitecture.Application.Constants;
+using CleanArchitecture.Application.DTOs.AzureBlob;
 using CleanArchitecture.Application.DTOs.BatchDto;
 using CleanArchitecture.Application.DTOs.BrandDto;
 using CleanArchitecture.Application.DTOs.Cosmetic;
@@ -24,6 +25,7 @@ namespace CleanArchitecture.Application.Services
     private readonly IValidator<CosmeticImagesUploadRequest> _cosmeticImagesUploadValidator;
     private readonly IFilePathFactory _filePathFactory;
     private readonly IEnumerable<ICosmeticFilterStrategy> _filterStrategies;
+
     public CosmeticService(
       IUnitOfWork unitOfWork,
       IErrorFactory errorFactory,
@@ -31,7 +33,7 @@ namespace CleanArchitecture.Application.Services
       IValidator<CosmeticImagesUploadRequest> cosmeticImagesUploadValidator,
       IFilePathFactory filePathFactory,
       IEnumerable<ICosmeticFilterStrategy> filterStrategies
-      )
+    )
     {
       _unitOfWork = unitOfWork;
       _errorFactory = errorFactory;
@@ -66,7 +68,8 @@ namespace CleanArchitecture.Application.Services
         // Handle thumbnail if provided
         if (request.Thumbnail is not null && request.Thumbnail.Length > 0)
         {
-          var filePath = _filePathFactory.CreateFilePath(ObjectType.CosmeticThumbnail, orgcosmetic.Id, request.Thumbnail.FileName);
+          var filePath = _filePathFactory.CreateFilePath(ObjectType.CosmeticThumbnail, orgcosmetic.Id,
+            request.Thumbnail.FileName);
           var uploadRequest = new UploadRequest(filePath, request.Thumbnail);
           var url = await _blobService.UploadBlobsAsync([uploadRequest]);
           orgcosmetic.ThumbnailUrl = url.First();
@@ -106,6 +109,7 @@ namespace CleanArchitecture.Application.Services
         return Result<CosmeticResponse>.Failure([error.err], error.statusCode);
       }
     }
+
     // Helper method for applying sorting
     private IQueryable<Cosmetic> ApplySorting(IQueryable<Cosmetic> query, string sortColumn, string sortOrder)
     {
@@ -117,11 +121,14 @@ namespace CleanArchitecture.Application.Services
         "createat" => isAscending ? query.OrderBy(c => c.CreateAt) : query.OrderByDescending(c => c.CreateAt),
         "brand" => isAscending ? query.OrderBy(c => c.Brand.Name) : query.OrderByDescending(c => c.Brand.Name),
         "skintype" => isAscending ? query.OrderBy(c => c.SkinType.Name) : query.OrderByDescending(c => c.SkinType.Name),
-        "cosmetictype" => isAscending ? query.OrderBy(c => c.CosmeticType.Name) : query.OrderByDescending(c => c.CosmeticType.Name),
+        "cosmetictype" => isAscending
+          ? query.OrderBy(c => c.CosmeticType.Name)
+          : query.OrderByDescending(c => c.CosmeticType.Name),
         // Note: Can't directly sort by Price since it's calculated from another table
         _ => isAscending ? query.OrderBy(c => c.Name) : query.OrderByDescending(c => c.Name), // Default sort
       };
     }
+
     public async Task<Result<PaginatedList<CosmeticResponse>>> GetCosmeticsAsync(GetCosmeticsRequest request)
     {
       try
@@ -143,13 +150,13 @@ namespace CleanArchitecture.Application.Services
 
         // Now apply includes after filtering and sorting
         var query = baseQuery
-            .Include(c => c.Brand)
-            .Include(c => c.SkinType)
-            .Include(c => c.CosmeticType)
-            .Include(c => c.CosmeticSubcategories)
-            .Include(c => c.CosmeticImages)
-            .Include(c => c.Batches)
-            .Include(c => c.Feedbacks);
+          .Include(c => c.Brand)
+          .Include(c => c.SkinType)
+          .Include(c => c.CosmeticType)
+          .Include(c => c.CosmeticSubcategories)
+          .Include(c => c.CosmeticImages)
+          .Include(c => c.Batches)
+          .Include(c => c.Feedbacks);
 
         // Project to response DTO
         var cosmeticResponseQuery = query.Select(c => new CosmeticResponse
@@ -185,9 +192,7 @@ namespace CleanArchitecture.Application.Services
           CosmeticTypeId = c.CosmeticTypeId,
           CosmeticType = new CosmeticTypeResponse
           {
-            Id = c.CosmeticType.Id,
-            Name = c.CosmeticType.Name,
-            Description = c.CosmeticType.Description
+            Id = c.CosmeticType.Id, Name = c.CosmeticType.Name, Description = c.CosmeticType.Description
             // Add other necessary cosmetic type properties
           },
           Name = c.Name,
@@ -215,12 +220,11 @@ namespace CleanArchitecture.Application.Services
               Description = cs.SubCategory.Description,
               CategoryId = cs.SubCategory.CategoryId,
             }
-              // Add other necessary subcategory properties
-            }).ToList(),
+            // Add other necessary subcategory properties
+          }).ToList(),
           CosmeticImages = c.CosmeticImages.Select(ci => new CosmeticImageCosmeticResponse
           {
-            Id = ci.Id,
-            ImageUrl = ci.ImageUrl
+            Id = ci.Id, ImageUrl = ci.ImageUrl
             // Add other necessary image properties
           }).ToList(),
           Batches = c.Batches.Select(b => new BatchResponse
@@ -234,14 +238,14 @@ namespace CleanArchitecture.Application.Services
           }).ToList(),
           Feedbacks = c.Feedbacks.Select(f => new FeedbackCosmeticResponse
           {
-            Id = f.Id,
-            Rating = f.Rating,
+            Id = f.Id, Rating = f.Rating,
             // Add other necessary feedback properties
           }).ToList()
         });
 
         // Create paginated list
-        var cosmetics = await PaginatedList<CosmeticResponse>.CreateAsync(cosmeticResponseQuery, request.PageIndex, request.PageSize);
+        var cosmetics =
+          await PaginatedList<CosmeticResponse>.CreateAsync(cosmeticResponseQuery, request.PageIndex, request.PageSize);
 
         // Get prices for each cosmetic in the results
         foreach (var cosmetic in cosmetics.Items)
@@ -258,9 +262,11 @@ namespace CleanArchitecture.Application.Services
       }
       catch (Exception ex)
       {
-        return Result<PaginatedList<CosmeticResponse>>.Failure([CosmeticErrors.CosmeticQueryFailue], StatusCodes.Status500InternalServerError);
+        return Result<PaginatedList<CosmeticResponse>>.Failure([CosmeticErrors.CosmeticQueryFailue],
+          StatusCodes.Status500InternalServerError);
       }
     }
+
     public async Task<Result<CosmeticResponse>> GetCosmeticById(Guid id)
     {
       var cosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(id);
@@ -475,19 +481,46 @@ namespace CleanArchitecture.Application.Services
       );
     }
 
-    public async Task<Result<CosmeticResponse>> UploadCosmeticImages(CosmeticImagesUploadRequest request)
+    public async Task<Result<CosmeticResponse>> UploadCosmeticImages(CosmeticImagesUploadRequest request,
+      string? imageType)
     {
       var validationResult = await _cosmeticImagesUploadValidator.ValidateAsync(request);
       if (!validationResult.IsValid)
-      {
+      { 
         var errors = _errorFactory.CreateValidationError("Images", validationResult);
         return Result<CosmeticResponse>.Failure(errors.errs, errors.statusCode);
+      }
+
+      if (!string.IsNullOrEmpty(imageType) &&
+          !imageType.Equals(ImageType.THUMBNAIL, StringComparison.OrdinalIgnoreCase))
+        return Result<CosmeticResponse>.Failure(
+          [new Error("CosmeticImage.InvalidImageType", "Invalid image type for cosmetic")],
+          StatusCodes.Status400BadRequest);
+
+      var cosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(request.CosmeticId);
+
+      if (cosmetic is null)
+      {
+        var error = _errorFactory.CreateNotFoundError("Cosmetic");
+        return Result<CosmeticResponse>.Failure([error.err], error.statusCode);
       }
 
       var uploadRequests = new List<UploadRequest>();
       foreach (var image in request.Images)
       {
-        string filePath = _filePathFactory.CreateFilePath(ObjectType.CosmeticImage, request.CosmeticId, image.FileName);
+        string filePath = string.Empty;
+        switch (imageType.ToLower())
+        {
+          case ImageType.THUMBNAIL:
+            filePath = _filePathFactory.CreateFilePath(ObjectType.CosmeticThumbnail, request.CosmeticId,
+              image.FileName);
+            break;
+
+          default:
+            filePath = _filePathFactory.CreateFilePath(ObjectType.CosmeticImage, request.CosmeticId, image.FileName);
+            break;
+        }
+
         uploadRequests.Add(new UploadRequest(filePath, image));
       }
 
@@ -500,12 +533,26 @@ namespace CleanArchitecture.Application.Services
 
       var cosmeticImages = uploadedUrls.Select(url => new CosmeticImage
       {
-        CosmeticId = request.CosmeticId,
-        ImageUrl = url.ToString()
+        CosmeticId = request.CosmeticId, ImageUrl = url.ToString()
       }).ToList();
 
       foreach (var cosmeticImage in cosmeticImages)
       {
+        if (imageType.Equals(ImageType.THUMBNAIL, StringComparison.OrdinalIgnoreCase))
+        {
+          // If image is thumbnail, there is only 1 image file, so we break after update
+          var currentThumbnailUrl = cosmetic.ThumbnailUrl;
+          if (!string.IsNullOrEmpty(currentThumbnailUrl))
+          {
+            var isDeleted = await _blobService.DeleteBlobAsync(currentThumbnailUrl);
+            if (!isDeleted)
+              return Result<CosmeticResponse>.Failure([new Error("CosmeticThumbnail.DeletedFailed", "Thumbnail deleted failed.")], StatusCodes.Status500InternalServerError);
+          }
+          
+          cosmetic.ThumbnailUrl = cosmeticImage.ImageUrl;
+          break;
+        }
+
         await _unitOfWork.CosmeticImages.CreateAsync(cosmeticImage);
       }
 
@@ -516,7 +563,6 @@ namespace CleanArchitecture.Application.Services
         return Result<CosmeticResponse>.Failure([error.err], error.statusCode);
       }
 
-      var cosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(request.CosmeticId);
       var response = cosmetic.Adapt<CosmeticResponse>();
 
       return Result<CosmeticResponse>.Success(response, StatusCodes.Status201Created);
