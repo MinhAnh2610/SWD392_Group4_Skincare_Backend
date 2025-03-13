@@ -250,6 +250,7 @@ namespace CleanArchitecture.Application.Services
           if (entity != null)
           {
             cosmetic.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(entity);
+            cosmetic.OriginalPrice = await _unitOfWork.Cosmetics.GetCosmeticOriginalPrice(entity);
           }
         }
 
@@ -268,6 +269,7 @@ namespace CleanArchitecture.Application.Services
         var cosmeticResponse = cosmetic.Adapt<CosmeticResponse>();
 
         cosmeticResponse.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
+        cosmeticResponse.OriginalPrice = await _unitOfWork.Cosmetics.GetCosmeticOriginalPrice(cosmetic);
 
         return Result<CosmeticResponse>.Success(cosmeticResponse, StatusCodes.Status200OK);
       }
@@ -289,6 +291,7 @@ namespace CleanArchitecture.Application.Services
         {
           var cosmetic = cosmetics.First(c => c.Id == response.Id);
           response.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
+          response.OriginalPrice = await _unitOfWork.Cosmetics.GetCosmeticOriginalPrice(cosmetic);
         }
 
         return Result<List<CosmeticResponse>>.Success(cosmeticsResponse, StatusCodes.Status200OK);
@@ -311,6 +314,7 @@ namespace CleanArchitecture.Application.Services
         {
           var cosmetic = cosmetics.First(c => c.Id == response.Id);
           response.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
+          response.OriginalPrice = await _unitOfWork.Cosmetics.GetCosmeticOriginalPrice(cosmetic);
         }
 
         return Result<List<CosmeticResponse>>.Success(cosmeticsResponse, StatusCodes.Status200OK);
@@ -333,6 +337,7 @@ namespace CleanArchitecture.Application.Services
         {
           var cosmetic = cosmetics.First(c => c.Id == response.Id);
           response.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
+          response.OriginalPrice = await _unitOfWork.Cosmetics.GetCosmeticOriginalPrice(cosmetic);
         }
 
         return Result<List<CosmeticResponse>>.Success(cosmeticsResponse, StatusCodes.Status200OK);
@@ -355,6 +360,7 @@ namespace CleanArchitecture.Application.Services
         {
           var cosmetic = cosmetics.First(c => c.Id == response.Id);
           response.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
+          response.OriginalPrice = await _unitOfWork.Cosmetics.GetCosmeticOriginalPrice(cosmetic);
         }
 
         return Result<List<CosmeticResponse>>.Success(cosmeticsResponse, StatusCodes.Status200OK);
@@ -460,6 +466,7 @@ namespace CleanArchitecture.Application.Services
       {
         var cosmetic = filteredResults.First(c => c.Id == response.Id);
         response.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
+        response.OriginalPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
       }
 
       return Result<List<CosmeticResponse>>.Success(
