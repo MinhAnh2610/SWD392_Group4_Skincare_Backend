@@ -8,13 +8,13 @@ public class BatchRepository : GenericRepository<Batch>, IBatchRepository
 {
   public BatchRepository(ApplicationDbContext context) : base(context)
   {
-    
+     
   }
   public async Task<List<Batch>> GetListByAnyId(
-      Expression<Func<Batch, bool>> predicate,
+       Expression<Func<Batch, bool>> predicate,
       int level )
   {
-    if (level < 1) level = 1;
+    if  (level < 1) level = 1;
 
     var entityType = _context.Model.FindEntityType(typeof(Batch));
     var query = _context.Set<Batch>().AsQueryable();

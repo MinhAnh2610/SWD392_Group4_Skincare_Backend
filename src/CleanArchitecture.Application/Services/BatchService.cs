@@ -67,6 +67,7 @@ namespace CleanArchitecture.Application.Services
       if (batches != null)
       {
         var batchesResponse = batches.Adapt<List<BatchResponse>>();
+        Console.WriteLine(batchesResponse);
         return Result<List<BatchResponse>>.Success(batchesResponse, StatusCodes.Status200OK);
       }
 
@@ -79,6 +80,7 @@ namespace CleanArchitecture.Application.Services
 
       if (batch is null)
       {
+        Console.WriteLine("Batch not found");
         var error = _errorFactory.CreateNotFoundError("Batch");
         return Result<BatchResponse>.Failure([error.err], error.statusCode);
       }
@@ -91,6 +93,7 @@ namespace CleanArchitecture.Application.Services
       var batch = await _unitOfWork.Batches.GetListByAnyId(e => e.CosmeticId == cosId, 2);
       if (batch != null)
       {
+        Console.WriteLine("NotFound");
         var batchesResponse = batch.Adapt<List<BatchResponse>>();
         return Result<List<BatchResponse>>.Success(batchesResponse, StatusCodes.Status200OK);
       }
@@ -116,6 +119,7 @@ namespace CleanArchitecture.Application.Services
       var isSaved = await _unitOfWork.CompleteAsync();
       if (!isSaved)
       {
+        Console.WriteLine("Database error");
         var error = _errorFactory.CreateDatabaseError("Batch");
         return Result<BatchResponse>.Failure([error.err], error.statusCode);
       }
@@ -144,6 +148,7 @@ namespace CleanArchitecture.Application.Services
       {
         predicate = predicate.Or(b => b.ExpirationDate >= startDate && b.ExpirationDate <= endDate);
       }
+
 
       var batches = await _unitOfWork.Batches.GetListByAnyId(predicate, 2);
       var batchesResponse = batches.Adapt<List<BatchResponse>>();
