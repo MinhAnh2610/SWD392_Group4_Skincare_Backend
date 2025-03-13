@@ -24,6 +24,7 @@ namespace CleanArchitecture.Application.DTOs.Cosmetic
     public CosmeticTypeResponse? CosmeticType { get; set; }
     public string Name { get; set; } = default!;
     public decimal Price { get; set; }
+    public decimal OriginalPrice { get; set; }
     public bool Gender { get; set; } = true;
     public string Notice { get; set; } = default!;
     public string Ingredients { get; set; } = default!;
