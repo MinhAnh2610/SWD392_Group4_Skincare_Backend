@@ -178,6 +178,7 @@ namespace CleanArchitecture.Application.Services
           Width = c.Width,
           Height = c.Height,
           ThumbnailUrl = c.ThumbnailUrl,
+          VolumeUnit = c.VolumeUnit,
           CosmeticSubcategories = c.CosmeticSubcategories.Select(cs => new CosmeticSubcategoryResponse
           {
             CosmeticId = cs.CosmeticId,

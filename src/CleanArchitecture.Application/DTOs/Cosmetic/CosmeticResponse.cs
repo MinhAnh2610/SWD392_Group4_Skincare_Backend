@@ -34,6 +34,7 @@ namespace CleanArchitecture.Application.DTOs.Cosmetic
     public int Width { get; set; }
     public int Height { get; set; }
     public string? ThumbnailUrl { get; set; }
+    public VolumeUnit VolumeUnit { get; set; }
     public List<CosmeticSubcategoryResponse>? CosmeticSubcategories { get; set; }
     public List<CosmeticImageCosmeticResponse>? CosmeticImages { get; set; }
     public List<FeedbackCosmeticResponse>? Feedbacks { get; set; }
