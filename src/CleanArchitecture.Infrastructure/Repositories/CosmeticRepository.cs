@@ -37,13 +37,10 @@ public class CosmeticRepository : GenericRepository<Cosmetic>, ICosmeticReposito
   }
   public override async Task<Cosmetic?> GetByIdAsync(Guid id)
   {
-    var cosmeticsdtos = await _context.Cosmetics
-        .Where(c => c.Id == id)
-        .ProjectToType<CosmeticResponse>()
-        .FirstOrDefaultAsync();
+    var cosmetic = await _context.Cosmetics
+        .FirstOrDefaultAsync(cosmetic => cosmetic.Id == id);
 
-    var cosmetics = cosmeticsdtos.Adapt<Cosmetic>();
-    return cosmetics;
+    return cosmetic;
   }
 
   public async Task<decimal> GetCosmeticPrice(Cosmetic cosmetic)

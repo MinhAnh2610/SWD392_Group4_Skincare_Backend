@@ -3,17 +3,22 @@ using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
 using CleanArchitecture.Application.DTOs.AzureBlob;
 using CleanArchitecture.Application.ServiceContracts;
+using DotNetEnv;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace CleanArchitecture.Infrastructure.AzureBlobService
 {
   public class BlobService : IBlobService
   {
+    private readonly ILogger<BlobService> _logger;
     private readonly BlobServiceClient _blobServiceClient;
 
-    public BlobService(BlobServiceClient blobServiceClient)
+    public BlobService(BlobServiceClient blobServiceClient, ILogger<BlobService> logger)
     {
       _blobServiceClient = blobServiceClient;
+      _logger = logger;
     }
 
     public async Task<string> GetBlobsLinkAsync(string blobName)
@@ -102,11 +107,34 @@ namespace CleanArchitecture.Infrastructure.AzureBlobService
       return blobUrls;
     }
 
-    public async Task DeleteBlobAsync(string filePath)
+    public async Task<bool> DeleteBlobAsync(string fileLink)
     {
-      var containerClient = _blobServiceClient.GetBlobContainerClient("defleur");
-      var blobClient = containerClient.GetBlobClient(filePath);
-      await blobClient.DeleteIfExistsAsync();
-    }
+      if (!Uri.TryCreate(fileLink, UriKind.Absolute, out Uri uri))
+        return false;
+
+      try
+      {
+        var blobUriBuilder = new BlobUriBuilder(uri);
+        if (string.IsNullOrEmpty(blobUriBuilder.BlobContainerName) || string.IsNullOrEmpty(blobUriBuilder.BlobName))
+          return false;
+
+        // Use a connection string (injected or configured securely)
+        Env.Load("azure.env");
+        string? connectionString = Environment.GetEnvironmentVariable("azureBlobConnectionString");
+        var blobClient = new BlobClient(connectionString, blobUriBuilder.BlobContainerName, blobUriBuilder.BlobName);
+
+        var exists = await blobClient.ExistsAsync();
+        if (!exists.Value)
+          return false;
+
+        await blobClient.DeleteAsync();
+        return true;
+      }
+      catch (Exception ex)
+      {
+        _logger.LogError($"Delete blob failed at {DateTime.UtcNow} with link {fileLink}: {ex.Message}");
+        return false;
+      }
+    } 
   }
 }

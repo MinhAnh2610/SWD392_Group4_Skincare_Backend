@@ -8,6 +8,6 @@ namespace CleanArchitecture.Application.ServiceContracts
   {
     Task<Stream> GetBlobAsync(string filePath);
     Task<List<string>> UploadBlobsAsync(IEnumerable<UploadRequest> uploadRequests);
-    Task DeleteBlobAsync(string filePath);
+    Task<bool> DeleteBlobAsync(string fileLink);
   }
 }
