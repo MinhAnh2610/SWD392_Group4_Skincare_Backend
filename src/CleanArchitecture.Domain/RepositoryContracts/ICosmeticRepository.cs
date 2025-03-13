@@ -5,6 +5,7 @@ namespace CleanArchitecture.Domain.RepositoryContracts;
 public interface ICosmeticRepository : IGenericRepository<Cosmetic>
 {
   Task<List<Cosmetic>> GetListByAnyId(Expression<Func<Cosmetic, bool>> predicate);
+  Task<Cosmetic?> GetByIdWithBatchesAsync(Guid id)
   Task<decimal> GetCosmeticPrice(Cosmetic cosmetic);
   Task<decimal> GetCosmeticOriginalPrice(Cosmetic cosmetic);
   Task<decimal> GetCartItemPriceByCart(Cart cart);

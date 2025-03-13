@@ -38,6 +38,15 @@ public class CosmeticRepository : GenericRepository<Cosmetic>, ICosmeticReposito
   public override async Task<Cosmetic?> GetByIdAsync(Guid id)
   {
     var cosmetic = await _context.Cosmetics
+        .FirstOrDefaultAsync(cosmetic => cosmetic.Id == id);
+
+    return cosmetic;
+  }
+
+  // New method with batches included
+  public async Task<Cosmetic?> GetByIdWithBatchesAsync(Guid id)
+  {
+    var cosmetic = await _context.Cosmetics
         .Include(c => c.Batches)
         .FirstOrDefaultAsync(cosmetic => cosmetic.Id == id);
 

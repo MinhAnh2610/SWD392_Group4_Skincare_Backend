@@ -55,7 +55,7 @@ namespace CleanArchitecture.Application.Services
       }
 
       // Retrieve the cosmetic (product) being added.
-      var cosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(addProductRequest.CosmeticId);
+      var cosmetic = await _unitOfWork.Cosmetics.GetByIdWithBatchesAsync(addProductRequest.CosmeticId);
       if (cosmetic == null)
       {
         return Result<List<CartResponse>>.Failure(
@@ -398,7 +398,7 @@ namespace CleanArchitecture.Application.Services
 
       foreach (var item in items)
       {
-        var cosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(item.CosmeticId);
+        var cosmetic = await _unitOfWork.Cosmetics.GetByIdWithBatchesAsync(item.CosmeticId);
         if (cosmetic == null)
         {
           return Result<CartResponse>.Failure(
