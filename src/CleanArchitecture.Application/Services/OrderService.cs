@@ -305,11 +305,35 @@ public class OrderService : IOrderService
 
     var orderResponse = MapToOrderResponse(order);
     orderResponse.CustomerId = customer.Id;
+    // Generate payment URL if needed
+    if (request.PaymentMethod == PaymentMethods.ONLINE)
+    {
+      await HandlePaymentForWalkInOrder(order, orderResponse);
+    }
     orderResponse.Invoice = invoiceByte;
 
     return Result<OrderResponse>.Success(orderResponse, StatusCodes.Status200OK);
   }
+  // New method to handle payment for walk-in orders
+  private async Task HandlePaymentForWalkInOrder(Order order, OrderResponse orderResponse)
+  {
+    var vnPayRequest = new VnPayPaymentRequestDto
+    {
+      OrderId = order.Id,
+      PaymentMethod = PaymentMethods.ONLINE,
+      Amount = (float)order.TotalPrice
+    };
 
+    var httpContext = _httpContextAccessor.HttpContext;
+    if (httpContext != null)
+    {
+      var paymentUrlResult = _vnPayIntegrationService.CreatePaymentUrl(vnPayRequest, httpContext);
+      if (paymentUrlResult.IsSuccess)
+      {
+        orderResponse.PaymentUrl = paymentUrlResult.Data;
+      }
+    }
+  }
   private async Task<Result<Cart>> ValidateOrderRequest(CreateOnlineOrderRequest request)
   {
     // Validate cart exists and has items
@@ -453,7 +477,7 @@ public class OrderService : IOrderService
   private async Task HandlePaymentMethod(string paymentMethod, Order order, OrderResponse orderResponse)
   {
     // Handle online payment
-    if (paymentMethod == PaymentMethods.ONLINE)
+    if (paymentMethod == PaymentMethods.ONLINE || paymentMethod == PaymentMethods.COD)
     {
       var vnPayRequest = new VnPayPaymentRequestDto
       {
