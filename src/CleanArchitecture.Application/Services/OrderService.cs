@@ -1,12 +1,9 @@
-﻿using Castle.Components.DictionaryAdapter.Xml;
-using Castle.Core.Internal;
-using CleanArchitecture.Application.Constants;
+﻿using CleanArchitecture.Application.Constants;
 using CleanArchitecture.Application.DTOs.GHN.Request;
 using CleanArchitecture.Application.DTOs.GHN.Response;
 using CleanArchitecture.Application.DTOs.Order;
 using CleanArchitecture.Application.DTOs.OrderDto;
 using CleanArchitecture.Application.DTOs.OrderItemDto;
-using CleanArchitecture.Application.DTOs.UserDto;
 using CleanArchitecture.Application.DTOs.VnPay;
 using CleanArchitecture.Application.Enums;
 using CleanArchitecture.Application.Interfaces;
