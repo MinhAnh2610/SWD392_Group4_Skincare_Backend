@@ -462,7 +462,7 @@ public class OrderService : IOrderService
         Quantity = ci.Quantity
       }).ToList(),
       // Set default delivery date to 7 days from now
-      DeliveryDate = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow.AddDays(7))
+      //DeliveryDate = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow.AddDays(7))
     };
   }
 
