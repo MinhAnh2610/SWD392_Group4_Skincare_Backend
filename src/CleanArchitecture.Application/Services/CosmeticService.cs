@@ -184,10 +184,12 @@ namespace CleanArchitecture.Application.Services
             CosmeticId = cs.CosmeticId,
             SubCategoryId = cs.SubCategoryId
           }).ToList(),
-          CosmeticImages = c.CosmeticImages.Select(ci => new CosmeticImageCosmeticResponse
+          CosmeticImages = c.CosmeticImages.Select(ci => new CosmeticImageResponse() 
           {
             Id = ci.Id,
-            ImageUrl = ci.ImageUrl
+            ImageUrl = ci.ImageUrl,
+            CosmeticId = c.Id,
+            CosmeticName = c.Name
           }).ToList(),
           Feedbacks = c.Feedbacks.Select(f => new FeedbackCosmeticResponse
           {
@@ -237,6 +239,16 @@ namespace CleanArchitecture.Application.Services
 
         cosmeticResponse.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
         cosmeticResponse.OriginalPrice = await _unitOfWork.Cosmetics.GetCosmeticOriginalPrice(cosmetic);
+        var images = await _unitOfWork.CosmeticImages.GetCosmeticImagesByCosmeticId(id);
+        var imagesDto = images.Select(image => new CosmeticImageResponse
+        {
+          ImageUrl = image.ImageUrl,
+          Id = image.Id,
+          CosmeticId = cosmetic.Id,
+          CosmeticName = cosmetic.Name
+        }).ToList();
+        
+        cosmeticResponse.CosmeticImages = imagesDto; 
 
         return Result<CosmeticResponse>.Success(cosmeticResponse, StatusCodes.Status200OK);
       }
