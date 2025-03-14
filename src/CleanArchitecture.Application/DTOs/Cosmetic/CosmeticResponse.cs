@@ -36,7 +36,7 @@ namespace CleanArchitecture.Application.DTOs.Cosmetic
     public string? ThumbnailUrl { get; set; }
     public VolumeUnit VolumeUnit { get; set; }
     public List<CosmeticSubcategoryResponse>? CosmeticSubcategories { get; set; }
-    public List<CosmeticImageCosmeticResponse>? CosmeticImages { get; set; }
+    public List<CosmeticImageResponse>? CosmeticImages { get; set; }
     public List<FeedbackCosmeticResponse>? Feedbacks { get; set; }
     public List<BatchResponse>? Batches { get; set; }
     public int Quantity =>

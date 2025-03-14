@@ -2,4 +2,5 @@
 
 public interface ICosmeticImageRepository : IGenericRepository<CosmeticImage>
 {
+  Task<List<CosmeticImage>> GetCosmeticImagesByCosmeticId(Guid cosmeticId);
 }

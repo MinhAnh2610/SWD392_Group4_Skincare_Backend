@@ -14,4 +14,15 @@ public class CosmeticImageRepository : GenericRepository<CosmeticImage>, ICosmet
       .Include(ci => ci.Cosmetic)
       .ToListAsync();
   }
+
+  public async Task<List<CosmeticImage>> GetCosmeticImagesByCosmeticId(Guid cosmeticId)
+  {
+    var images = await (
+        from cosmeticImages in _context.CosmeticsImages
+        where cosmeticImages.CosmeticId == cosmeticId
+          select cosmeticImages
+      ).ToListAsync();
+
+    return images;
+  }
 }
