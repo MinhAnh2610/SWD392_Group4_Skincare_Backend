@@ -126,10 +126,7 @@ public class OrderController : ICarterModule
     .ProducesProblem(StatusCodes.Status404NotFound)
     .WithSummary("Update Order Status")
     .WithDescription("Update Order Status")
-    .RequireAuthorization(new AuthorizeAttribute
-    {
-      Roles = "Staff, Manager"
-    });
+    .RequireAuthorization();
 
     // 6. Delete Order (Admin)
     group.MapDelete("/{orderId}", async (
