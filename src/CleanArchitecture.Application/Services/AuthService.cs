@@ -61,7 +61,8 @@ public class AuthService : IAuthService
 
     var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-    var domain = "https://de-fleur.netlify.app/reset-password";
+    //var domain = "https://de-fleur.netlify.app/reset-password";
+    var domain = "https://localhost:5173/reset-password";
     var queryString = $"?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(user.Email!)}";
     var forgotPasswordLink = $"{domain}{queryString}";
     var htmlMail = $@"<!DOCTYPE html>
