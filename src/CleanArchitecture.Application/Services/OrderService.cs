@@ -619,7 +619,12 @@ public class OrderService : IOrderService
           [new Error("Order.NotFound", "Order not found")],
           StatusCodes.Status404NotFound);
       }
-
+      if(request.Status != OrderStatus.CANCELLED && _claimsService.CurrentUserRoles.Contains("Customer"))
+      {
+        return Result<OrderResponse>.Failure(
+          [new Error("Order.Update", "Failed to update order")],
+          StatusCodes.Status403Forbidden);
+      }
       order.Status = request.Status;
       order.LastModified = DateTime.UtcNow;
       order.LastModifiedBy = _claimsService.CurrentUserId.ToString();
