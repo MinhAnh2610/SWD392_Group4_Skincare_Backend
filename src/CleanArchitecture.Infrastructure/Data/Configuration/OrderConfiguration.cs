@@ -30,9 +30,9 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
       .HasColumnType("timestamp")
       .HasDefaultValueSql("CURRENT_TIMESTAMP");
     
-    builder.Property(order => order.DeliveryDate)
-      .HasColumnType("timestamp")
-      .HasDefaultValueSql("CURRENT_TIMESTAMP");
+    //builder.Property(order => order.DeliveryDate)
+    //  .HasColumnType("timestamp")
+    //  .HasDefaultValueSql("CURRENT_TIMESTAMP");
     
     builder.Property(order => order.CreateAt)
       .HasColumnType("timestamp")

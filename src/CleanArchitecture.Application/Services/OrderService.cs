@@ -189,8 +189,6 @@ public class OrderService : IOrderService
         StatusCodes.Status500InternalServerError);
     }
   }
-
-
   public async Task<Result<OrderResponse>> InitiateOrder(CreateWalkInOrderRequest request)
   {
     var validationResult = await _createWalkInOrderRequestValidator.ValidateAsync(request);
@@ -464,7 +462,7 @@ public class OrderService : IOrderService
         Quantity = ci.Quantity
       }).ToList(),
       // Set default delivery date to 7 days from now
-      DeliveryDate = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow.AddDays(7))
+      //DeliveryDate = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow.AddDays(7))
     };
   }
 
@@ -628,6 +626,18 @@ public class OrderService : IOrderService
       order.Status = request.Status;
       order.LastModified = DateTime.UtcNow;
       order.LastModifiedBy = _claimsService.CurrentUserId.ToString();
+
+      if (request.Status == OrderStatus.CANCELLED)
+      {
+        var ghnOrderResult = await _ghnService.ChangeShippingOrderStatus(new SwitchShippingOrdersStatusRequest
+        {
+          OrderCodes = [order.TrackingNumber]
+        }, "cancel");
+        if (ghnOrderResult.IsFailure)
+        {
+          return Result<OrderResponse>.Failure(ghnOrderResult.Errors, ghnOrderResult.Status);
+        }
+      }
 
       _unitOfWork.Orders.Update(order);
       var saved = await _unitOfWork.CompleteAsync();
