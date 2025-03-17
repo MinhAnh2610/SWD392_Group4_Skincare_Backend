@@ -540,6 +540,7 @@ public class OrderService : IOrderService
         order.Status = OrderStatus.FAILED;
       }
 
+      order.DeliveryDate = DateTime.UtcNow;
       order.LastModified = DateTime.UtcNow;
       order.LastModifiedBy = _claimsService.CurrentUserId.ToString();
       _unitOfWork.Orders.Update(order);
