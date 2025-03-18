@@ -2,7 +2,6 @@
 
 public class CreateOnlineOrderRequest : ICreateOrderRequest
 {
-    public Guid CartId { get; set; }
     public Guid? CouponId { get; set; }
     public string ShippingAddress { get; set; }
     public string BillingAddress { get; set; }

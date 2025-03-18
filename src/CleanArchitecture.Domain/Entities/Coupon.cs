@@ -8,5 +8,7 @@ public class Coupon : Entity<Guid>
   public DateTime StartDate { get; set; }
   public DateTime EndDate { get; set; }
   public int UsageLimit { get; set; }
+  public decimal MaxDiscountAmount { get; set; }
+  public decimal MinimumOrderPrice { get; set; }
   public List<Order> Orders { get; set; } = new List<Order>();
 }

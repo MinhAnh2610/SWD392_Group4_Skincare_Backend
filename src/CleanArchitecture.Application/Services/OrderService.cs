@@ -114,13 +114,22 @@ public class OrderService : IOrderService
       decimal totalPrice = discountedSubtotal;
 
       // Apply coupon discount if provided
+      decimal? couponDiscount = null;
       if (request.CouponId.HasValue)
       {
         var coupon = await _unitOfWork.Coupons.GetByIdAsync(request.CouponId.Value);
+        if (totalPrice < coupon.MinimumOrderPrice)
+        {
+          return Result<OrderResponse>.Failure([
+            new Error("Order.InsufficientPriceForCoupon", $"The order does not met coupon minimum price which is {coupon.MinimumOrderPrice}")], StatusCodes.Status400BadRequest);
+        }
         if (coupon != null && coupon.UsageLimit > 0 && coupon.EndDate > DateTime.UtcNow)
         {
-          decimal couponDiscount = (totalPrice * (decimal)coupon.DiscountAmount) / 100m;
-          totalPrice -= couponDiscount;
+          couponDiscount = (totalPrice * (decimal)coupon.DiscountAmount) / 100m;
+          if (couponDiscount > coupon.MaxDiscountAmount)
+            couponDiscount = coupon.MaxDiscountAmount;
+          
+          totalPrice -= (decimal)couponDiscount;
 
           // Update coupon usage
           coupon.UsageLimit--;
@@ -151,6 +160,8 @@ public class OrderService : IOrderService
 
       // Generate order response
       var orderResponse = MapToOrderResponse(order);
+      if (couponDiscount is not null)
+        orderResponse.CouponDiscount = couponDiscount;
 
       // Handle payment method specific logic
       await HandlePaymentMethod(request.PaymentMethod, order, orderResponse);
@@ -335,8 +346,8 @@ public class OrderService : IOrderService
   }
   private async Task<Result<Cart>> ValidateOrderRequest(CreateOnlineOrderRequest request)
   {
+    var cart = await _unitOfWork.Carts.GetCartByUserIdAsync(_claimsService.CurrentUserId);
     // Validate cart exists and has items
-    var cart = await _unitOfWork.Carts.GetCartWithItemsAsync(request.CartId);
     if (cart == null || !cart.CartItems.Any())
     {
       return Result<Cart>.Failure(

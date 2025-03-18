@@ -113,7 +113,10 @@ namespace CleanArchitecture.Application.Services
         DiscountAmount = createCouponRequest.Discount,
         StartDate = DateTime.Now,
         EndDate = createCouponRequest.ExpiryDate,
-        UsageLimit = createCouponRequest.UsageLimit
+        UsageLimit = createCouponRequest.UsageLimit,
+        IsActive = true,
+        MaxDiscountAmount = createCouponRequest.MaxDiscountAmount,
+        MinimumOrderPrice = createCouponRequest.MinimumOrderPrice
       };
 
       await _unitOfWork.Coupons.CreateAsync(coupon);
@@ -203,6 +206,8 @@ namespace CleanArchitecture.Application.Services
       coupon.DiscountAmount = updateCouponRequest.Discount;
       coupon.EndDate = updateCouponRequest.ExpiryDate;
       coupon.UsageLimit = updateCouponRequest.UsageLimit;
+      coupon.MaxDiscountAmount = updateCouponRequest.MaxDiscountAmount ?? coupon.MaxDiscountAmount;
+      coupon.MinimumOrderPrice = updateCouponRequest.MinimumOrderPrice ?? coupon.MinimumOrderPrice;
 
       _unitOfWork.Coupons.Update(coupon);
       var isSaved = await _unitOfWork.CompleteAsync();
