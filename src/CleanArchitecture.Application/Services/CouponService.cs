@@ -249,6 +249,13 @@ namespace CleanArchitecture.Application.Services
     {
       var coupons = await _unitOfWork.Coupons.GetAllAsync();
       var coupon = coupons.FirstOrDefault(c => c.Code == code);
+      if(coupon.UsageLimit == 0 )
+      {
+           return Result<CouponResponse>.Failure(
+                new List<Error> { new Error("Coupon.Get", "Coupon Usage is out numbered or expired") },
+                StatusCodes.Status404NotFound
+        );
+      }
       if (coupon == null)
       {
         return Result<CouponResponse>.Failure(
