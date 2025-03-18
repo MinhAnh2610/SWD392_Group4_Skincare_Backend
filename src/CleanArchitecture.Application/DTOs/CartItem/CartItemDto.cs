@@ -4,7 +4,7 @@
   {
     public Guid CosmeticId { get; set; }
     public string CosmeticName { get; set; } = string.Empty;
-    public string CosmeticImage { get; set; } = string.Empty;
+    public string ThumbnailUrl { get; set; } = string.Empty;
     public decimal Price { get; set; } // Original price
     public decimal DiscountedPrice { get; set; } // Price after event discount
     public decimal DiscountPercentage { get; set; } // Event discount percentage
