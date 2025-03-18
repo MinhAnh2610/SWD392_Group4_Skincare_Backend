@@ -8,8 +8,7 @@ namespace CleanArchitecture.Application.Validators.Coupon
   {
     public UpdateCouponRequestValidator()
     {
-      RuleFor(x => x.Id)
-          .NotEmpty().WithMessage("Coupon ID is required.");
+
 
       RuleFor(x => x.Code)
           .NotEmpty().WithMessage("Coupon code is required.")

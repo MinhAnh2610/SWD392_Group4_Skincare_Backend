@@ -9,5 +9,7 @@
     public DateTime StartDate { get; set; }
     public DateTime ExpiryDate { get; set; }
     public int UsageLimit { get; set; }
+    public decimal MaxDiscountAmount { get; set; }
+    public decimal MinimumOrderPrice { get; set; }
   }
 }

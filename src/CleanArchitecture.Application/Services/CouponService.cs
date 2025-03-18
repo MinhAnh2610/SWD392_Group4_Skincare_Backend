@@ -1,341 +1,192 @@
-﻿using Abp.Collections.Extensions;
-using Azure.Core;
-using CleanArchitecture.Application.DTOs.BlogDto;
-using CleanArchitecture.Application.DTOs.CouponDTO;
+﻿using CleanArchitecture.Application.DTOs.CouponDTO;
 using CleanArchitecture.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 
-namespace CleanArchitecture.Application.Services
+public class CouponService : ICouponService
 {
-  public class CouponService : ICouponService
-  {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IErrorFactory _errorFactory;
+  private readonly IUnitOfWork _unitOfWork;
+  private readonly IErrorFactory _errorFactory;
+  private readonly IValidator<UpdateCouponRequest> _updateCouponValidator;
+  private readonly IValidator<CreateCouponRequest> _createCouponValidator;
 
-    private readonly IValidator<ApplyCouponRequest> _couponValidator;
-    private readonly IValidator<UpdateCouponRequest> _updateCouponValidator;
-    private readonly IValidator<CreateCouponRequest> _createCouponValidator;
-
-    public CouponService(IUnitOfWork unitOfWork, IValidator<ApplyCouponRequest> couponValidator, IErrorFactory errorFactory, IValidator<UpdateCouponRequest> updateValidator,
+  public CouponService(
+      IUnitOfWork unitOfWork,
+      IErrorFactory errorFactory,
+      IValidator<UpdateCouponRequest> updateValidator,
       IValidator<CreateCouponRequest> createCouponValidator)
+  {
+    _unitOfWork = unitOfWork;
+    _errorFactory = errorFactory;
+    _updateCouponValidator = updateValidator;
+    _createCouponValidator = createCouponValidator;
+  }
+
+  private CouponResponse MapToCouponResponse(Coupon coupon)
+  {
+    return new CouponResponse
     {
-      _unitOfWork = unitOfWork;
-      _couponValidator = couponValidator;
-      _errorFactory = errorFactory;
-      _updateCouponValidator = updateValidator;
-      _createCouponValidator = createCouponValidator;
-    }
+      Id = coupon.Id,
+      Name = coupon.Name,
+      Code = coupon.Code,
+      Discount = coupon.DiscountAmount,
+      StartDate = coupon.StartDate,
+      ExpiryDate = coupon.EndDate,
+      UsageLimit = coupon.UsageLimit,
+      MaxDiscountAmount = coupon.MaxDiscountAmount,
+      MinimumOrderPrice = coupon.MinimumOrderPrice
+    };
+  }
 
-    public async Task<Result<CouponResponse>> ApplyCoupon(ApplyCouponRequest applyCouponRequest)
-    {
-      var validationResult = await _couponValidator.ValidateAsync(applyCouponRequest);
-      if (!validationResult.IsValid)
-      {
-        var errors = _errorFactory.CreateValidationError("Coupon", validationResult);
-        return Result<CouponResponse>.Failure(errors.errs, errors.statusCode);
-      }
-
-      var coupon = await _unitOfWork.Coupons.GetByIdAsync(applyCouponRequest.code);
-      if (coupon == null)
-      {
-        return Result<CouponResponse>.Failure(
-               new List<Error> { new Error("Coupon.Apply", "Coupon Not Found") },
-               StatusCodes.Status404NotFound
-               );
-      }
-
-      var order = await _unitOfWork.Orders.GetByIdAsync(applyCouponRequest.order);
-
-      if (order == null)
-      {
-        return Result<CouponResponse>.Failure(
-               new List<Error> { new Error("Coupon.Apply", "Order Not Found") },
-               StatusCodes.Status404NotFound
-               );
-      }
-
-      if (coupon.EndDate < DateTime.Now)
-      {
-        return Result<CouponResponse>.Failure(
-               new List<Error> { new Error("Coupon.Apply", "Coupon Expired") },
-               StatusCodes.Status400BadRequest
-               );
-      }
-
-      if (coupon.StartDate > DateTime.Now)
-      {
-        return Result<CouponResponse>.Failure(
-               new List<Error> { new Error("Coupon.Apply", "Coupon Not Started") },
-               StatusCodes.Status400BadRequest
-               );
-      }
-
-      if (coupon.UsageLimit <= 0)
-      {
-        return Result<CouponResponse>.Failure(
-               new List<Error> { new Error("Coupon.Apply", "Coupon Limit Exceeded") },
-               StatusCodes.Status400BadRequest
-               );
-      }
-
-      order.Coupon = coupon;
-      _unitOfWork.Orders.Update(order);
-      var isSaved = await _unitOfWork.CompleteAsync();
-      if (!isSaved)
-      {
-        var error = _errorFactory.CreateDatabaseError("Coupon");
-        return Result<CouponResponse>.Failure([error.err], error.statusCode);
-      }
-      return Result<CouponResponse>.Success(new CouponResponse
-      {
-        Id = coupon.Id,
-        Name = coupon.Name,
-        Code = coupon.Code,
-        Discount = coupon.DiscountAmount,
-        StartDate = coupon.StartDate,
-        ExpiryDate = coupon.EndDate,
-        UsageLimit = coupon.UsageLimit
-      }, StatusCodes.Status200OK);
-    }
-
-    public async Task<Result<CouponResponse>> CreateCoupon(CreateCouponRequest createCouponRequest)
-    {
-      var validationResult = await _createCouponValidator.ValidateAsync(createCouponRequest);
-      if (!validationResult.IsValid)
-      {
-        var errors = _errorFactory.CreateValidationError("Coupon", validationResult);
-        return Result<CouponResponse>.Failure(errors.errs, errors.statusCode);
-      }
-      var coupon = new Coupon
-      {
-        Name = createCouponRequest.Name,
-        Code = createCouponRequest.Code,
-        DiscountAmount = createCouponRequest.Discount,
-        StartDate = DateTime.Now,
-        EndDate = createCouponRequest.ExpiryDate,
-        UsageLimit = createCouponRequest.UsageLimit,
-        IsActive = true,
-        MaxDiscountAmount = createCouponRequest.MaxDiscountAmount,
-        MinimumOrderPrice = createCouponRequest.MinimumOrderPrice
-      };
-
-      await _unitOfWork.Coupons.CreateAsync(coupon);
-      var isSaved = await _unitOfWork.CompleteAsync();
-      if (!isSaved)
-      {
-        var error = _errorFactory.CreateDatabaseError("Coupon");
-        return Result<CouponResponse>.Failure([error.err], error.statusCode);
-      }
-      return Result<CouponResponse>.Success(new CouponResponse
-      {
-        Id = coupon.Id,
-        Name = coupon.Name,
-        Code = coupon.Code,
-        Discount = coupon.DiscountAmount,
-        StartDate = coupon.StartDate,
-        ExpiryDate = coupon.EndDate,
-        UsageLimit = coupon.UsageLimit
-      }, StatusCodes.Status201Created);
-    }
-
-    public async Task<Result<CouponResponse>> DeleteCoupon(Guid id)
-    {
-      var coupon = await _unitOfWork.Coupons.GetByIdAsync(id);
-      if (coupon == null)
-      {
-        return Result<CouponResponse>.Failure(
-                 new List<Error> { new Error("Coupon.Delete", "Coupon Not Found") },
-                        StatusCodes.Status404NotFound
-                               );
-      }
-
-      _unitOfWork.Coupons.Remove(coupon);
-      var isSaved = await _unitOfWork.CompleteAsync();
-      if (!isSaved)
-      {
-        var error = _errorFactory.CreateDatabaseError("Coupon");
-        return Result<CouponResponse>.Failure([error.err], error.statusCode);
-      }
-      return Result<CouponResponse>.Success(new CouponResponse
-      {
-        Id = coupon.Id,
-        Name = coupon.Name,
-        Code = coupon.Code,
-        Discount = coupon.DiscountAmount,
-        StartDate = coupon.StartDate,
-        ExpiryDate = coupon.EndDate,
-        UsageLimit = coupon.UsageLimit
-      }, StatusCodes.Status200OK);
-    }
-
-    public async Task<Result<List<CouponResponse>>> GetAllCoupons()
+  public async Task<Result<List<CouponResponse>>> GetAllCoupons()
+  {
+    try
     {
       var coupons = await _unitOfWork.Coupons.GetAllAsync();
-      return Result<List<CouponResponse>>.Success(coupons.Select(c => new CouponResponse
-      {
-        Id = c.Id,
-        Name = c.Name,
-        Code = c.Code,
-        Discount = c.DiscountAmount,
-        StartDate = c.StartDate,
-        ExpiryDate = c.EndDate,
-        UsageLimit = c.UsageLimit
-      }).ToList(), StatusCodes.Status200OK);
+      var response = coupons.Select(MapToCouponResponse).ToList();
+      return Result<List<CouponResponse>>.Success(response, StatusCodes.Status200OK);
     }
-
-    public async Task<Result<CouponResponse>> UpdateCoupon(UpdateCouponRequest updateCouponRequest)
+    catch (Exception ex)
     {
-      var validationResult = await _updateCouponValidator.ValidateAsync(updateCouponRequest);
-      if (!validationResult.IsValid)
-      {
-        var errors = _errorFactory.CreateValidationError("Coupon", validationResult);
-        return Result<CouponResponse>.Failure(errors.errs, errors.statusCode);
-      }
-
-      var coupon = await _unitOfWork.Coupons.GetByIdAsync(updateCouponRequest.Id);
-      if (coupon == null)
-      {
-        return Result<CouponResponse>.Failure(
-                 new List<Error> { new Error("Coupon.Update", "Coupon Not Found") },
-                        StatusCodes.Status404NotFound
-                               );
-      }
-
-
-      coupon.Code = updateCouponRequest.Code;
-      coupon.DiscountAmount = updateCouponRequest.Discount;
-      coupon.EndDate = updateCouponRequest.ExpiryDate;
-      coupon.UsageLimit = updateCouponRequest.UsageLimit;
-      coupon.MaxDiscountAmount = updateCouponRequest.MaxDiscountAmount ?? coupon.MaxDiscountAmount;
-      coupon.MinimumOrderPrice = updateCouponRequest.MinimumOrderPrice ?? coupon.MinimumOrderPrice;
-
-      _unitOfWork.Coupons.Update(coupon);
-      var isSaved = await _unitOfWork.CompleteAsync();
-      if (!isSaved)
-      {
-        var error = _errorFactory.CreateDatabaseError("Coupon");
-        return Result<CouponResponse>.Failure([error.err], error.statusCode);
-      }
-      return Result<CouponResponse>.Success(new CouponResponse
-      {
-        Id = coupon.Id,
-        Name = coupon.Name,
-        Code = coupon.Code,
-        Discount = coupon.DiscountAmount,
-        StartDate = coupon.StartDate,
-        ExpiryDate = coupon.EndDate,
-        UsageLimit = coupon.UsageLimit
-      }, StatusCodes.Status200OK);
-    }
-
-    public async Task<Result<CouponResponse>> GetCouponById(Guid id)
-    {
-      var coupon = await _unitOfWork.Coupons.GetByIdAsync(id);
-      if (coupon == null)
-      {
-        return Result<CouponResponse>.Failure(
-        new List<Error> { new Error("Coupon.Get", "Coupon Not Found") },
-        StatusCodes.Status404NotFound
-        );
-      }
-      return Result<CouponResponse>.Success(new CouponResponse
-      {
-        Id = coupon.Id,
-        Name = coupon.Name,
-        Code = coupon.Code,
-        Discount = coupon.DiscountAmount,
-        StartDate = coupon.StartDate,
-        ExpiryDate = coupon.EndDate,
-        UsageLimit = coupon.UsageLimit
-      }, StatusCodes.Status200OK);
-    }
-
-    public async Task<Result<CouponResponse>> GetCouponByCode(string code)
-    {
-      var coupons = await _unitOfWork.Coupons.GetAllAsync();
-      var coupon = coupons.FirstOrDefault(c => c.Code == code);
-      
-      if (coupon == null)
-      {
-        return Result<CouponResponse>.Failure(
-                new List<Error> { new Error("Coupon.Get", "Coupon Not Found") },
-                StatusCodes.Status404NotFound
-        );
-      }
-      if (coupon.UsageLimit == 0)
-      {
-        return Result<CouponResponse>.Failure(
-             new List<Error> { new Error("Coupon.Get", "Coupon Usage is out numbered or expired") },
-             StatusCodes.Status404NotFound
-      );
-      }
-      return Result<CouponResponse>.Success(new CouponResponse
-      {
-        Id = coupon.Id,
-        Name = coupon.Name,
-        Code = coupon.Code,
-        Discount = coupon.DiscountAmount,
-        StartDate = coupon.StartDate,
-        ExpiryDate = coupon.EndDate,
-        UsageLimit = coupon.UsageLimit
-      }, StatusCodes.Status200OK);
-    }
-
-    //Just in case API if error occurs remove this method
-    public async Task<Result<CouponResponse>> RemoveCoupon(string code, Guid orderId)
-    {
-      var coupon = await _unitOfWork.Coupons.GetByIdAsync(code);
-      if (coupon == null)
-      {
-        return Result<CouponResponse>.Failure(
-        new List<Error> { new Error("Coupon.Remove", "Coupon Not Found") },
-        StatusCodes.Status404NotFound
-        );
-      }
-
-      var order = await _unitOfWork.Orders.GetByIdAsync(orderId);
-      if (order == null)
-      {
-        return Result<CouponResponse>.Failure(
-        new List<Error> { new Error("Coupon.Remove", "Order Not Found") },
-        StatusCodes.Status404NotFound
-        );
-      }
-
-      if (order.Coupon == null)
-      {
-        return Result<CouponResponse>.Failure(
-                        new List<Error> { new Error("Coupon.Remove", "Coupon Not Applied") },
-                                      StatusCodes.Status400BadRequest
-                                                    );
-      }
-
-      if (order.Coupon.Code != code)
-      {
-        return Result<CouponResponse>.Failure(
-                        new List<Error> { new Error("Coupon.Remove", "Coupon Not Applied") },
-                                      StatusCodes.Status400BadRequest
-                                                    );
-      }
-
-      order.Coupon = null;
-      _unitOfWork.Orders.Update(order);
-      var isSaved = await _unitOfWork.CompleteAsync();
-      if (!isSaved)
-      {
-        var error = _errorFactory.CreateDatabaseError("Coupon");
-        return Result<CouponResponse>.Failure([error.err], error.statusCode);
-      }
-      return Result<CouponResponse>.Success(new CouponResponse
-      {
-        Id = coupon.Id,
-        Name = coupon.Name,
-        Code = coupon.Code,
-        Discount = coupon.DiscountAmount,
-        StartDate = coupon.StartDate,
-        ExpiryDate = coupon.EndDate,
-        UsageLimit = coupon.UsageLimit
-      }, StatusCodes.Status200OK);
+      return Result<List<CouponResponse>>.Failure(
+          [new Error("Coupon.GetAll", ex.Message)],
+          StatusCodes.Status500InternalServerError);
     }
   }
+
+  public async Task<Result<CouponResponse>> GetCouponById(Guid id)
+  {
+    var coupon = await _unitOfWork.Coupons.GetByIdAsync(id);
+    if (coupon == null)
+    {
+      return Result<CouponResponse>.Failure(
+          [new Error("Coupon.Get", "Coupon not found")],
+          StatusCodes.Status404NotFound);
+    }
+
+    return Result<CouponResponse>.Success(MapToCouponResponse(coupon), StatusCodes.Status200OK);
+  }
+
+  public async Task<Result<CouponResponse>> GetCouponByCode(string code)
+  {
+    var coupons = await _unitOfWork.Coupons.GetAllAsync();
+    var coupon = coupons.FirstOrDefault(c => c.Code == code);
+
+    if (coupon == null)
+    {
+      return Result<CouponResponse>.Failure(
+          [new Error("Coupon.Get", "Coupon not found")],
+          StatusCodes.Status404NotFound);
+    }
+
+    if (coupon.UsageLimit <= 0)
+    {
+      return Result<CouponResponse>.Failure(
+          [new Error("Coupon.Get", "Coupon usage limit exceeded")],
+          StatusCodes.Status400BadRequest);
+    }
+
+    if (coupon.EndDate < DateTime.Now)
+    {
+      return Result<CouponResponse>.Failure(
+          [new Error("Coupon.Get", "Coupon has expired")],
+          StatusCodes.Status400BadRequest);
+    }
+
+    return Result<CouponResponse>.Success(MapToCouponResponse(coupon), StatusCodes.Status200OK);
+  }
+
+  public async Task<Result<CouponResponse>> CreateCoupon(CreateCouponRequest request)
+  {
+    var validationResult = await _createCouponValidator.ValidateAsync(request);
+    if (!validationResult.IsValid)
+    {
+      var errors = _errorFactory.CreateValidationError("Coupon", validationResult);
+      return Result<CouponResponse>.Failure(errors.errs, errors.statusCode);
+    }
+
+    var coupon = new Coupon
+    {
+      Name = request.Name,
+      Code = request.Code,
+      DiscountAmount = request.Discount,
+      StartDate = DateTime.Now,
+      EndDate = request.ExpiryDate,
+      UsageLimit = request.UsageLimit,
+      IsActive = true,
+      MaxDiscountAmount = request.MaxDiscountAmount,
+      MinimumOrderPrice = request.MinimumOrderPrice
+    };
+
+    await _unitOfWork.Coupons.CreateAsync(coupon);
+    var isSaved = await _unitOfWork.CompleteAsync();
+
+    if (!isSaved)
+    {
+      var error = _errorFactory.CreateDatabaseError("Coupon");
+      return Result<CouponResponse>.Failure([error.err], error.statusCode);
+    }
+
+    var response = MapToCouponResponse(coupon);
+    return Result<CouponResponse>.Success(response, StatusCodes.Status201Created);
+  }
+
+  public async Task<Result<CouponResponse>> UpdateCoupon(UpdateCouponRequest request, Guid id)
+  {
+    var validationResult = await _updateCouponValidator.ValidateAsync(request);
+    if (!validationResult.IsValid)
+    {
+      var errors = _errorFactory.CreateValidationError("Coupon", validationResult);
+      return Result<CouponResponse>.Failure(errors.errs, errors.statusCode);
+    }
+
+    var coupon = await _unitOfWork.Coupons.GetByIdAsync(id);
+    if (coupon == null)
+    {
+      return Result<CouponResponse>.Failure(
+          [new Error("Coupon.Update", "Coupon not found")],
+          StatusCodes.Status404NotFound);
+    }
+
+    coupon.Code = request.Code;
+    coupon.DiscountAmount = request.Discount;
+    coupon.EndDate = request.ExpiryDate;
+    coupon.UsageLimit = request.UsageLimit;
+    coupon.MaxDiscountAmount = request.MaxDiscountAmount ?? coupon.MaxDiscountAmount;
+    coupon.MinimumOrderPrice = request.MinimumOrderPrice ?? coupon.MinimumOrderPrice;
+
+    _unitOfWork.Coupons.Update(coupon);
+    var isSaved = await _unitOfWork.CompleteAsync();
+
+    if (!isSaved)
+    {
+      var error = _errorFactory.CreateDatabaseError("Coupon");
+      return Result<CouponResponse>.Failure([error.err], error.statusCode);
+    }
+
+    return Result<CouponResponse>.Success(MapToCouponResponse(coupon), StatusCodes.Status200OK);
+  }
+
+  public async Task<Result<CouponResponse>> DeleteCoupon(Guid id)
+  {
+    var coupon = await _unitOfWork.Coupons.GetByIdAsync(id);
+    if (coupon == null)
+    {
+      return Result<CouponResponse>.Failure(
+          [new Error("Coupon.Delete", "Coupon not found")],
+          StatusCodes.Status404NotFound);
+    }
+
+    _unitOfWork.Coupons.Remove(coupon);
+    var isSaved = await _unitOfWork.CompleteAsync();
+
+    if (!isSaved)
+    {
+      var error = _errorFactory.CreateDatabaseError("Coupon");
+      return Result<CouponResponse>.Failure([error.err], error.statusCode);
+    }
+
+    return Result<CouponResponse>.Success(MapToCouponResponse(coupon), StatusCodes.Status200OK);
+  }
+
+ 
 }

@@ -209,6 +209,31 @@ public class OrderService : IOrderService
       return Result<OrderResponse>.Failure(error.errs, error.statusCode);
     }
 
+    decimal totalPrice = 0;
+    decimal subTotal = 0;
+    List<OrderItem> orderItems = new List<OrderItem>();
+
+    // Calculate prices first to validate against coupon minimum
+    foreach (var orderItem in request.Cosmetics)
+    {
+      var cosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(orderItem.Key);
+      if (cosmetic is null)
+        return null;
+      var originalPrice = await _unitOfWork.Cosmetics.GetCosmeticOriginalPrice(cosmetic);
+      var sellingPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
+      var quantity = orderItem.Value;
+      subTotal += originalPrice * quantity;
+      totalPrice += sellingPrice * quantity;
+
+      orderItems.Add(new OrderItem()
+      {
+        CosmeticId = cosmetic.Id,
+        SellingPrice = sellingPrice * orderItem.Value,
+        Quantity = orderItem.Value
+      });
+    }
+
+    decimal? couponDiscount = null;
     if (request.CouponId is not null)
     {
       var coupon = await _unitOfWork.Coupons.GetByIdAsync(request.CouponId);
@@ -217,6 +242,32 @@ public class OrderService : IOrderService
         var error = _errorFactory.CreateInvalidCouponError();
         return Result<OrderResponse>.Failure([error.err], error.statusCode);
       }
+
+      // Check minimum order price
+      if (totalPrice < coupon.MinimumOrderPrice)
+      {
+        return Result<OrderResponse>.Failure([
+          new Error("Order.InsufficientPriceForCoupon", $"The order does not meet coupon minimum price which is {coupon.MinimumOrderPrice}")
+        ], StatusCodes.Status400BadRequest);
+      }
+
+      // Check coupon validity
+      if (coupon.UsageLimit == 0 || coupon.EndDate < DateTime.UtcNow)
+      {
+        return Result<OrderResponse>.Failure([
+          new Error("Coupon.Usage", "Coupon is not available")
+        ], StatusCodes.Status400BadRequest);
+      }
+
+      // Calculate discount with maximum limit
+      couponDiscount = (totalPrice * (decimal)coupon.DiscountAmount) / 100m;
+      if (couponDiscount > coupon.MaxDiscountAmount)
+        couponDiscount = coupon.MaxDiscountAmount;
+
+      totalPrice -= (decimal)couponDiscount;
+
+      coupon.UsageLimit -= 1;
+      _unitOfWork.Coupons.Update(coupon);
     }
 
     var customer = await _unitOfWork.Users.GetByPhoneNumberAsync(request.CustomerPhoneNumber!);
@@ -254,53 +305,12 @@ public class OrderService : IOrderService
       OrderDate = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow),
       DeliveryDate = null,
       ETA = null,
-      IsActive = true
+      IsActive = true,
+      TotalPrice = totalPrice,
+      SubTotal = subTotal,
+      OrderItems = orderItems,
+      Status = OrderStatus.COMPLETED
     };
-
-    List<OrderItem> orderItems = new List<OrderItem>();
-    decimal subTotal = 0;
-    decimal totalPrice = 0;
-
-    foreach (var orderItem in request.Cosmetics)
-    {
-      var cosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(orderItem.Key);
-      if (cosmetic is null)
-        return null;
-      var originalPrice = await _unitOfWork.Cosmetics.GetCosmeticOriginalPrice(cosmetic);
-      var sellingPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetic);
-      var quantity = orderItem.Value;
-      subTotal += originalPrice * quantity;
-      totalPrice += sellingPrice * quantity;
-
-      orderItems.Add(new OrderItem()
-      {
-        CosmeticId = cosmetic.Id,
-        SellingPrice = sellingPrice * orderItem.Value,
-        Quantity = orderItem.Value,
-        OrderId = order.Id
-      });
-    }
-
-    if (request.CouponId is not null)
-    {
-      var coupon = await _unitOfWork.Coupons.GetByIdAsync(request.CouponId);
-      if (coupon!.UsageLimit == 0 || coupon.EndDate < DateTime.UtcNow)
-      {
-        var errors = new List<Error>
-        {
-          new Error("Coupon.Usage", "Coupon is not available")
-        };
-        return Result<OrderResponse>.Failure(errors, StatusCodes.Status400BadRequest);
-      }
-      totalPrice = (totalPrice * (100m - (decimal)coupon.DiscountAmount)) / 100m;
-
-      coupon.UsageLimit -= 1;
-      _unitOfWork.Coupons.Update(coupon);
-    }
-    order.TotalPrice = totalPrice;
-    order.SubTotal = subTotal;
-    order.OrderItems = orderItems;
-    order.Status = OrderStatus.COMPLETED;
 
     await _unitOfWork.Orders.CreateAsync(order);
     await _unitOfWork.CompleteAsync();
@@ -315,6 +325,9 @@ public class OrderService : IOrderService
 
     var orderResponse = MapToOrderResponse(order);
     orderResponse.CustomerId = customer.Id;
+    if (couponDiscount.HasValue)
+      orderResponse.CouponDiscount = couponDiscount;
+
     // Generate payment URL if needed
     if (request.PaymentMethod == PaymentMethods.ONLINE)
     {
