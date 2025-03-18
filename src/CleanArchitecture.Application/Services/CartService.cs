@@ -38,99 +38,84 @@ namespace CleanArchitecture.Application.Services
             StatusCodes.Status401Unauthorized);
       }
 
-      // Use a transaction to prevent race conditions
-      using var transaction = await _unitOfWork.BeginTransactionAsync();
-      try
+      // Retrieve the current user's cart; create one if it doesn't exist.
+      var cart = await _unitOfWork.Carts.GetCartByUserIdAsync(userId);
+      if (cart == null)
       {
-        // Retrieve the current user's cart with a lock to prevent concurrent modifications
-        var cart = await _unitOfWork.Carts.GetCartByUserIdWithLockAsync(userId);
-        if (cart == null)
+        cart = new Cart
         {
-          cart = new Cart
-          {
-            Id = Guid.NewGuid(),
-            CustomerId = userId,
-            TotalPrice = 0,
-            CartItems = new List<CartItem>()
-          };
+          Id = Guid.NewGuid(),
+          CustomerId = userId,
+          TotalPrice = 0,
+          CartItems = new List<CartItem>()
+        };
 
-          await _unitOfWork.Carts.CreateAsync(cart);
-        }
-
-        // Retrieve the cosmetic (product) being added.
-        var cosmetic = await _unitOfWork.Cosmetics.GetByIdWithBatchesAsync(addProductRequest.CosmeticId);
-        if (cosmetic == null)
-        {
-          return Result<List<CartResponse>>.Failure(
-              new List<Error> { new Error("Cart.AddCartItem", "Cosmetic not found") },
-              StatusCodes.Status404NotFound); // Changed to 404 for clarity
-        }
-
-        // Check available quantity
-        int availableQuantity = 0;
-        if (cosmetic.Batches != null && cosmetic.Batches.Any())
-        {
-          availableQuantity = cosmetic.Batches.Sum(batch => batch.Quantity);
-        }
-        if (availableQuantity < addProductRequest.Quantity)
-        {
-          return Result<List<CartResponse>>.Failure(
-              new List<Error> { new Error("Cart.AddCartItem", "Not enough quantity available") },
-              StatusCodes.Status400BadRequest); // Changed to 400 for clarity
-        }
-
-        // Check if the item is already in the cart; if so, update its quantity.
-        var existingCartItem = cart.CartItems?.FirstOrDefault(ci => ci.CosmeticId == addProductRequest.CosmeticId);
-        if (existingCartItem != null)
-        {
-          existingCartItem.Quantity += addProductRequest.Quantity;
-        }
-        else
-        {
-          var cartItem = new CartItem
-          {
-            CartId = cart.Id,
-            CosmeticId = addProductRequest.CosmeticId,
-            Quantity = addProductRequest.Quantity
-          };
-          cart.CartItems?.Add(cartItem);
-        }
-
-        // Recalculate the cart's total price with discounts
-        decimal totalPrice = 0;
-        foreach (var item in cart.CartItems)
-        {
-          var itemCosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(item.CosmeticId);
-          if (itemCosmetic != null)
-          {
-            decimal discountedPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(itemCosmetic);
-            totalPrice += discountedPrice * item.Quantity;
-          }
-        }
-
-        cart.TotalPrice = totalPrice;
+        await _unitOfWork.Carts.CreateAsync(cart);
         await _unitOfWork.CompleteAsync();
-
-        // Commit the transaction
-        await transaction.CommitAsync();
-
-        // Map the updated cart to a DTO.
-        var cartResponse = MapCartToCartResponse(cart);
-        var cosmetics = await _unitOfWork.Cosmetics.GetCosmeticsByCart(cart);
-        foreach (var item in cartResponse.Items)
-        {
-          item.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetics.First(c => c.Id == item.CosmeticId));
-        }
-        return Result<List<CartResponse>>.Success(new List<CartResponse> { cartResponse }, StatusCodes.Status200OK);
       }
-      catch (Exception ex)
+
+      // Retrieve the cosmetic (product) being added.
+      var cosmetic = await _unitOfWork.Cosmetics.GetByIdWithBatchesAsync(addProductRequest.CosmeticId);
+      if (cosmetic == null)
       {
-        // Rollback the transaction in case of any error
-        await transaction.RollbackAsync();
         return Result<List<CartResponse>>.Failure(
-            new List<Error> { new Error("Cart.AddCartItem", $"An error occurred: {ex.Message}") },
+            new List<Error> { new Error("Cart.AddCartItem", "Cosmetic not found") },
             StatusCodes.Status500InternalServerError);
       }
+
+      // Check available quantity (assuming cosmetic.Batches holds stock info).
+      int availableQuantity = 0;
+      if (cosmetic.Batches != null && cosmetic.Batches.Any())
+      {
+        availableQuantity = cosmetic.Batches.Sum(batch => batch.Quantity);
+      }
+      if (availableQuantity < addProductRequest.Quantity)
+      {
+        return Result<List<CartResponse>>.Failure(
+            new List<Error> { new Error("Cart.AddCartItem", "Not enough quantity available") },
+            StatusCodes.Status500InternalServerError);
+      }
+
+      // Check if the item is already in the cart; if so, update its quantity.
+      var existingCartItem = cart.CartItems?.FirstOrDefault(ci => ci.CosmeticId == addProductRequest.CosmeticId);
+      if (existingCartItem != null)
+      {
+        existingCartItem.Quantity += addProductRequest.Quantity;
+      }
+      else
+      {
+        var cartItem = new CartItem
+        {
+          CartId = cart.Id,
+          CosmeticId = addProductRequest.CosmeticId,
+          Quantity = addProductRequest.Quantity
+        };
+        cart.CartItems?.Add(cartItem);
+      }
+
+      // Recalculate the cart's total price with discounts
+      decimal totalPrice = 0;
+      foreach (var item in cart.CartItems)
+      {
+        var itemCosmetic = await _unitOfWork.Cosmetics.GetByIdAsync(item.CosmeticId);
+        if (itemCosmetic != null)
+        {
+          decimal discountedPrice = await _unitOfWork.Cosmetics.GetCosmeticPrice(itemCosmetic);
+          totalPrice += discountedPrice * item.Quantity;
+        }
+      }
+
+      cart.TotalPrice = totalPrice;
+      await _unitOfWork.CompleteAsync();
+
+      // Map the updated cart to a DTO.
+      var cartResponse = MapCartToCartResponse(cart);
+      var cosmetics = await _unitOfWork.Cosmetics.GetCosmeticsByCart(cart);
+      foreach (var item in cartResponse.Items)
+      {
+        item.Price = await _unitOfWork.Cosmetics.GetCosmeticPrice(cosmetics.First(c => c.Id == item.CosmeticId));
+      }
+      return Result<List<CartResponse>>.Success(new List<CartResponse> { cartResponse }, StatusCodes.Status200OK);
     }
 
     public async Task<Result<CartResponse>> DeleteCartItemForCurrentUserAsync(Guid cosmeticId)

@@ -55,12 +55,5 @@ namespace CleanArchitecture.Infrastructure.Repositories
         .ThenInclude(ci => ci.Cosmetic)
         .FirstOrDefaultAsync(c => c.Id == cartId);
     }
-
-    public async Task<Cart> GetCartByUserIdWithLockAsync(Guid userId)
-    {
-      return await _context.Carts
-    .Include(c => c.CartItems)
-    .FirstOrDefaultAsync(c => c.CustomerId == userId);
-    }
   }
 }
