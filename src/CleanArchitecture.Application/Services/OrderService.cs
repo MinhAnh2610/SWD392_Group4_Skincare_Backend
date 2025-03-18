@@ -127,7 +127,7 @@ public class OrderService : IOrderService
           _unitOfWork.Coupons.Update(coupon);
         }
       }
-
+      order.TotalPrice = totalPrice;
       // Get Shop Info for Create a Shipping Order
       var shopInfo = await _ghnService.GetStoreInformationAsync();
 
@@ -785,7 +785,7 @@ public class OrderService : IOrderService
       Height = details.Height, // Default height or map if applicable
       PickStationId = 0, // Default pick station ID or map if applicable
       DeliverStationId = null, // Set to null or map if applicable
-      InsuranceValue = 0, // Use total price as insurance value
+      InsuranceValue = (int)order.TotalPrice, // Use total price as insurance value
       ServiceId = 0, // Default service ID or map if applicable
       ServiceTypeId = 2, // Default service type ID or map if applicable
       Coupon = null, // Use coupon code if available
