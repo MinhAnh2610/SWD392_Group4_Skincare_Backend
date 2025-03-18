@@ -146,17 +146,13 @@ namespace CleanArchitecture.Presentation.Endpoints
       group.MapGet("/get-coupon-by-code/{code}", async (ICouponService couponService, string code) =>
       {
         var result = await couponService.GetCouponByCode(code);
-        if (result.IsSuccess)
-        {
-          return Results.Ok(ApiResponse<CouponResponse>.SuccessResponse(result.Data!, "Get Coupon By Code Successfully."));
-        }
-        return result.Status switch
-        {
-          _ => Results.StatusCode(StatusCodes.Status500InternalServerError)
-        };
+
+        // Use the Match method to return the appropriate status code
+        return result.Match("Get Coupon By Code Successfully.");
       })
         .WithName("GetCouponByCode")
         .Produces<ApiResponse<CouponResponse>>(StatusCodes.Status200OK)
+        .ProducesProblem(StatusCodes.Status404NotFound)
         .ProducesProblem(StatusCodes.Status401Unauthorized)
         .ProducesProblem(StatusCodes.Status500InternalServerError)
         .WithSummary("GetCouponByCode")
