@@ -313,7 +313,7 @@ public class AuthService : IAuthService
     if (!result.Succeeded)
     {
       var errors = result.Errors.Select(e => new Error(e.Code, e.Description)).ToList();
-      return Result<string>.Failure(errors, StatusCodes.Status500InternalServerError);
+      return Result<string>.Failure(errors, StatusCodes.Status400BadRequest);
     }
     var roleResult = await _userManager.AddToRolesAsync(user, [Roles.Customer]);
     if (!roleResult.Succeeded)
