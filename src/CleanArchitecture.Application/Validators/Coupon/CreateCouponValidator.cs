@@ -21,6 +21,12 @@ namespace CleanArchitecture.Application.Validators.Coupon
 
       RuleFor(x => x.UsageLimit)
           .GreaterThan(0).WithMessage("Usage limit must be greater than zero.");
+      
+      RuleFor(x => x.MaxDiscountAmount)
+        .GreaterThan(-1).WithMessage("Max discount amount must not be negative.");
+      
+      RuleFor(x => x.MinimumOrderPrice)
+        .GreaterThan(-1).WithMessage("Minimum order price must not be negative.");
     }
   }
 }

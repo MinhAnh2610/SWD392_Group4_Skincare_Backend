@@ -12,6 +12,7 @@ public class OrderResponse
   public string? CouponName { get; set; }
   public decimal? SubTotal { get; set; }
   public decimal? TotalPrice { get; set; }
+  public decimal? CouponDiscount { get; set; }
   public DateTime? OrderDate { get; set; }
   public string? ShippingAddress { get; set; } = default!;
   public string? BillingAddress { get; set; } = default!;

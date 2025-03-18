@@ -6,9 +6,6 @@ public class CreateOrderRequestValidator : AbstractValidator<CreateOnlineOrderRe
 {
   public CreateOrderRequestValidator()
   {
-    RuleFor(x => x.CartId)
-        .NotEmpty().WithMessage("Cart ID is required.");
-
     RuleFor(x => x.ShippingAddress)
         .NotEmpty().WithMessage("Shipping address is required.")
         .MaximumLength(255).WithMessage("Shipping address is too long.");
