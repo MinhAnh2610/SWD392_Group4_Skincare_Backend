@@ -10,5 +10,7 @@ public class Coupon : Entity<Guid>
   public int UsageLimit { get; set; }
   public decimal MaxDiscountAmount { get; set; }
   public decimal MinimumOrderPrice { get; set; }
+  public decimal PointRequired { get; set; }
   public List<Order> Orders { get; set; } = new List<Order>();
+  public List<UserCoupon>? UserCoupons { get; set; } = new List<UserCoupon>();
 }

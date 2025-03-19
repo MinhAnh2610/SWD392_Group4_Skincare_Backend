@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage;
+using Org.BouncyCastle.Tls;
 
 namespace CleanArchitecture.Infrastructure.Data.Configuration;
 
@@ -31,5 +33,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     builder.HasMany(user => user.Testimonials)
         .WithOne(testimonial => testimonial.Customer)
         .HasForeignKey(t => t.CustomerId);
+    
   }
 }
