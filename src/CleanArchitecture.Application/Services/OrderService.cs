@@ -37,7 +37,8 @@ public class OrderService : IOrderService
     IVnPayIntegrationService vnPayIntegrationService,
     IHttpContextAccessor httpContextAccessor,
     IValidator<CreateOnlineOrderRequest> createOrderRequestValidator,
-    UserManager<User> userManager, IValidator<CreateWalkInOrderRequest> createWalkInOrderRequestValidator, IEnumerable<IInvoiceGenerateStrategy> invoiceGenerateStrategies)
+    UserManager<User> userManager, IValidator<CreateWalkInOrderRequest> createWalkInOrderRequestValidator,
+    IEnumerable<IInvoiceGenerateStrategy> invoiceGenerateStrategies)
   {
     _unitOfWork = unitOfWork;
     _errorFactory = errorFactory;
@@ -118,24 +119,40 @@ public class OrderService : IOrderService
       if (request.CouponId.HasValue)
       {
         var coupon = await _unitOfWork.Coupons.GetByIdAsync(request.CouponId.Value);
+        if (coupon is null)
+        {
+          var error = _errorFactory.CreateNotFoundError("Coupon");
+          return Result<OrderResponse>.Failure([error.err], StatusCodes.Status404NotFound);
+        }
+        
+        var userCoupon  = await _unitOfWork.UserCoupons.GetByIdAsync(_claimsService.CurrentUserId, coupon.Id);
+        if (userCoupon is null || userCoupon.Quantity <= 0)
+        {
+          return Result<OrderResponse>.Failure([new Error("UserCoupon.NoCoupon", "User doesnt have this coupon")],
+            StatusCodes.Status400BadRequest);
+        }
+        
         if (totalPrice < coupon.MinimumOrderPrice)
         {
           return Result<OrderResponse>.Failure([
-            new Error("Order.InsufficientPriceForCoupon", $"The order does not met coupon minimum price which is {coupon.MinimumOrderPrice}")], StatusCodes.Status400BadRequest);
+            new Error("Order.InsufficientPriceForCoupon",
+              $"The order does not met coupon minimum price which is {coupon.MinimumOrderPrice}")
+          ], StatusCodes.Status400BadRequest);
         }
-        if (coupon != null && coupon.UsageLimit > 0 && coupon.EndDate > DateTime.UtcNow)
+
+        if (coupon != null && userCoupon.Quantity > 0 && coupon.EndDate > DateTime.UtcNow)
         {
           couponDiscount = (totalPrice * (decimal)coupon.DiscountAmount) / 100m;
           if (couponDiscount > coupon.MaxDiscountAmount)
             couponDiscount = coupon.MaxDiscountAmount;
-          
+
           totalPrice -= (decimal)couponDiscount;
 
-          // Update coupon usage
-          coupon.UsageLimit--;
-          _unitOfWork.Coupons.Update(coupon);
+          // Update user coupon quantity 
+          userCoupon.Quantity--;
         }
       }
+
       order.TotalPrice = totalPrice;
       // Get Shop Info for Create a Shipping Order
       var shopInfo = await _ghnService.GetStoreInformationAsync();
@@ -166,6 +183,9 @@ public class OrderService : IOrderService
       // Handle payment method specific logic
       await HandlePaymentMethod(request.PaymentMethod, order, orderResponse);
 
+      // Add point to user
+      AddPointToCustomer(order.TotalPrice, customer);
+      
       // Save order to database
       _unitOfWork.Orders.Create(order);
 
@@ -200,6 +220,7 @@ public class OrderService : IOrderService
         StatusCodes.Status500InternalServerError);
     }
   }
+
   public async Task<Result<OrderResponse>> InitiateOrder(CreateWalkInOrderRequest request)
   {
     var validationResult = await _createWalkInOrderRequestValidator.ValidateAsync(request);
@@ -227,9 +248,7 @@ public class OrderService : IOrderService
 
       orderItems.Add(new OrderItem()
       {
-        CosmeticId = cosmetic.Id,
-        SellingPrice = sellingPrice * orderItem.Value,
-        Quantity = orderItem.Value
+        CosmeticId = cosmetic.Id, SellingPrice = sellingPrice * orderItem.Value, Quantity = orderItem.Value
       });
     }
 
@@ -247,7 +266,8 @@ public class OrderService : IOrderService
       if (totalPrice < coupon.MinimumOrderPrice)
       {
         return Result<OrderResponse>.Failure([
-          new Error("Order.InsufficientPriceForCoupon", $"The order does not meet coupon minimum price which is {coupon.MinimumOrderPrice}")
+          new Error("Order.InsufficientPriceForCoupon",
+            $"The order does not meet coupon minimum price which is {coupon.MinimumOrderPrice}")
         ], StatusCodes.Status400BadRequest);
       }
 
@@ -266,7 +286,8 @@ public class OrderService : IOrderService
 
       totalPrice -= (decimal)couponDiscount;
 
-      coupon.UsageLimit -= 1;
+      // 
+      // coupon.UsageLimit -= 1;
       _unitOfWork.Coupons.Update(coupon);
     }
 
@@ -289,6 +310,7 @@ public class OrderService : IOrderService
         var errors = result.Errors.Select(e => new Error(e.Code, e.Description)).ToList();
         return Result<OrderResponse>.Failure(errors, StatusCodes.Status500InternalServerError);
       }
+
       var roleResult = await _userManager.AddToRolesAsync(customer, [Roles.Customer]);
       if (!roleResult.Succeeded)
       {
@@ -296,6 +318,8 @@ public class OrderService : IOrderService
         return Result<OrderResponse>.Failure(errors, StatusCodes.Status500InternalServerError);
       }
     }
+    
+    AddPointToCustomer(totalPrice, customer);
 
     var order = new Order()
     {
@@ -311,6 +335,8 @@ public class OrderService : IOrderService
       OrderItems = orderItems,
       Status = OrderStatus.COMPLETED
     };
+
+    // Add Point to user account
 
     await _unitOfWork.Orders.CreateAsync(order);
     await _unitOfWork.CompleteAsync();
@@ -333,18 +359,18 @@ public class OrderService : IOrderService
     {
       await HandlePaymentForWalkInOrder(order, orderResponse);
     }
+
     orderResponse.Invoice = invoiceByte;
 
     return Result<OrderResponse>.Success(orderResponse, StatusCodes.Status200OK);
   }
+
   // New method to handle payment for walk-in orders
   private async Task HandlePaymentForWalkInOrder(Order order, OrderResponse orderResponse)
   {
     var vnPayRequest = new VnPayPaymentRequestDto
     {
-      OrderId = order.Id,
-      PaymentMethod = PaymentMethods.ONLINE,
-      Amount = (float)order.TotalPrice
+      OrderId = order.Id, PaymentMethod = PaymentMethods.ONLINE, Amount = (float)order.TotalPrice
     };
 
     var httpContext = _httpContextAccessor.HttpContext;
@@ -357,6 +383,7 @@ public class OrderService : IOrderService
       }
     }
   }
+
   private async Task<Result<Cart>> ValidateOrderRequest(CreateOnlineOrderRequest request)
   {
     var cart = await _unitOfWork.Carts.GetCartByUserIdAsync(_claimsService.CurrentUserId);
@@ -481,9 +508,7 @@ public class OrderService : IOrderService
       LastModifiedBy = cart.Customer.UserName,
       OrderItems = cart.CartItems.Select(ci => new OrderItem
       {
-        Cosmetic = ci.Cosmetic,
-        CosmeticId = ci.CosmeticId,
-        Quantity = ci.Quantity
+        Cosmetic = ci.Cosmetic, CosmeticId = ci.CosmeticId, Quantity = ci.Quantity
       }).ToList(),
       // Set default delivery date to 7 days from now
       //DeliveryDate = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow.AddDays(7))
@@ -504,9 +529,7 @@ public class OrderService : IOrderService
     {
       var vnPayRequest = new VnPayPaymentRequestDto
       {
-        OrderId = order.Id,
-        PaymentMethod = PaymentMethods.ONLINE,
-        Amount = (float)order.TotalPrice
+        OrderId = order.Id, PaymentMethod = PaymentMethods.ONLINE, Amount = (float)order.TotalPrice
       };
 
       var httpContext = _httpContextAccessor.HttpContext;
@@ -619,6 +642,7 @@ public class OrderService : IOrderService
           new List<Error> { new Error("Order.Customer", "Could not find orders") },
           StatusCodes.Status404NotFound);
       }
+
       var response = orders.Select(MapToOrderResponse).ToList();
       return Result<List<OrderResponse>>.Success(response, StatusCodes.Status200OK);
     }
@@ -642,22 +666,23 @@ public class OrderService : IOrderService
           [new Error("Order.NotFound", "Order not found")],
           StatusCodes.Status404NotFound);
       }
-      if(request.Status != OrderStatus.CANCELLED && _claimsService.CurrentUserRoles.Contains("Customer"))
+
+      if (request.Status != OrderStatus.CANCELLED && _claimsService.CurrentUserRoles.Contains("Customer"))
       {
         return Result<OrderResponse>.Failure(
           [new Error("Order.Update", "Failed to update order")],
           StatusCodes.Status403Forbidden);
       }
+
       order.Status = request.Status;
       order.LastModified = DateTime.UtcNow;
       order.LastModifiedBy = _claimsService.CurrentUserId.ToString();
 
       if (request.Status == OrderStatus.CANCELLED)
       {
-        var ghnOrderResult = await _ghnService.ChangeShippingOrderStatus(new SwitchShippingOrdersStatusRequest
-        {
-          OrderCodes = [order.TrackingNumber]
-        }, "cancel");
+        var ghnOrderResult =
+          await _ghnService.ChangeShippingOrderStatus(
+            new SwitchShippingOrdersStatusRequest { OrderCodes = [order.TrackingNumber] }, "cancel");
         if (ghnOrderResult.IsFailure)
         {
           return Result<OrderResponse>.Failure(ghnOrderResult.Errors, ghnOrderResult.Status);
@@ -673,6 +698,7 @@ public class OrderService : IOrderService
           [new Error("Order.Update", "Failed to update order")],
           StatusCodes.Status500InternalServerError);
       }
+
       return Result<OrderResponse>.Success(
         MapToOrderResponse(order),
         StatusCodes.Status200OK);
@@ -769,9 +795,7 @@ public class OrderService : IOrderService
       LastModifiedBy = order.LastModifiedBy,
       OrderItems = order.OrderItems.Select(oi => new OrderItemResponse
       {
-        CosmeticId = oi.CosmeticId,
-        Quantity = oi.Quantity,
-        SellingPrice = oi.SellingPrice
+        CosmeticId = oi.CosmeticId, Quantity = oi.Quantity, SellingPrice = oi.SellingPrice
       }).ToList()
     };
   }
@@ -833,6 +857,11 @@ public class OrderService : IOrderService
       Height = item.Cosmetic.Height, // Default height or map if applicable
       Weight = item.Cosmetic.Weight // Default weight or map if applicable
     }).ToList();
+  }
+
+  private void AddPointToCustomer(decimal orderPrice, User customer)
+  {
+    customer.Point += orderPrice / 100;
   }
 }
 

@@ -6,6 +6,7 @@ public class User : IdentityUser<Guid>
     public string? FirstName { get; set; } = default!;
     public string? LastName { get; set; } = default!;
     public bool Gender { get; set; } = true;
+    public decimal Point { get; set; } = 0;
     public Guid? SkinTypeId { get; set; }
     public SkinType? SkinType { get; set; }
     public string? RefreshToken { get; set; }
@@ -16,4 +17,5 @@ public class User : IdentityUser<Guid>
     public List<Order> Orders { get; set; } = new List<Order>();
     public List<Testimonial>? Testimonials { get; set; } = new List<Testimonial>();
     public List<UserRole>? UserRoles { get; set; } = new List<UserRole>();
+    public List<UserCoupon>? UserCoupons { get; set; } = new List<UserCoupon>();
 }

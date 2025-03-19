@@ -52,6 +52,8 @@ public class UnitOfWork : IUnitOfWork
   public ITagRepository Tags => new TagRepository(_context);
   public ITestimonialRepository Testimonials => new TestimonialRepository(_context);
   public IUserRepository Users => new UserRepository(_context);
+  public IUserCouponRepository UserCoupons => new UserCouponRepository(_context);
+  public IPlayLogRepository PlayLogs =>  new PlayLogRepository(_context);
 
   #endregion
 

@@ -41,6 +41,8 @@ public interface IUnitOfWork : IDisposable
   ITagRepository Tags { get; }
   ITestimonialRepository Testimonials { get; }
   IUserRepository Users { get; }
+  IUserCouponRepository UserCoupons { get; }
+  IPlayLogRepository PlayLogs { get; }
   #endregion
   Task<IDbContextTransaction> BeginTransactionAsync();
   Task RollBackAsync();

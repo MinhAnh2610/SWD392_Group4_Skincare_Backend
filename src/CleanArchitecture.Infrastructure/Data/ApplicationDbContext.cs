@@ -55,6 +55,8 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>, IApplic
   public DbSet<SubCategory> SubCategories => Set<SubCategory>();
   public DbSet<Tag> Tags => Set<Tag>();
   public DbSet<Testimonial> Testimonials => Set<Testimonial>();
+  public DbSet<UserCoupon> UserCoupons => Set<UserCoupon>();
+  public DbSet<PlayLog> PlayLogs => Set<PlayLog>();
 
   protected override void OnModelCreating(ModelBuilder builder)
   {

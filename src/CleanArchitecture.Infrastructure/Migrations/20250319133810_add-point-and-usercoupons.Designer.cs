@@ -3,6 +3,7 @@ using System;
 using CleanArchitecture.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CleanArchitecture.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250319133810_add-point-and-usercoupons")]
+    partial class addpointandusercoupons
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -561,9 +564,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
-                    b.Property<decimal>("PointRequired")
-                        .HasColumnType("numeric");
-
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp without time zone");
 
@@ -705,40 +705,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.HasIndex("CosmeticId");
 
                     b.ToTable("OrderItems");
-                });
-
-            modelBuilder.Entity("CleanArchitecture.Domain.Entities.PlayLog", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("CreateAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("PlayTimeStamp")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("PlayLogs");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Policy", b =>
@@ -1458,24 +1424,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("CleanArchitecture.Domain.Entities.UserCoupon", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CouponId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("integer");
-
-                    b.HasKey("UserId", "CouponId");
-
-                    b.HasIndex("CouponId");
-
-                    b.ToTable("UserCoupons");
-                });
-
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.UserRole", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -1894,17 +1842,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("CleanArchitecture.Domain.Entities.PlayLog", b =>
-                {
-                    b.HasOne("CleanArchitecture.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Question", b =>
                 {
                     b.HasOne("CleanArchitecture.Domain.Entities.QuestionType", "QuestionType")
@@ -2088,25 +2025,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Navigation("SkinType");
                 });
 
-            modelBuilder.Entity("CleanArchitecture.Domain.Entities.UserCoupon", b =>
-                {
-                    b.HasOne("CleanArchitecture.Domain.Entities.Coupon", "Coupon")
-                        .WithMany("UserCoupons")
-                        .HasForeignKey("CouponId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CleanArchitecture.Domain.Entities.User", "User")
-                        .WithMany("UserCoupons")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Coupon");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.UserRole", b =>
                 {
                     b.HasOne("CleanArchitecture.Domain.Entities.Role", "Role")
@@ -2252,8 +2170,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Coupon", b =>
                 {
                     b.Navigation("Orders");
-
-                    b.Navigation("UserCoupons");
                 });
 
             modelBuilder.Entity("CleanArchitecture.Domain.Entities.Event", b =>
@@ -2326,8 +2242,6 @@ namespace CleanArchitecture.Infrastructure.Migrations
                     b.Navigation("Refunds");
 
                     b.Navigation("Testimonials");
-
-                    b.Navigation("UserCoupons");
 
                     b.Navigation("UserRoles");
                 });

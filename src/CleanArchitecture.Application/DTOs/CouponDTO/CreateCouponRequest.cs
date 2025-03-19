@@ -15,5 +15,6 @@ namespace CleanArchitecture.Application.DTOs.CouponDTO
     public int UsageLimit { get; set; }
     public decimal MaxDiscountAmount { get; set; }
     public decimal MinimumOrderPrice { get; set; }
+    public decimal PointRequired { get; set; }
   }
 }
