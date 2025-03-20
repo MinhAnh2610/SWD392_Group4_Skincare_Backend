@@ -198,7 +198,8 @@ public class UserService : IUserService
         IsSensitive = userSkinType.IsSensitive,
         IsUneven = userSkinType.IsUneven,
         IsWrinkle = userSkinType.IsWrinkle
-      }
+      },
+      Point = userInfo.Point,
     }, StatusCodes.Status200OK);
   }
 

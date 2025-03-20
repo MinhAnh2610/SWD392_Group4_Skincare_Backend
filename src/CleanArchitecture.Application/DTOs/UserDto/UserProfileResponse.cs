@@ -16,4 +16,5 @@ public class UserProfileResponse
   public SkinTypeResponse? SkinType { get; set; }
   public List<string>? Roles { get; set; } = new List<string>();
   public DateTime CreateAt { get; set; }
+  public decimal Point { get; set; } 
 }
