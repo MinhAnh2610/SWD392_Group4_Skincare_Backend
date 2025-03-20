@@ -39,7 +39,8 @@ public class CouponService : ICouponService
       ExpiryDate = coupon.EndDate,
       UsageLimit = coupon.UsageLimit,
       MaxDiscountAmount = coupon.MaxDiscountAmount,
-      MinimumOrderPrice = coupon.MinimumOrderPrice
+      MinimumOrderPrice = coupon.MinimumOrderPrice,
+      PointRequired = coupon.PointRequired
     };
   }
 
