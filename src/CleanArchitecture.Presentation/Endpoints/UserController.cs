@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Application.DTOs.UserDto;
+﻿using CleanArchitecture.Application.DTOs.UserCouponDto;
+using CleanArchitecture.Application.DTOs.UserDto;
 using CleanArchitecture.Application.Enums;
 using Microsoft.AspNetCore.Mvc;
 
@@ -165,6 +166,32 @@ public class UserController : ICarterModule
     {
       Roles = "Staff, Manager"
     });
+    #endregion
+    // Add this endpoint to your UserController class
+    #region Get User Coupons API
+    group.MapGet("/coupons", async (IUserService userService) =>
+    {
+      var result = await userService.GetUserCouponsAsync();
+      if (result.IsSuccess)
+      {
+        return Results.Ok(ApiResponse<List<UserCouponResponse>>.SuccessResponse(result.Data!, "Retrieved User Coupons Successfully."));
+      }
+
+      return result.Status switch
+      {
+        StatusCodes.Status401Unauthorized => Results.Unauthorized(),
+        StatusCodes.Status404NotFound => Results.NotFound(ApiResponse<List<UserCouponResponse>>.FailureResponse(result.Errors, "User not found.")),
+        _ => Results.StatusCode(StatusCodes.Status500InternalServerError)
+      };
+    })
+    .WithName("GetUserCoupons")
+    .Produces<ApiResponse<List<UserCouponResponse>>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status401Unauthorized)
+    .ProducesProblem(StatusCodes.Status404NotFound)
+    .ProducesProblem(StatusCodes.Status500InternalServerError)
+    .WithSummary("GetUserCoupons")
+    .WithDescription("Get Current User's Coupons")
+    .RequireAuthorization();
     #endregion
   }
 }

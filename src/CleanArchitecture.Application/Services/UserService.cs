@@ -1,6 +1,8 @@
 ﻿using Azure.Core;
 using CleanArchitecture.Application.Common;
+using CleanArchitecture.Application.DTOs.CouponDTO;
 using CleanArchitecture.Application.DTOs.SkinTypeDto;
+using CleanArchitecture.Application.DTOs.UserCouponDto;
 using CleanArchitecture.Application.DTOs.UserDto;
 using CleanArchitecture.Application.Enums;
 using CleanArchitecture.Domain.RepositoryContracts;
@@ -149,6 +151,56 @@ public class UserService : IUserService
     }
 
     return Result<List<UserProfileResponse>>.Success(userResponses, StatusCodes.Status200OK);
+  }
+
+  public async Task<Result<List<UserCouponResponse>>> GetUserCouponsAsync()
+  {
+    var user = _httpContextAccessor.HttpContext?.User;
+    if (user == null || !user.Identity!.IsAuthenticated)
+    {
+      return Result<List<UserCouponResponse>>.Failure([UserErrors.UnauthorizedUser], StatusCodes.Status401Unauthorized);
+    }
+
+    var id = user.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+    var userInfo = await _userManager.FindByIdAsync(id);
+
+    if (userInfo == null)
+    {
+      return Result<List<UserCouponResponse>>.Failure([AuthErrors.UserNotFound], StatusCodes.Status404NotFound);
+    }
+
+    var userCoupons = await _unitOfWork.UserCoupons.GetUserCouponsAsync(userInfo);
+
+    // Load the coupon details for each user coupon
+    var userCouponResponses = new List<UserCouponResponse>();
+    foreach (var userCoupon in userCoupons)
+    {
+      var coupon = await _unitOfWork.Coupons.GetByIdAsync(userCoupon.CouponId);
+      if (coupon != null)
+      {
+        userCouponResponses.Add(new UserCouponResponse
+        {
+          UserId = userCoupon.UserId,
+          CouponId = userCoupon.CouponId,
+          Quantity = userCoupon.Quantity,
+          Coupon = new CouponResponse
+          {
+            Id = coupon.Id,
+            Name = coupon.Name,
+            Code = coupon.Code,
+            Discount = coupon.DiscountAmount,
+            StartDate = coupon.StartDate,
+            ExpiryDate = coupon.EndDate,
+            UsageLimit = coupon.UsageLimit,
+            MaxDiscountAmount = coupon.MaxDiscountAmount,
+            MinimumOrderPrice = coupon.MinimumOrderPrice,
+            PointRequired = coupon.PointRequired
+          }
+        });
+      }
+    }
+
+    return Result<List<UserCouponResponse>>.Success(userCouponResponses, StatusCodes.Status200OK);
   }
 
   public async Task<Result<UserProfileResponse>> GetUserProfile()

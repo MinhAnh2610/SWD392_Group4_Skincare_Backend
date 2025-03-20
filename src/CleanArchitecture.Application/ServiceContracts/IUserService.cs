@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Application.DTOs.UserDto;
+﻿using CleanArchitecture.Application.DTOs.UserCouponDto;
+using CleanArchitecture.Application.DTOs.UserDto;
 
 namespace CleanArchitecture.Application.ServiceContracts;
 
@@ -10,4 +11,6 @@ public interface IUserService
   Task<Result<UserProfileResponse>> UpdateUserProfileAsync(UpdateProfileRequest request);
   Task<Result<string>> EnableUserAsync(UserRequest request);
   Task<Result<string>> DisableUserAsync(UserRequest request);
+  // Add this method to your existing IUserService interface
+  Task<Result<List<UserCouponResponse>>> GetUserCouponsAsync();
 }
