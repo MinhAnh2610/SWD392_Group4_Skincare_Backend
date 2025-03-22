@@ -547,8 +547,7 @@ public class OrderService : IOrderService
     // else if (paymentMethod == PaymentMethods.COD) { ... }
   }
 
-  public async Task<Result<OrderResponse>> CompleteOrder(Guid orderId, string paymentStatus,
-    PaymentReturnData paymentData)
+  public async Task<Result<OrderResponse>> CompleteOrder(Guid orderId, string paymentStatus, PaymentReturnData paymentData)
   {
     try
     {
@@ -556,8 +555,8 @@ public class OrderService : IOrderService
       if (order == null || order.Status != OrderStatus.PENDING)
       {
         return Result<OrderResponse>.Failure(
-          new List<Error> { new Error("Order.NotFound", "Invalid order or wrong status") },
-          StatusCodes.Status404NotFound);
+            new List<Error> { new Error("Order.NotFound", "Invalid order or wrong status") },
+            StatusCodes.Status404NotFound);
       }
 
       // Determine order status based on VNPay's return paymentStatus (e.g. "00" means success)
@@ -585,6 +584,12 @@ public class OrderService : IOrderService
       else
       {
         order.Status = OrderStatus.FAILED;
+
+        // Restore coupon if payment failed and order had a coupon
+        if (order.CouponId.HasValue)
+        {
+          await RestoreCouponToUser(order.CustomerId, order.CouponId.Value);
+        }
       }
 
       order.DeliveryDate = DateTime.UtcNow;
@@ -596,19 +601,19 @@ public class OrderService : IOrderService
       if (!saved)
       {
         return Result<OrderResponse>.Failure(
-          new List<Error> { new Error("Order.Complete", "Failed to update order") },
-          StatusCodes.Status500InternalServerError);
+            new List<Error> { new Error("Order.Complete", "Failed to update order") },
+            StatusCodes.Status500InternalServerError);
       }
 
       return Result<OrderResponse>.Success(
-        MapToOrderResponse(order),
-        StatusCodes.Status200OK);
+          MapToOrderResponse(order),
+          StatusCodes.Status200OK);
     }
     catch (Exception ex)
     {
       return Result<OrderResponse>.Failure(
-        new List<Error> { new Error("Order.Complete", ex.Message) },
-        StatusCodes.Status500InternalServerError);
+          new List<Error> { new Error("Order.Complete", ex.Message) },
+          StatusCodes.Status500InternalServerError);
     }
   }
 
@@ -655,6 +660,7 @@ public class OrderService : IOrderService
   }
 
   // 5. Update Order Status (Admin)
+  // Modify the UpdateOrderStatusAsync method to handle coupon restoration
   public async Task<Result<OrderResponse>> UpdateOrderStatusAsync(Guid orderId, UpdateOrderStatusRequest request)
   {
     try
@@ -663,16 +669,24 @@ public class OrderService : IOrderService
       if (order == null)
       {
         return Result<OrderResponse>.Failure(
-          [new Error("Order.NotFound", "Order not found")],
-          StatusCodes.Status404NotFound);
+            [new Error("Order.NotFound", "Order not found")],
+            StatusCodes.Status404NotFound);
       }
 
-      if (request.Status != OrderStatus.CANCELLED && _claimsService.CurrentUserRoles.Contains("Customer"))
+      if ((request.Status != OrderStatus.CANCELLED && request.Status != OrderStatus.FAILED) &&
+          _claimsService.CurrentUserRoles.Contains("Customer"))
       {
         return Result<OrderResponse>.Failure(
-          [new Error("Order.Update", "Failed to update order")],
-          StatusCodes.Status403Forbidden);
+            [new Error("Order.Update", "Customers can only cancel orders or mark as payment failed")],
+            StatusCodes.Status403Forbidden);
       }
+
+      // Check if we need to restore a coupon (for CANCELLED or FAILED status)
+      bool shouldRestoreCoupon = (request.Status == OrderStatus.CANCELLED ||
+                                 request.Status == OrderStatus.FAILED) &&
+                                 order.CouponId.HasValue &&
+                                 order.Status != OrderStatus.CANCELLED &&
+                                 order.Status != OrderStatus.FAILED;
 
       order.Status = request.Status;
       order.LastModified = DateTime.UtcNow;
@@ -681,12 +695,23 @@ public class OrderService : IOrderService
       if (request.Status == OrderStatus.CANCELLED)
       {
         var ghnOrderResult =
-          await _ghnService.ChangeShippingOrderStatus(
-            new SwitchShippingOrdersStatusRequest { OrderCodes = [order.TrackingNumber] }, "cancel");
+            await _ghnService.ChangeShippingOrderStatus(
+                new SwitchShippingOrdersStatusRequest { OrderCodes = [order.TrackingNumber] }, "cancel");
         if (ghnOrderResult.IsFailure)
         {
           return Result<OrderResponse>.Failure(ghnOrderResult.Errors, ghnOrderResult.Status);
         }
+
+        // Restore coupon if order is being cancelled and had a coupon
+        if (shouldRestoreCoupon)
+        {
+          await RestoreCouponToUser(order.CustomerId, order.CouponId.Value);
+        }
+      }
+      else if (request.Status == OrderStatus.FAILED && shouldRestoreCoupon)
+      {
+        // Restore coupon if order is marked as payment failed and had a coupon
+        await RestoreCouponToUser(order.CustomerId, order.CouponId.Value);
       }
 
       _unitOfWork.Orders.Update(order);
@@ -695,20 +720,46 @@ public class OrderService : IOrderService
       if (!saved)
       {
         return Result<OrderResponse>.Failure(
-          [new Error("Order.Update", "Failed to update order")],
-          StatusCodes.Status500InternalServerError);
+            [new Error("Order.Update", "Failed to update order")],
+            StatusCodes.Status500InternalServerError);
       }
 
       return Result<OrderResponse>.Success(
-        MapToOrderResponse(order),
-        StatusCodes.Status200OK);
+          MapToOrderResponse(order),
+          StatusCodes.Status200OK);
     }
     catch (Exception ex)
     {
       return Result<OrderResponse>.Failure(
-        [new Error("Order.Update", ex.Message)],
-        StatusCodes.Status500InternalServerError);
+          [new Error("Order.Update", ex.Message)],
+          StatusCodes.Status500InternalServerError);
     }
+  }
+
+  // Add a helper method to restore coupons
+  private async Task RestoreCouponToUser(Guid userId, Guid couponId)
+  {
+    var userCoupon = await _unitOfWork.UserCoupons.GetByIdAsync(userId, couponId);
+
+    if (userCoupon != null)
+    {
+      // Increment the quantity to restore the coupon
+      userCoupon.Quantity++;
+      _unitOfWork.UserCoupons.Update(userCoupon);
+    }
+    else
+    {
+      // If the user coupon record doesn't exist, create a new one
+      var newUserCoupon = new UserCoupon
+      {
+        UserId = userId,
+        CouponId = couponId,
+        Quantity = 1
+      };
+      _unitOfWork.UserCoupons.Create(newUserCoupon);
+    }
+
+    // Note: We don't call CompleteAsync() here because it will be called in the parent method
   }
 
   // 6. Delete Order (Admin)
