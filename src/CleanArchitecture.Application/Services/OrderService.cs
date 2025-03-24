@@ -909,7 +909,7 @@ public class OrderService : IOrderService
 
   private void AddPointToCustomer(decimal orderPrice, User customer)
   {
-    customer.Point += Math.Round(orderPrice / 100000);
+    customer.Point += Math.Round(orderPrice / 10000);
   }
 }
 
