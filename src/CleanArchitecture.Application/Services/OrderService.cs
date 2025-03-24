@@ -182,9 +182,6 @@ public class OrderService : IOrderService
 
       // Handle payment method specific logic
       await HandlePaymentMethod(request.PaymentMethod, order, orderResponse);
-
-      // Add point to user
-      AddPointToCustomer(order.TotalPrice, customer);
       
       // Save order to database
       _unitOfWork.Orders.Create(order);
@@ -319,7 +316,6 @@ public class OrderService : IOrderService
       }
     }
     
-    AddPointToCustomer(totalPrice, customer);
 
     var order = new Order()
     {
@@ -574,7 +570,8 @@ public class OrderService : IOrderService
           Date = _timeZoneService.ConvertToLocalTime(DateTime.UtcNow),
           TransactionId = paymentData.TransactionId // from VNPay return data
         };
-
+        //Add points to user account
+        AddPointToCustomer(order.TotalPrice, order.Customer);
         // Save payment record using your PaymentRepository
         _unitOfWork.Payments.Create(payment);
 
@@ -912,7 +909,7 @@ public class OrderService : IOrderService
 
   private void AddPointToCustomer(decimal orderPrice, User customer)
   {
-    customer.Point += orderPrice / 100;
+    customer.Point += Math.Round(orderPrice / 100000);
   }
 }
 
