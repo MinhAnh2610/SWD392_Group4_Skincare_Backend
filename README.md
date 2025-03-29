@@ -5,15 +5,29 @@
 
 
 ## Table of Contents
+- [Table of Contents](#table-of-contents)
 - [Project Overview](#project-overview)
 - [System Architecture](#system-architecture)
   - [System Context](#system-context)
 - [Features](#features)
+  - [Authentication and User Management](#authentication-and-user-management)
+  - [Product Catalog](#product-catalog)
+  - [Skin Quiz](#skin-quiz)
+  - [Order Processing](#order-processing)
+  - [Inventory Management](#inventory-management)
+  - [Sales and Reporting](#sales-and-reporting)
+  - [Promotions](#promotions)
+  - [Content Management](#content-management)
+  - [Customer Support](#customer-support)
 - [Technology Stack](#technology-stack)
 - [Setup Guide](#setup-guide)
   - [System Requirements](#system-requirements)
   - [Docker Setup](#docker-setup)
+    - [Prerequisites](#prerequisites)
+    - [Instructions](#instructions)
   - [Traditional Setup](#traditional-setup)
+    - [Prerequisites](#prerequisites-1)
+    - [Instructions](#instructions-1)
 - [Database Management](#database-management)
   - [Using DBeaver](#using-dbeaver)
 - [Troubleshooting](#troubleshooting)
@@ -21,6 +35,16 @@
 - [External Integrations](#external-integrations)
 - [Team](#team)
 - [CI/CD](#cicd)
+- [Guide to initialize Development Environment using Docker](#guide-to-initialize-development-environment-using-docker)
+  - [Prerequisites](#prerequisites-2)
+      - [dbcon.env](#dbconenv)
+  - [Instructions:](#instructions-2)
+- [Guide to update database](#guide-to-update-database)
+  - [Prerequisites](#prerequisites-3)
+  - [Instructions:](#instructions-3)
+- [Guide to access Database on DBeaver](#guide-to-access-database-on-dbeaver)
+  - [Prerequisites](#prerequisites-4)
+- [Instructions:](#instructions-4)
 
 ## Project Overview
 
@@ -238,13 +262,13 @@ graph TD
 - **Database Engineer:** [Name]
 - **DevOps Engineer:** [Name]
 
-# CI/CD
+## CI/CD
 https://jenkins.pak160404.click/job/SWD_SkinCare/
 
 Backend for a Skincare System
 
-# Guide to initialize Development Environment using Docker
-## Prerequisites
+## Guide to initialize Development Environment using Docker
+### Prerequisites
 - Docker is installed
 - Create a .env folder, then create a dbcon.env at the root of your project solution ( on the same level of the docker compose)
 ##### dbcon.env
@@ -252,26 +276,26 @@ Backend for a Skincare System
 databaseConnectionString=Server=skincare.db;Database=skincare;User Id=admin;Password=secret;
 ```
 
-## Instructions:
--  ### Step 0: 
+### Instructions:
+-  #### Step 0: 
  - Disable the current PostgreSQL service in services.msc.
-- ### Step 1:
+- #### Step 1:
  - Run `docker-compose up`, this will create two services (Web API and Database).
-- ### Step 2:
+- #### Step 2:
  - Web API should be accessible at http://localhost:8080/swagger/index.html
  
-# Guide to update database
-## Prerequisites
+## Guide to update database
+### Prerequisites
 - Database container is running.
-## Instructions:
-- ### Step 1:
+### Instructions:
+- #### Step 1:
  - Open terminal and run:
  ```
 dotnet ef database update --startup-project ./src/CleanArchitecture.Presentation/CleanArchitecture.Presentation.csproj --project ./src/CleanArchitecture.Infrastructure/CleanArchitecture.Infrastructure.csproj --connection "Server=localhost;Database=skincare;Port=5432;User Id=admin;Password=secret;"
 ```
 
-# Guide to access Database on DBeaver
-## Prerequisites
+## Guide to access Database on DBeaver
+### Prerequisites
 - Database container is running.
 - DBeaver is installed.
 ## Instructions:
