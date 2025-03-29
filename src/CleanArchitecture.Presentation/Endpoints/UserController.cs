@@ -1,5 +1,7 @@
-﻿using CleanArchitecture.Application.DTOs.User;
+﻿using CleanArchitecture.Application.DTOs.UserCouponDto;
+using CleanArchitecture.Application.DTOs.UserDto;
 using CleanArchitecture.Application.Enums;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CleanArchitecture.Presentation.Endpoints;
 
@@ -10,12 +12,12 @@ public class UserController : ICarterModule
     var group = app.MapGroup("api/user").WithTags("User Management");
 
     #region User Profile API
-    group.MapGet("/profile", async (IUserService userService) =>
+    group.MapGet("/me", async (IUserService userService) =>
     {
       var result = await userService.GetUserProfile();
       if (result.IsSuccess)
       {
-        return Results.Ok(ApiResponse<UserProfileResponse>.SuccessResponse(result.Data!, "Retrieve User Profile Successfully."));
+        return Results.Ok(ApiResponse<UserProfileResponse>.SuccessResponse(result.Data!, "Retrieved User Profile Successfully."));
       }
 
       return result.Status switch
@@ -23,22 +25,48 @@ public class UserController : ICarterModule
         _ => Results.StatusCode(StatusCodes.Status500InternalServerError)
       };
     })
-    .WithName("UserProfile")
-    .Produces<ApiResponse<UserProfileResponse>>(StatusCodes.Status200OK)
+  .WithName("GetCurrentUserProfile")
+  .Produces<ApiResponse<UserProfileResponse>>(StatusCodes.Status200OK)
+  .ProducesProblem(StatusCodes.Status401Unauthorized)
+  .ProducesProblem(StatusCodes.Status500InternalServerError)
+  .WithSummary("GetCurrentUserProfile")
+  .WithDescription("Get Current User Profile")
+  .RequireAuthorization();
+    #endregion
+
+    #region Get All Users API
+    group.MapGet("/", async (IUserService userService) =>
+    {
+      var result = await userService.GetAllUsers();
+      if (result.IsSuccess)
+      {
+        return Results.Ok(ApiResponse<List<UserProfileResponse>>.SuccessResponse(result.Data!, "Retrieve All User's Profile Successfully."));
+      }
+
+      return result.Status switch
+      {
+        _ => Results.StatusCode(StatusCodes.Status500InternalServerError)
+      };
+    })
+    .WithName("GetAllUsers")
+    .Produces<ApiResponse<List<UserProfileResponse>>>(StatusCodes.Status200OK)
     .ProducesProblem(StatusCodes.Status401Unauthorized)
     .ProducesProblem(StatusCodes.Status500InternalServerError)
-    .WithSummary("UserProfile")
-    .WithDescription("Get User Profile")
-    .RequireAuthorization();
+    .WithSummary("GetAllUsers")
+    .WithDescription("Get All Users")
+    .RequireAuthorization(new AuthorizeAttribute
+    {
+      Roles = "Manager, Staff"
+    });
     #endregion
 
     #region Update User Profile API
-    group.MapPut("/profile", async (IUserService userService, UpdateProfileRequest request) =>
+    group.MapPut("/me", async (IUserService userService, UpdateProfileRequest request) =>
     {
       var result = await userService.UpdateUserProfileAsync(request);
       if (result.IsSuccess)
       {
-        Results.Ok(ApiResponse<UserProfileResponse>.SuccessResponse(result.Data!, "Update User Profile Successfully."));
+        return Results.Ok(ApiResponse<UserProfileResponse>.SuccessResponse(result.Data!, "Updated User Profile Successfully."));
       }
 
       return result.Status switch
@@ -50,21 +78,22 @@ public class UserController : ICarterModule
         _ => Results.StatusCode(StatusCodes.Status500InternalServerError)
       };
     })
-    .WithName("UpdateProfile")
-    .Produces<ApiResponse<UserProfileResponse>>(StatusCodes.Status200OK)
-    .ProducesProblem(StatusCodes.Status400BadRequest)
-    .ProducesProblem(StatusCodes.Status401Unauthorized)
-    .ProducesProblem(StatusCodes.Status404NotFound)
-    .ProducesProblem(StatusCodes.Status409Conflict)
-    .ProducesProblem(StatusCodes.Status500InternalServerError)
-    .WithSummary("UpdateProfile")
-    .WithDescription("Update User Profile")
-    .RequireAuthorization();
+  .WithName("UpdateCurrentUserProfile")
+  .Produces<ApiResponse<UserProfileResponse>>(StatusCodes.Status200OK)
+  .ProducesProblem(StatusCodes.Status400BadRequest)
+  .ProducesProblem(StatusCodes.Status401Unauthorized)
+  .ProducesProblem(StatusCodes.Status404NotFound)
+  .ProducesProblem(StatusCodes.Status409Conflict)
+  .ProducesProblem(StatusCodes.Status500InternalServerError)
+  .WithSummary("UpdateCurrentUserProfile")
+  .WithDescription("Update Current User Profile")
+  .RequireAuthorization();
     #endregion
 
     #region Enable User API
     group.MapPut("/enable", async (IUserService userService, UserRequest request) =>
     {
+     
       var result = await userService.EnableUserAsync(request);
       if (result.IsSuccess)
       {
@@ -87,7 +116,7 @@ public class UserController : ICarterModule
     .WithDescription("Enable User Account")
     .RequireAuthorization(new AuthorizeAttribute
     {
-      Roles = Roles.Admin,
+      Roles = Roles.Manager,
     });
     #endregion
 
@@ -116,8 +145,53 @@ public class UserController : ICarterModule
     .WithDescription("Disable User Account")
     .RequireAuthorization(new AuthorizeAttribute
     {
-      Roles = Roles.Admin,
+      Roles = Roles.Manager,
     });
+    #endregion
+
+    #region Create Walk In User API
+    group.MapPost("/walkin", async (IUserService userService, [FromBody] CreateWalkInUserRequest request) =>
+    {
+      var result = await userService.CreateWalkInUser(request);
+
+      return result.Match(Message.SUCCESSFUL_CREATED(nameof(result)));
+    })
+    .WithName("CreateWalkInUser")
+    .Produces<ApiResponse<UserProfileResponse>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status401Unauthorized)
+    .ProducesProblem(StatusCodes.Status500InternalServerError)
+    .WithSummary("CreateWalkInUser")
+    .WithDescription("Create Walk In User")
+    .RequireAuthorization(new AuthorizeAttribute
+    {
+      Roles = "Staff, Manager"
+    });
+    #endregion
+    // Add this endpoint to your UserController class
+    #region Get User Coupons API
+    group.MapGet("/coupons", async (IUserService userService) =>
+    {
+      var result = await userService.GetUserCouponsAsync();
+      if (result.IsSuccess)
+      {
+        return Results.Ok(ApiResponse<List<UserCouponResponse>>.SuccessResponse(result.Data!, "Retrieved User Coupons Successfully."));
+      }
+
+      return result.Status switch
+      {
+        StatusCodes.Status401Unauthorized => Results.Unauthorized(),
+        StatusCodes.Status404NotFound => Results.NotFound(ApiResponse<List<UserCouponResponse>>.FailureResponse(result.Errors, "User not found.")),
+        _ => Results.StatusCode(StatusCodes.Status500InternalServerError)
+      };
+    })
+    .WithName("GetUserCoupons")
+    .Produces<ApiResponse<List<UserCouponResponse>>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status401Unauthorized)
+    .ProducesProblem(StatusCodes.Status404NotFound)
+    .ProducesProblem(StatusCodes.Status500InternalServerError)
+    .WithSummary("GetUserCoupons")
+    .WithDescription("Get Current User's Coupons")
+    .RequireAuthorization();
     #endregion
   }
 }

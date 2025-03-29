@@ -142,7 +142,7 @@ public class AuthController : ICarterModule
     #region External Login API
     group.MapGet("/external-login", ([FromQuery] string provider) =>
     {
-      var redirectUrl = "https://localhost:5051/api/auth";
+      var redirectUrl = "https://api.pak160404.click/api/auth";
       switch (provider)
       {
         case "Google":
@@ -186,7 +186,13 @@ public class AuthController : ICarterModule
       await httpContext.SignInAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme, principal);
 
       return Results.Ok("Hey");
-    });
+    })
+    .WithName("GoogleSignIn")
+    .Produces<ApiResponse<string>>(StatusCodes.Status200OK)
+    .ProducesProblem(StatusCodes.Status400BadRequest)
+    .ProducesProblem(StatusCodes.Status500InternalServerError)
+    .WithSummary("GoogleSignIn")
+    .WithDescription("Enter Your Credentials To Sign In With Google");
     #endregion
   }
 }

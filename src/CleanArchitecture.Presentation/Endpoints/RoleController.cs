@@ -1,5 +1,5 @@
-﻿using CleanArchitecture.Application.DTOs.Role;
-using CleanArchitecture.Application.DTOs.User;
+﻿using CleanArchitecture.Application.DTOs.RoleDto;
+using CleanArchitecture.Application.DTOs.UserDto;
 using CleanArchitecture.Application.Enums;
 
 namespace CleanArchitecture.Presentation.Endpoints;
@@ -35,7 +35,7 @@ public class RoleController : ICarterModule
     .WithDescription("Assign User To Roles")
     .RequireAuthorization(new AuthorizeAttribute
     {
-      Roles = Roles.Admin
+      Roles = Roles.Manager
     });
     #endregion
   }

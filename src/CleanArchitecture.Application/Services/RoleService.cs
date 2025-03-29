@@ -1,6 +1,5 @@
-﻿using CleanArchitecture.Application.DTOs.Role;
-using CleanArchitecture.Application.DTOs.User;
-using CleanArchitecture.Application.ServiceContracts;
+﻿using CleanArchitecture.Application.DTOs.RoleDto;
+using CleanArchitecture.Application.DTOs.UserDto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 
@@ -54,7 +53,7 @@ public class RoleService : IRoleService
     var resultErrors = result.Errors.Select(e => new Error(e.Code, e.Description)).ToList();
     var userProfile = new UserProfileResponse
     {
-      Id = user.Id,
+      Id = user.Id.ToString(),
       UserName = user.UserName!,
       Email = user.Email!,
       BirthDate = user.BirthDate,

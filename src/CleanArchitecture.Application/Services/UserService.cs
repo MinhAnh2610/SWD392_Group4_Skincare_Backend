@@ -1,7 +1,11 @@
-﻿using CleanArchitecture.Application.DTOs.User;
-using CleanArchitecture.Application.ServiceContracts;
-using FluentValidation;
-using IdentityModel;
+﻿using Azure.Core;
+using CleanArchitecture.Application.Common;
+using CleanArchitecture.Application.DTOs.CouponDTO;
+using CleanArchitecture.Application.DTOs.SkinTypeDto;
+using CleanArchitecture.Application.DTOs.UserCouponDto;
+using CleanArchitecture.Application.DTOs.UserDto;
+using CleanArchitecture.Application.Enums;
+using CleanArchitecture.Domain.RepositoryContracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
@@ -14,16 +18,61 @@ public class UserService : IUserService
   private readonly UserManager<User> _userManager;
   private readonly IValidator<UpdateProfileRequest> _updateProfileValidator;
   private readonly IValidator<UserRequest> _userValidator;
+  private readonly IValidator<CreateWalkInUserRequest> _createWalkInUserRequest;
+  private readonly IUnitOfWork _unitOfWork;
 
   public UserService(IHttpContextAccessor httpContextAccessor,
                      UserManager<User> userManager,
                      IValidator<UpdateProfileRequest> updateProfileValidator,
-                     IValidator<UserRequest> userValidator)
+                     IValidator<UserRequest> userValidator,
+                     IValidator<CreateWalkInUserRequest> createWalkInUserRequest,
+                     IUnitOfWork unitOfWork)
   {
     _httpContextAccessor = httpContextAccessor;
     _userManager = userManager;
     _updateProfileValidator = updateProfileValidator;
     _userValidator = userValidator;
+    _createWalkInUserRequest = createWalkInUserRequest;
+    _unitOfWork = unitOfWork;
+  }
+
+  public async Task<Result<UserProfileResponse>> CreateWalkInUser(CreateWalkInUserRequest request)
+  {
+    var validationResult = await _createWalkInUserRequest.ValidateAsync(request);
+    if (!validationResult.IsValid)
+    {
+      throw new ValidationException(validationResult.Errors);
+    }
+
+    if (await _userManager.FindByNameAsync(request.UserName!) != null)
+    {
+      return Result<UserProfileResponse>.Failure([AuthErrors.DuplicateUserName], StatusCodes.Status409Conflict);
+    }
+    if (await _unitOfWork.Users.GetByPhoneNumberAsync(request.PhoneNumber) != null)
+    {
+      return Result<UserProfileResponse>.Failure([AuthErrors.DuplicatePhoneNumber], StatusCodes.Status409Conflict);
+    }
+
+    var user = new User
+    {
+      UserName = request.UserName,
+      PhoneNumber = request.PhoneNumber
+    };
+
+    var result = await _userManager.CreateAsync(user, request.PhoneNumber);
+    if (!result.Succeeded)
+    {
+      var errors = result.Errors.Select(e => new Error(e.Code, e.Description)).ToList();
+      return Result<UserProfileResponse>.Failure(errors, StatusCodes.Status500InternalServerError);
+    }
+    var roleResult = await _userManager.AddToRolesAsync(user, [Roles.Customer]);
+    if (!roleResult.Succeeded)
+    {
+      var errors = roleResult.Errors.Select(e => new Error(e.Code, e.Description)).ToList();
+      return Result<UserProfileResponse>.Failure(errors, StatusCodes.Status500InternalServerError);
+    }
+    await _unitOfWork.CompleteAsync();
+    return Result<UserProfileResponse>.Success(default!, StatusCodes.Status200OK);
   }
 
   public async Task<Result<string>> DisableUserAsync(UserRequest request)
@@ -77,6 +126,83 @@ public class UserService : IUserService
       : Result<string>.Failure(resultErrors, StatusCodes.Status400BadRequest);
   }
 
+  public async Task<Result<List<UserProfileResponse>>> GetAllUsers()
+  {
+    var users = await _userManager.Users.ToListAsync();
+
+    var userResponses = new List<UserProfileResponse>();
+
+    foreach (var user in users)
+    {
+      var roles = await _userManager.GetRolesAsync(user);
+
+      userResponses.Add(new UserProfileResponse
+      {
+        Id = user.Id.ToString(),
+        UserName = user.UserName,
+        Email = user.Email,
+        PhoneNumber = user.PhoneNumber,
+        BirthDate = (user.BirthDate == null) ? default : DateOnly.Parse(user.BirthDate.ToString()!),
+        FirstName = user.FirstName,
+        LastName = user.LastName,
+        Gender = Boolean.Parse(user.Gender.ToString()),
+        Roles = roles.ToList()
+      });
+    }
+
+    return Result<List<UserProfileResponse>>.Success(userResponses, StatusCodes.Status200OK);
+  }
+
+  public async Task<Result<List<UserCouponResponse>>> GetUserCouponsAsync()
+  {
+    var user = _httpContextAccessor.HttpContext?.User;
+    if (user == null || !user.Identity!.IsAuthenticated)
+    {
+      return Result<List<UserCouponResponse>>.Failure([UserErrors.UnauthorizedUser], StatusCodes.Status401Unauthorized);
+    }
+
+    var id = user.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+    var userInfo = await _userManager.FindByIdAsync(id);
+
+    if (userInfo == null)
+    {
+      return Result<List<UserCouponResponse>>.Failure([AuthErrors.UserNotFound], StatusCodes.Status404NotFound);
+    }
+
+    var userCoupons = await _unitOfWork.UserCoupons.GetUserCouponsAsync(userInfo);
+
+    // Load the coupon details for each user coupon
+    var userCouponResponses = new List<UserCouponResponse>();
+    foreach (var userCoupon in userCoupons)
+    {
+      var coupon = await _unitOfWork.Coupons.GetByIdAsync(userCoupon.CouponId);
+      if (coupon != null)
+      {
+        userCouponResponses.Add(new UserCouponResponse
+        {
+          UserId = userCoupon.UserId,
+          CouponId = userCoupon.CouponId,
+          Quantity = userCoupon.Quantity,
+          Coupon = new CouponResponse
+          {
+            Id = coupon.Id,
+            Name = coupon.Name,
+            Code = coupon.Code,
+            Discount = coupon.DiscountAmount,
+            StartDate = coupon.StartDate,
+            ExpiryDate = coupon.EndDate,
+            UsageLimit = coupon.UsageLimit,
+            MaxDiscountAmount = coupon.MaxDiscountAmount,
+            MinimumOrderPrice = coupon.MinimumOrderPrice,
+            PointRequired = coupon.PointRequired
+          }
+        });
+      }
+    }
+
+    return Result<List<UserCouponResponse>>.Success(userCouponResponses, StatusCodes.Status200OK);
+  }
+
   public async Task<Result<UserProfileResponse>> GetUserProfile()
   {
     var user = _httpContextAccessor.HttpContext?.User;
@@ -86,26 +212,46 @@ public class UserService : IUserService
     }
 
     var id = user.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-    var userName = user.FindFirst(JwtClaimTypes.Name)!.Value;
-    var email = user.FindFirst(ClaimTypes.Email)!.Value;
-    var phoneNumber = user.FindFirst(JwtClaimTypes.PhoneNumber)?.Value;
-    var birthDate = user.FindFirst(ClaimTypes.DateOfBirth)?.Value;
-    var firstName = user.FindFirst(ClaimTypes.Surname)?.Value;
-    var lastname = user.FindFirst(ClaimTypes.GivenName)?.Value;
-    var gender = user.FindFirst(ClaimTypes.Gender)!.Value;
-    var roles = user.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
+    //var userName = user.FindFirst(JwtClaimTypes.Name)!.Value;
+    //var email = user.FindFirst(ClaimTypes.Email)!.Value;
+    //var phoneNumber = user.FindFirst(JwtClaimTypes.PhoneNumber)?.Value;
+    //var birthDate = user.FindFirst(ClaimTypes.DateOfBirth)?.Value;
+    //var firstName = user.FindFirst(ClaimTypes.Surname)?.Value;
+    //var lastname = user.FindFirst(ClaimTypes.GivenName)?.Value;
+    //var gender = user.FindFirst(ClaimTypes.Gender)!.Value;
+    //var roles = user.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
+
+    var userInfo = await _userManager.FindByIdAsync(id);
+    var userRoles = await _userManager.GetRolesAsync(userInfo!);
+    var userSkinType = new SkinType();
+    if (userInfo!.SkinTypeId != null)
+    {
+      userSkinType = await _unitOfWork.SkinTypes.GetByIdAsync((Guid)userInfo.SkinTypeId);
+    }
 
     return Result<UserProfileResponse>.Success(new UserProfileResponse
     {
       Id = id,
-      UserName = userName,
-      Email = email,
-      PhoneNumber = phoneNumber,
-      BirthDate = (birthDate == null) ? default : DateOnly.Parse(birthDate!),
-      FirstName = firstName,
-      LastName = lastname,
-      Gender = Boolean.Parse(gender),
-      Roles = roles
+      UserName = userInfo!.UserName,
+      Email = userInfo.Email,
+      PhoneNumber = userInfo.PhoneNumber,
+      BirthDate = (userInfo.BirthDate == null) ? default : userInfo.BirthDate,
+      FirstName = userInfo.FirstName,
+      LastName = userInfo.LastName,
+      Gender = userInfo.Gender,
+      Roles = userRoles.ToList(),
+      SkinTypeId = userInfo.SkinTypeId.ToString(),
+      SkinType = new SkinTypeResponse
+      {
+        Id = userInfo.Id,
+        Description = userSkinType.Description,
+        Name = userSkinType.Name,
+        IsDry = userSkinType.IsDry,
+        IsSensitive = userSkinType.IsSensitive,
+        IsUneven = userSkinType.IsUneven,
+        IsWrinkle = userSkinType.IsWrinkle
+      },
+      Point = userInfo.Point,
     }, StatusCodes.Status200OK);
   }
 

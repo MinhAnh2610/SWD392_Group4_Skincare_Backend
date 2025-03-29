@@ -1,0 +1,25 @@
+﻿using CleanArchitecture.Domain.RepositoryContracts;
+
+namespace CleanArchitecture.Infrastructure.Repositories;
+
+public class FeedbackRepository : GenericRepository<Feedback>, IFeedbackRepository
+{
+  public FeedbackRepository(ApplicationDbContext context) : base(context)
+  {
+  }
+
+  public override async Task<List<Feedback>> GetAllAsync()
+  {
+    return await _context.Feedbacks
+      .Include(f => f.Cosmetic)
+      .Include(f => f.Customer)
+      .ToListAsync();
+  }
+
+  public async Task<List<Feedback>> GetFeedbacksByCustomerIdAsync(Guid customerId)
+  {
+    return await _context.Set<Feedback>()
+      .Where(f => f.CustomerId == customerId)
+      .ToListAsync();
+  }
+}
